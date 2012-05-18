@@ -41,6 +41,7 @@ function ponychanx()
 	var QR = {
 		init: function() {
 			QR.addhandles();
+			QR.keybinds();
 			if (Settings.get("x.show")=="true") QR.show();
 		},
 		quote: function(h) {
@@ -147,7 +148,11 @@ function ponychanx()
 		},
 		thumb: function() {
 			var f = document.getElementById("imgfile").files[0];
-			if (f == null) return;
+			if (f == null) {
+				$jq("#imagelist").html("").css("display", "none");
+				$jq("#qr").css("height", "230px");
+				return;
+			}
 			url = window.URL || window.webkitURL;
 			fU = url.createObjectURL(f);
 			document.getElementById("imagelist").style.backgroundImage = "url(" + fU + ")";
@@ -170,6 +175,21 @@ function ponychanx()
 		storefields: function() {
 			Settings.set("x.name", $jq("#qr :input[name='name']").val());
 			Settings.set("x.email", $jq("#qr :input[name='em']").val());
+		},
+		keybinds: function() {
+			var isCtrl = false;
+			$jq(document).keyup(function (e) {
+				if(e.which == 17) isCtrl=false;
+			}).keydown(function (e) {
+				if(e.which == 17) isCtrl=true;
+				if(e.which == 83 && isCtrl == true) {
+					var v = $jq("#qr textarea").val();
+					$jq("#qr textarea").val(v + "[?][/?]");
+					var vv = $jq("#qr textarea").val().length-4;
+					document.getElementById("msg").setSelectionRange(vv,vv);
+					return false;
+				}
+			});
 		}
 	};
 	
