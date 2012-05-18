@@ -29,6 +29,7 @@ function ponychanx()
 	Updater = {
 		init: function() {
 			Updater.listen();
+			Updater.get();
 		},
 		listen: function() {
 			// just use ponyup's autoupdate for now...
@@ -38,6 +39,30 @@ function ponychanx()
 					Notifier.newhandle(e.target);
 				}
 			}, true);
+		},
+		get: function() {
+			var d = new Date();
+			var dd = d.getTime()-10000;
+			d.setTime(dd);
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", document.URL);
+			xhr.setRequestHeader("If-Modified-Since", d.toUTCString());
+			xhr.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, */*");
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200) {
+						var l = $jq($jq("table:not(.postform):not(.userdelete) tbody tr td.reply[id] a[name]").get().reverse())[0].name;
+						var f = false;
+						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
+							if (f) $jq(".thread").append(this);
+							if ($jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
+								f = true;
+						});
+					}
+					setTimeout(function() { Updater.get(); }, 10000);
+				}
+			}
 		}
 	};
 	
