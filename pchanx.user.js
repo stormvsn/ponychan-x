@@ -4,8 +4,9 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*/res/*
-// @version       0.1
+// @version       0.2
 // @icon          http://i.imgur.com/12a0D.jpg
+// @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // ==/UserScript==
 
 function ponychanx()
@@ -21,6 +22,7 @@ function ponychanx()
 			Html.init();
 			Css.init();
 			Updater.init();
+			Notifier.init();
 		},
 	};
 	
@@ -33,6 +35,7 @@ function ponychanx()
 			document.body.addEventListener('DOMNodeInserted', function(e) {
 				if(e.target.nodeName=='TABLE') {
 					QR.newhandle(e.target);
+					Notifier.newhandle(e.target);
 				}
 			}, true);
 		}
@@ -179,9 +182,9 @@ function ponychanx()
 		keybinds: function() {
 			var isCtrl = false;
 			$jq(document).keyup(function (e) {
-				if(e.which == 17) isCtrl=false;
+				if(e.which == 17) isCtrl = false;
 			}).keydown(function (e) {
-				if(e.which == 17) isCtrl=true;
+				if(e.which == 17) isCtrl = true;
 				if(e.which == 83 && isCtrl == true) {
 					var v = $jq("#qr textarea").val();
 					$jq("#qr textarea").val(v + "[?][/?]");
@@ -204,6 +207,30 @@ function ponychanx()
 		}
 	};
 	
+	var Notifier = {
+		_new: 0,
+		title: document.title,
+		_focus: true,
+		init: function() {
+			$jq(window).bind("focus", function() {
+				Notifier._new = 0;
+				Notifier._focus = true;
+				setTimeout(function() {
+					document.title = ".";
+					document.title = Notifier.title;
+				}, 1000);
+			});
+			$jq(window).bind("blur", function() {
+				Notifier._focus = false;
+			});
+		},
+		newhandle: function(e) {
+			if (Notifier._focus) return;
+			++Notifier._new;
+			document.title = Notifier.title + " ("+Notifier._new+")";
+		}
+	}
+	
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
@@ -220,7 +247,6 @@ function ponychanx()
 			return localStorage.getItem(n);
 		}
 	};
-	
 	
 	$jq(document).ready(function() {
 		Main.init();
