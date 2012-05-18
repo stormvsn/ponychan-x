@@ -20,7 +20,22 @@ function ponychanx()
 			QR.init();
 			Html.init();
 			Css.init();
+			Updater.init();
 		},
+	};
+	
+	Updater = {
+		init: function() {
+			Updater.listen();
+		},
+		listen: function() {
+			// just use ponyup's autoupdate for now...
+			document.body.addEventListener('DOMNodeInserted', function(e) {
+				if(e.target.nodeName=='TABLE') {
+					QR.newhandle(e.target);
+				}
+			}, true);
+		}
 	};
 	
 	var QR = {
@@ -124,6 +139,11 @@ function ponychanx()
 				$jq(this).attr("href", "javascript:;").removeAttr("onclick");
 				$jq(this).on("click", function() { QR.quote(this.innerHTML); return false; } );
 			});
+		},
+		newhandle: function(t) {
+			var h = $jq(".reflink a:odd", t);
+			$jq(h).attr("href", "javascript:;").removeAttr("onclick");
+			$jq(h).on("click", function() { QR.quote(this.innerHTML); return false; } );
 		},
 		thumb: function() {
 			var f = document.getElementById("imgfile").files[0];
