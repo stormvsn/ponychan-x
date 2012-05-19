@@ -23,22 +23,13 @@ function ponychanx()
 			Css.init();
 			Updater.init();
 			Notifier.init();
+			Posts.init();
 		},
 	};
 	
 	Updater = {
 		init: function() {
-			Updater.listen();
 			Updater.get();
-		},
-		listen: function() {
-			// just use ponyup's autoupdate for now...
-			document.body.addEventListener('DOMNodeInserted', function(e) {
-				if(e.target.nodeName=='TABLE') {
-					QR.newhandle(e.target);
-					Notifier.newhandle(e.target);
-				}
-			}, true);
 		},
 		get: function() {
 			var d = new Date();
@@ -55,7 +46,11 @@ function ponychanx()
 						var l = $jq($jq("table:not(.postform):not(.userdelete) tbody tr td.reply[id] a[name]").get().reverse())[0].name;
 						var f = false;
 						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
-							if (f) $jq(".thread").append(this);
+							if (f) {
+								$jq(".thread").append(this);
+								Posts.newhandle(this);
+								Notifier.newhandle(this);
+							}
 							if ($jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
 								f = true;
 						});
@@ -68,7 +63,6 @@ function ponychanx()
 	
 	var QR = {
 		init: function() {
-			QR.addhandles();
 			QR.keybinds();
 			if (Settings.get("x.show")=="true") QR.show();
 		},
@@ -163,17 +157,6 @@ function ponychanx()
 			$jq("#qr :input[type='file']").val("");
 			$jq("#qr > input[type='button']").val("Reply");
 		},
-		addhandles: function() {
-			$jq(".reflink a:odd").each(function() {
-				$jq(this).attr("href", "javascript:;").removeAttr("onclick");
-				$jq(this).on("click", function() { QR.quote(this.innerHTML); return false; } );
-			});
-		},
-		newhandle: function(t) {
-			var h = $jq(".reflink a:odd", t);
-			$jq(h).attr("href", "javascript:;").removeAttr("onclick");
-			$jq(h).on("click", function() { QR.quote(this.innerHTML); return false; } );
-		},
 		thumb: function() {
 			var f = document.getElementById("imgfile").files[0];
 			if (f == null) {
@@ -220,6 +203,32 @@ function ponychanx()
 			});
 		}
 	};
+	
+	var Posts = {
+		init: function() {
+			Posts.addhandles();
+		},
+		addhandles: function() {
+			$jq(".reflink a:odd").each(function() {
+				$jq(this).attr("href", "javascript:;").removeAttr("onclick");
+				$jq(this).on("click", function() { QR.quote(this.innerHTML); return false; } );
+			});
+		},
+		newhandle: function(t) {
+			var h = $jq(".reflink a:odd", t);
+			$jq(h).attr("href", "javascript:;").removeAttr("onclick");
+			$jq(h).on("click", function() { QR.quote(this.innerHTML); return false; } );
+			Posts.update(t);
+		},
+		update: function(t) {
+			$jq("blockquote a[class]", t).each(function() {
+				if (this.className.substr(0, 4) == "ref|") {
+					this.addEventListener("mouseover", addreflinkpreview, false);
+					this.addEventListener("mouseout", delreflinkpreview, false);
+				}
+			});
+		}
+	}
 	
 	var Html = {
 		init: function() {
