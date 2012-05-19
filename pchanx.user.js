@@ -258,21 +258,19 @@ function ponychanx()
 			});
 		},
 		newhandle: function(p) {
-			if (Settings.gets("Enable quick reply") == "true") {
-				$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
-				var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
-					var c = hp.closest("table");
-					if ($jq(hp).html() == "[ - ]") {
-						hp.html("[ + ]");
-						$jq(".reply", c).css("height", "10px").css("opacity","0.1");
-					} else {
-						hp.html("[ - ]");
-						$jq(".reply", c).css("height", "auto").css("opacity","1");
-					}
-				});
-			}
+			$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
+				var c = hp.closest("table");
+				if ($jq(hp).html() == "[ - ]") {
+					hp.html("[ + ]");
+					$jq(".reply", c).css("height", "10px").css("opacity","0.1");
+				} else {
+					hp.html("[ - ]");
+					$jq(".reply", c).css("height", "auto").css("opacity","1");
+				}
+			});
+			$jq(".doubledash", p).css("display", "block").html("").append(hp);
 			if (Settings.gets("Enable backlinks") == "true") {
-				$jq(".doubledash", p).css("display", "block").html("").append(hp);
 				$jq("blockquote a[class]", p).each(function() {
 					if (this.className.substr(0, 4) == "ref|") {
 						var to = this.innerHTML.substr(8, this.innerHTML.length);
