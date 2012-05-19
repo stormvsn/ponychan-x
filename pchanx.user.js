@@ -30,7 +30,7 @@ function ponychanx()
 	Updater = {
 		last: "",
 		init: function() {
-			Updater.get();
+			setTimeout(function() { Updater.get(); }, 15000);
 		},
 		get: function() {
 			var xhr = new XMLHttpRequest();
@@ -84,7 +84,7 @@ function ponychanx()
 			if ($jq("#qr").length) return;
 			var qr = document.createElement("div");
 			qr.setAttribute("id", "qr");
-			qr.innerHTML = '<div class="qrtop"><a href="javascript:;">X</a></div>\
+			qr.innerHTML = '<div class="qrtop"><span></span><a href="javascript:;">X</a></div>\
 			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" accesskey="n">\
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
@@ -130,7 +130,8 @@ function ponychanx()
 			var e = $jq("#qr :input[name='em']").val();
 			var s = $jq("#qr :input[name='subject']").val();
 			var m = $jq("#qr :input[name='message']").val();
-			var i = document.getElementById("imgfile").files[0];
+			var fid = parseInt($jq("#thumbselected").attr("name"));
+			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
 			d.append("board", bid);
 			d.append("replythread", tid);
@@ -146,7 +147,12 @@ function ponychanx()
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
-						QR.clear();
+						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
+							$jq(".qrtop span").html("<span>You are posting too quickly. Try again.");
+							$jq("#qr > input[type='button']").val("Retry");
+						}
+						else
+							QR.clear(fid);
 					} else {
 						$jq("#qr > input[type='button']").val("Error");
 					}
@@ -154,12 +160,21 @@ function ponychanx()
 			}
 			QR.storefields();
 		},
-		clear: function() {
-			$jq("#imagelist").html("").css("display", "none");
-			$jq("#qr").css("height", "230px");
+		clear: function(fid) {
+			$jq(".qrtop span").html("");
+			$jq(".listthumb[name='"+fid+"']").remove();
+			if ($jq("#thumbselected").length < 1) {
+				if ($jq(".listthumb").length > 0) {
+					$jq($jq(".listthumb")[0]).attr("id", "thumbselected")
+					document.getElementById("imagelist").scrollTop = 0;
+				} else {
+					$jq("#qr").css("height", "230px");
+					$jq("#imagelist").html("").css("display", "none");
+					$jq("#qr input[type='file']").val("");
+				}
+			}
 			$jq("#qr textarea").val("");
 			$jq("#qr :input[name='subject']").val("");
-			$jq("#qr :input[type='file']").val("");
 			$jq("#qr > input[type='button']").val("Reply");
 		},
 		thumb: function() {
@@ -169,6 +184,7 @@ function ponychanx()
 				$jq("#qr").css("height", "230px");
 				return;
 			}
+			$jq("#imagelist").html("");
 			var url = window.URL || window.webkitURL;
 			for (var i = 0, len = f.length; i < len; i++)
 			{
@@ -180,10 +196,10 @@ function ponychanx()
 					this.id = "thumbselected";
 				});
 				$jq(thumb).attr("class", "listthumb");
+				$jq(thumb).attr("name", i);
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")")
 			}
-			document.getElementById("imagelist").scrollTop = document.getElementById("imagelist").scrollHeight;
 			$jq("#imagelist").fadeIn("fast");
 			$jq("#qr").css("height", "308px");
 		},
@@ -304,7 +320,7 @@ function ponychanx()
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "#pxoptions { display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
+			s.innerHTML = "#pxoptions { display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
 			document.body.appendChild(s);
 		}
 	};
