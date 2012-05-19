@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*/res/*
-// @version       0.2
+// @version       0.3
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // ==/UserScript==
@@ -42,18 +42,23 @@ function ponychanx()
 			xhr.send();
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
-					if (xhr.status == 200) {
-						var l = $jq($jq("table:not(.postform):not(.userdelete) tbody tr td.reply[id] a[name]").get().reverse())[0].name;
-						var f = false;
-						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
-							if (f) {
-								$jq(".thread").append(this);
-								Posts.newhandle(this);
-								Notifier.newhandle(this);
-							}
-							if ($jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
-								f = true;
-						});
+					switch (xhr.status) {
+						case 200:
+							var l = $jq($jq("table:not(.postform):not(.userdelete) tbody tr td.reply[id] a[name]").get().reverse())[0].name;
+							var f = false;
+							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
+								if (f) {
+									$jq(".thread").append(this);
+									Posts.newhandle(this);
+									Notifier.newhandle(this);
+								}
+								if ($jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
+									f = true;
+							});
+						break;
+						case 404:
+							Notifier.settitle(Notifier.title + "(404)");
+						break;
 					}
 					setTimeout(function() { Updater.get(); }, 10000);
 				}
@@ -252,7 +257,7 @@ function ponychanx()
 				setTimeout(function() {
 					document.title = ".";
 					document.title = Notifier.title;
-				}, 1000);
+				}, 500);
 			});
 			$jq(window).bind("blur", function() {
 				Notifier._focus = false;
@@ -262,6 +267,9 @@ function ponychanx()
 			if (Notifier._focus) return;
 			++Notifier._new;
 			document.title = Notifier.title + " ("+Notifier._new+")";
+		},
+		settitle: function(t) {
+			document.title = t;
 		}
 	}
 	
