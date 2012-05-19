@@ -33,12 +33,12 @@ function ponychanx()
 		},
 		get: function() {
 			var d = new Date();
-			var dd = d.getTime()-10000;
+			var dd = d.getTime()-15000;
 			d.setTime(dd);
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", document.URL);
 			xhr.setRequestHeader("If-Modified-Since", d.toUTCString());
-			xhr.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, */*");
+			xhr.setRequestHeader("Accept", "*/*");
 			xhr.send();
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
@@ -50,6 +50,7 @@ function ponychanx()
 								if (f) {
 									$jq(".thread").append(this);
 									Posts.newhandle(this);
+									Posts.fixhover(this);
 									Notifier.newhandle(this);
 								}
 								if ($jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
@@ -60,7 +61,7 @@ function ponychanx()
 							Notifier.settitle(Notifier.title + "(404)");
 						break;
 					}
-					setTimeout(function() { Updater.get(); }, 10000);
+					setTimeout(function() { Updater.get(); }, 15000);
 				}
 			}
 		}
@@ -176,13 +177,11 @@ function ponychanx()
 			$jq("#qr").css("height", "316px");
 		},
 		loadfields: function() {
-				var ln = Settings.get("x.name");
-				var le = Settings.get("x.email");
+			var ln = Settings.get("x.name");
+			var le = Settings.get("x.email");
 			if (ln == null && le == null) {
-				var n = $jq("#postform :input[name='name']").val();
-				var e = $jq("#postform :input[name='em']").val();
-				$jq("#qr :input[name='name']").val(n);
-				$jq("#qr :input[name='em']").val(e);
+				$jq("#qr :input[name='name']").val($jq("#postform :input[name='name']").val());
+				$jq("#qr :input[name='em']").val($jq("#postform :input[name='em']").val());
 			} else {
 				$jq("#qr :input[name='name']").val(ln);
 				$jq("#qr :input[name='em']").val(le);
@@ -214,19 +213,26 @@ function ponychanx()
 			Posts.addhandles();
 		},
 		addhandles: function() {
-			$jq(".reflink a:odd").each(function() {
-				$jq(this).attr("href", "javascript:;").removeAttr("onclick");
-				$jq(this).on("click", function() { QR.quote(this.innerHTML); return false; } );
+			$jq("table:not(.postform):not(.userdelete)").each(function() {
+				Posts.newhandle(this);
 			});
 		},
-		newhandle: function(t) {
-			var h = $jq(".reflink a:odd", t);
-			$jq(h).attr("href", "javascript:;").removeAttr("onclick");
-			$jq(h).on("click", function() { QR.quote(this.innerHTML); return false; } );
-			Posts.update(t);
+		newhandle: function(p) {
+			$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
+				var c = hp.closest("table");
+				if ($jq(hp).html() == "[ - ]") {
+					hp.html("[ + ]");
+					$jq(".reply", c).css("height", "10px").css("opacity","0.1");
+				} else {
+					hp.html("[ - ]");
+					$jq(".reply", c).css("height", "auto").css("opacity","1");
+				}
+			});
+			$jq(".doubledash", p).css("display", "block").html("").append(hp);
 		},
-		update: function(t) {
-			$jq("blockquote a[class]", t).each(function() {
+		fixhover: function(p) {
+			$jq("blockquote a[class]", p).each(function() {
 				if (this.className.substr(0, 4) == "ref|") {
 					this.addEventListener("mouseover", addreflinkpreview, false);
 					this.addEventListener("mouseout", delreflinkpreview, false);
