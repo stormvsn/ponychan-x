@@ -257,6 +257,17 @@ function ponychanx()
 				}
 			});
 			$jq(".doubledash", p).css("display", "block").html("").append(hp);
+			$jq("blockquote a[class]", p).each(function() {
+				if (this.className.substr(0, 4) == "ref|") {
+					var to = this.innerHTML.substr(8, this.innerHTML.length);
+					var from = $jq(this).parent().parent().find("a[name]").attr("name");
+					var tto = $jq("a[name='"+to+"']");
+					if (tto != null) {
+						tto.parent().find(".reflink").addClass("ref|"+bid+"|"+tid+"|"+from).append("<a onclick='return highlight("+from+");' href='#"+from+"'>>>"+from+"</a> ");
+					}
+				}
+			});
+				
 		},
 		fixhover: function(p) {
 			$jq("blockquote a[class]", p).each(function() {
