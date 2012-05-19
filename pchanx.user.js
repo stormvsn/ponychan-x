@@ -318,7 +318,7 @@ function ponychanx()
 			}
 			$jq('#pxoptions input[type="checkbox"]').live("click", function() { Settings.sets($jq(this).attr("name"), String($jq(this).is(":checked"))); });
 			opt.append("Update every <select id='updatetimer' value='"+Settings.get("x.updatetimer")+"'><option value='10'>10</option><option value='15'>15</option><option value='30'>30</option></select> seconds<br />");
-			$jq("#updatetimer").live("change", function() { alert("aa"); Settings.set("x.updatetimer", String($jq(this).val())); });
+			$jq("#updatetimer").live("change", function() { Settings.set("x.updatetimer", String($jq(this).val())); });
 			opt.append("<br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
 		}
