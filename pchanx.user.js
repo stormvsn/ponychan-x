@@ -163,6 +163,12 @@ function ponychanx()
 		clear: function(fid) {
 			$jq(".qrtop span").html("");
 			$jq(".listthumb[name='"+fid+"']").remove();
+			QR.thumbreset();
+			$jq("#qr textarea").val("");
+			$jq("#qr :input[name='subject']").val("");
+			$jq("#qr > input[type='button']").val("Reply");
+		},
+		thumbreset: function() {
 			if ($jq("#thumbselected").length < 1) {
 				if ($jq(".listthumb").length > 0) {
 					$jq($jq(".listthumb")[0]).attr("id", "thumbselected")
@@ -173,9 +179,6 @@ function ponychanx()
 					$jq("#qr input[type='file']").val("");
 				}
 			}
-			$jq("#qr textarea").val("");
-			$jq("#qr :input[name='subject']").val("");
-			$jq("#qr > input[type='button']").val("Reply");
 		},
 		thumb: function() {
 			var f = document.getElementById("imgfile").files;
@@ -191,12 +194,18 @@ function ponychanx()
 				var fU = url.createObjectURL(f[i]);
 				var thumb = document.createElement("div");
 				$jq("#imagelist").append(thumb);
-				$jq(thumb).on("click", function() {
-					$jq("#thumbselected").removeAttr("id");
-					this.id = "thumbselected";
+				$jq(thumb).on("mousedown", function(e) {
+					if (e.which == 1) {
+						$jq("#thumbselected").removeAttr("id");
+						this.id = "thumbselected";
+					} else if (e.which == 2) {
+						$jq(this).remove();
+						QR.thumbreset();
+					}
 				});
 				$jq(thumb).attr("class", "listthumb");
 				$jq(thumb).attr("name", i);
+				$jq(thumb).attr("title", f[i].name + " (middle click to remove)");
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")")
 			}
@@ -348,6 +357,7 @@ function ponychanx()
 		},
 		settings: {
 			"Enable quick reply": {def: "true" },
+			"Enable backlinks": {def: "true" },
 			"Hide post form": { def: "true" },
 			"Enable autoupdate": { def: "true" },
 			"Show new post count in title": { def: "true" },
