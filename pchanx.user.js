@@ -28,20 +28,19 @@ function ponychanx()
 	};
 	
 	Updater = {
+		last: "",
 		init: function() {
 			Updater.get();
 		},
 		get: function() {
-			var d = new Date();
-			var dd = d.getTime()-15000;
-			d.setTime(dd);
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", document.URL);
-			xhr.setRequestHeader("If-Modified-Since", d.toUTCString());
+			xhr.setRequestHeader("If-Modified-Since", Updater.last);
 			xhr.setRequestHeader("Accept", "*/*");
 			xhr.send();
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
+					Updater.last = xhr.getResponseHeader("Last-Modified");
 					switch (xhr.status) {
 						case 200:
 							var l = $jq($jq("table:not(.postform):not(.userdelete) tbody tr td.reply[id] a[name]").get().reverse())[0].name;
