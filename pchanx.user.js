@@ -18,19 +18,22 @@ function ponychanx()
 	
 	var Main = {
 		init: function() {
-			QR.init();
+			if (Settings.gets("Enable quick reply")=="true") QR.init();
 			Html.init();
 			Css.init();
-			Updater.init();
-			Notifier.init();
+			if (Settings.gets("Enable autoupdate")=="true") Updater.init();
+			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
 			Posts.init();
 		},
 	};
 	
 	Updater = {
+		tmr: 10000,
 		last: "",
 		init: function() {
-			setTimeout(function() { Updater.get(); }, 15000);
+			var stmr = Settings.get("x.updatetimer");
+			if (stmr != null) Updater.tmr = parseInt(stmr)*1000;
+			setTimeout(function() { Updater.get(); }, Updater.tmr);
 		},
 		get: function() {
 			var xhr = new XMLHttpRequest();
@@ -57,10 +60,10 @@ function ponychanx()
 							});
 						break;
 						case 404:
-							Notifier.settitle(Notifier.title + "(404)");
+							document.title = Html.title + "(404)";
 						break;
 					}
-					setTimeout(function() { Updater.get(); }, 15000);
+					setTimeout(function() { Updater.get(); }, Updater.tmr);
 				}
 			}
 		}
@@ -69,6 +72,7 @@ function ponychanx()
 	var QR = {
 		init: function() {
 			QR.keybinds();
+			Html.hidepostform();
 			if (Settings.get("x.show")=="true") QR.show();
 		},
 		quote: function(h) {
@@ -254,29 +258,32 @@ function ponychanx()
 			});
 		},
 		newhandle: function(p) {
-			$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
-			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
-				var c = hp.closest("table");
-				if ($jq(hp).html() == "[ - ]") {
-					hp.html("[ + ]");
-					$jq(".reply", c).css("height", "10px").css("opacity","0.1");
-				} else {
-					hp.html("[ - ]");
-					$jq(".reply", c).css("height", "auto").css("opacity","1");
-				}
-			});
-			$jq(".doubledash", p).css("display", "block").html("").append(hp);
-			$jq("blockquote a[class]", p).each(function() {
-				if (this.className.substr(0, 4) == "ref|") {
-					var to = this.innerHTML.substr(8, this.innerHTML.length);
-					var from = $jq(this).parent().parent().find("a[name]").attr("name");
-					var tto = $jq("a[name='"+to+"']");
-					if (tto != null) {
-						tto.parent().find(".reflink").addClass("ref|"+bid+"|"+tid+"|"+from).append("<a onclick='return highlight("+from+");' href='#"+from+"'>>>"+from+"</a> ");
+			if (Settings.gets("Enable quick reply") == "true") {
+				$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+				var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
+					var c = hp.closest("table");
+					if ($jq(hp).html() == "[ - ]") {
+						hp.html("[ + ]");
+						$jq(".reply", c).css("height", "10px").css("opacity","0.1");
+					} else {
+						hp.html("[ - ]");
+						$jq(".reply", c).css("height", "auto").css("opacity","1");
 					}
-				}
-			});
-				
+				});
+			}
+			if (Settings.gets("Enable backlinks") == "true") {
+				$jq(".doubledash", p).css("display", "block").html("").append(hp);
+				$jq("blockquote a[class]", p).each(function() {
+					if (this.className.substr(0, 4) == "ref|") {
+						var to = this.innerHTML.substr(8, this.innerHTML.length);
+						var from = $jq(this).parent().parent().find("a[name]").attr("name");
+						var tto = $jq("a[name='"+to+"']");
+						if (tto != null) {
+							tto.parent().find(".reflink").addClass("ref|"+bid+"|"+tid+"|"+from).append("<a onclick='return highlight("+from+");' href='#"+from+"'>>>"+from+"</a> ");
+						}
+					}
+				});
+			}
 		},
 		fixhover: function(p) {
 			$jq("blockquote a[class]", p).each(function() {
@@ -289,30 +296,36 @@ function ponychanx()
 	}
 	
 	var Html = {
+		title: document.title,
 		init: function() {
+			Html.addoptions();
+		},
+		hidepostform: function() {
 			$jq("#postform").css("display", "none");
 			var a = document.createElement("a");
 			a.innerHTML = "<h2>Quick Reply</h2>";
 			a.href = "#";
 			a.onclick = function() { QR.show(); };
 			$jq(".postarea").prepend(a);
+		},
+		addoptions: function() {
 			$jq(".adminbar").prepend('<a class="adminbaritem" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			});
-			Html.showoptions();
-		},
-		showoptions: function() {
-			var opt = $jq("<div id='pxoptions'><strong>Options</strong><br /></div");
+			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div");
 			for (s in Settings.settings) {
-				opt.append("<input type='checkbox' "+(Settings.settings[s].def == "true" ? "checked" : "")+" /> "+s+"<br />");
+				opt.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
 			}
+			$jq('#pxoptions input[type="checkbox"]').live("click", function() { Settings.sets($jq(this).attr("name"), String($jq(this).is(":checked"))); });
+			opt.append("Update every <select id='updatetimer' value='"+Settings.get("x.updatetimer")+"'><option value='10'>10</option><option value='15'>15</option><option value='30'>30</option></select> seconds<br />");
+			$jq("#updatetimer").live("change", function() { alert("aa"); Settings.set("x.updatetimer", String($jq(this).val())); });
+			opt.append("<br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
 		}
 	};
 	
 	var Notifier = {
 		_new: 0,
-		title: document.title,
 		_focus: true,
 		init: function() {
 			$jq(window).bind("focus", function() {
@@ -320,7 +333,7 @@ function ponychanx()
 				Notifier._focus = true;
 				setTimeout(function() {
 					document.title = ".";
-					document.title = Notifier.title;
+					document.title = Html.title;
 				}, 500);
 			});
 			$jq(window).bind("blur", function() {
@@ -330,17 +343,14 @@ function ponychanx()
 		newhandle: function(e) {
 			if (Notifier._focus) return;
 			++Notifier._new;
-			document.title = Notifier.title + " ("+Notifier._new+")";
+			document.title = Html.title + " ("+Notifier._new+")";
 		},
-		settitle: function(t) {
-			document.title = t;
-		}
 	}
 	
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "#pxoptions { display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
+			s.innerHTML = "#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
 			document.body.appendChild(s);
 		}
 	};
@@ -355,10 +365,17 @@ function ponychanx()
 		get: function(n) {
 			return localStorage.getItem(n);
 		},
+		sets: function(n, v) {
+			localStorage.setItem("x.opt."+n, v);
+		},
+		gets: function(n) {
+			var v = Settings.get("x.opt."+n);
+			if (v != null) return v;
+			return Settings.settings[n].def;
+		},
 		settings: {
 			"Enable quick reply": {def: "true" },
 			"Enable backlinks": {def: "true" },
-			"Hide post form": { def: "true" },
 			"Enable autoupdate": { def: "true" },
 			"Show new post count in title": { def: "true" },
 		}
