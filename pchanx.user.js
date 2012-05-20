@@ -81,7 +81,10 @@ function ponychanx()
 		quote: function(h) {
 			QR.show();
 			var v = $jq("#qr textarea").val();
-			$jq("#qr textarea").val(v + ">>" + h + "\n").focus();
+			var qs = "";
+			var s = window.getSelection();
+			if (s != "") { qs = ">"+s+"\n"; }
+			$jq("#qr textarea").val(v + ">>" + h + "\n" + qs).focus();
 			var vv = $jq("#qr textarea").val().length;
 			document.getElementById("msg").setSelectionRange(vv,vv);
 		},
@@ -209,13 +212,14 @@ function ponychanx()
 					} else if (e.which == 2) {
 						$jq(this).remove();
 						QR.thumbreset();
+						url.revokeObjectURL(fU);
 					}
 				});
 				$jq(thumb).attr("class", "listthumb");
 				$jq(thumb).attr("name", i);
 				$jq(thumb).attr("title", f[i].name + " (middle click to remove)");
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
-				$jq(thumb).css("background-image", "url(" + fU + ")")
+				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
 			$jq("#imagelist").fadeIn("fast");
 			$jq("#qr").css("height", "308px");
@@ -281,17 +285,17 @@ function ponychanx()
 			var ei = (Settings.gets("Enable inline replies") == "true");
 			if (eb || ei) {
 				$jq("blockquote a[class]", p).each(function() {
-					var tto;
+					var tto, to, from;
+					if (this.className.substr(0, 4) == "ref|") {
+						to = this.innerHTML.substr(8, this.innerHTML.length);
+						from = $jq(this).parent().parent().find("a[name]").attr("name");
+						tto = $jq("a[name='"+to+"']");
+					}
 					if (!$jq(this).closest("td").hasClass("inline")) {
-						if (this.className.substr(0, 4) == "ref|") {
-							var to = this.innerHTML.substr(8, this.innerHTML.length);
-							var from = $jq(this).parent().parent().find("a[name]").attr("name");
-							tto = $jq("a[name='"+to+"']");
-							if (tto != null) {
-								if (eb)	{
-									tto.parent().find(".reflink").append("<a onclick='return highlight('"+from+"');' href='#"+from+"'>>>"+from+"</a> ");
-									$jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
-								}
+						if (tto != null) {
+							if (eb)	{
+								tto.parent().find(".reflink").append("<a onclick='return highlight('"+from+"');' href='#"+from+"'>>>"+from+"</a> ");
+								$jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
 							}
 						}
 					}
@@ -300,8 +304,11 @@ function ponychanx()
 							var n = $jq(this).next();
 							if (n.hasClass("inline"))
 								n.remove();
-							else
+							else {
 								var c = tto.parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
+								Posts.fixhover(c);
+								Posts.newhandle(c);
+							}
 								
 							return false;
 						});
