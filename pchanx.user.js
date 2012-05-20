@@ -24,6 +24,7 @@ function ponychanx()
 			Css.init();
 			if (Settings.gets("Enable autoupdate")=="true") Updater.init();
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
+			if (Settings.gets("Enable filter")=="true") Filter.init();
 			Posts.init();
 		},
 	};
@@ -39,7 +40,7 @@ function ponychanx()
 		get: function() {
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", durl+"?"+new Date().getTime());
-			xhr.setRequestHeader("If-Modified-Since", Updater.last);
+			//xhr.setRequestHeader("If-Modified-Since", Updater.last);
 			xhr.setRequestHeader("Accept", "*/*");
 			xhr.send();
 			xhr.onreadystatechange = function() {
@@ -47,7 +48,7 @@ function ponychanx()
 					Updater.last = xhr.getResponseHeader("Last-Modified");
 					switch (xhr.status) {
 						case 200:
-							var l = $jq($jq("table:not(.postform):not(.userdelete) tbody tr td.reply[id] a[name]").get().reverse())[0].name;
+							var l = $jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name;
 							var f = false;
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
 								if (f) {
@@ -154,12 +155,13 @@ function ponychanx()
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
-							$jq(".qrtop span").html("<span>You are posting too quickly. Try again.");
+							$jq(".qrtop span").html("You are posting too quickly. Try again.");
 							$jq("#qr > input[type='button']").val("Retry");
 						}
 						else
 							QR.clear(fid);
 					} else {
+						$jq(".qrtop span").html("An error occured while posting.");
 						$jq("#qr > input[type='button']").val("Error");
 					}
 				}
@@ -259,28 +261,50 @@ function ponychanx()
 				Posts.newhandle(this);
 			});
 		},
+		hide: function(hp) {
+			var c = hp.closest("table");
+			if ($jq(hp).html() == "[ - ]") {
+				hp.html("[ + ]");
+				$jq(".reply", c).addClass("hidden");
+			} else {
+				hp.html("[ - ]");
+				$jq(".reply", c).removeClass("hidden");
+			}
+		},
 		newhandle: function(p) {
 			$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
-				var c = hp.closest("table");
-				if ($jq(hp).html() == "[ - ]") {
-					hp.html("[ + ]");
-					$jq(".reply", c).css("height", "10px").css("opacity","0.1");
-				} else {
-					hp.html("[ - ]");
-					$jq(".reply", c).css("height", "auto").css("opacity","1");
-				}
+				Posts.hide(hp);
 			});
 			$jq(".doubledash", p).css("display", "block").html("").append(hp);
-			if (Settings.gets("Enable backlinks") == "true") {
+			var eb = (Settings.gets("Enable backlinks") == "true");
+			var ei = (Settings.gets("Enable inline replies") == "true");
+			if (eb || ei) {
 				$jq("blockquote a[class]", p).each(function() {
-					if (this.className.substr(0, 4) == "ref|") {
-						var to = this.innerHTML.substr(8, this.innerHTML.length);
-						var from = $jq(this).parent().parent().find("a[name]").attr("name");
-						var tto = $jq("a[name='"+to+"']");
-						if (tto != null) {
-							tto.parent().find(".reflink").addClass("ref|"+bid+"|"+tid+"|"+from).append("<a onclick='return highlight("+from+");' href='#"+from+"'>>>"+from+"</a> ");
+					var tto;
+					if (!$jq(this).closest("td.reply").hasClass("inline")) {
+						if (this.className.substr(0, 4) == "ref|") {
+							var to = this.innerHTML.substr(8, this.innerHTML.length);
+							var from = $jq(this).parent().parent().find("a[name]").attr("name");
+							tto = $jq("a[name='"+to+"']");
+							if (tto != null) {
+								if (eb)	{
+									tto.parent().find(".reflink").append("<a onclick='return highlight('"+from+"');' href='#"+from+"'>>>"+from+"</a> ");
+									$jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
+								}
+							}
 						}
+					}
+					if (ei) {
+						$jq(this).on("click", function() {
+							var n = $jq(this).next();
+							if (n.hasClass("inline"))
+								n.remove();
+							else
+								var c = tto.parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
+								
+							return false;
+						});
 					}
 				});
 			}
@@ -309,9 +333,9 @@ function ponychanx()
 			$jq(".postarea").prepend(a);
 		},
 		addoptions: function() {
-			$jq(".adminbar").prepend('<a class="adminbaritem" href="javascript:;">Ponychan X</a>').bind("click", function() {
+			$jq(".adminbar").prepend($jq('<a class="adminbaritem" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
-			});
+			}));
 			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div");
 			for (s in Settings.settings) {
 				opt.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
@@ -321,11 +345,13 @@ function ponychanx()
 			if (s == null) s = "10";
 			opt.append("Update every <input type='text' id='updatetimer' value='"+s+"'> seconds<br />");
 			$jq("#updatetimer").live("change", function() { if (isNaN(parseInt($jq(this).val()))) return; Settings.set("x.updatetimer", $jq(this).val()); });
-			opt.append("<br /><strong>Filter</strong><br />Seperate items with ;<br />");
-			opt.append("Names<br /><input type='text' value='' style='width: 99%'>");
-			opt.append("Tripcodes<br /><input type='text' value='' style='width: 99%'>");
-			opt.append("Posts<br /><input type='text' value='' style='width: 99%'>");
-			opt.append("<br /><br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
+			if (Settings.gets("Enable filter")=="true") {
+				opt.append("<br /><strong>Filter</strong><br />Seperate items with ;<br />");
+				opt.append("Names<br /><input id='nfilter' type='text' value='' style='width: 99%'>");
+				opt.append("Tripcodes<br /><input id='tfilter' type='text' value='' style='width: 99%'>");
+				opt.append("Posts<br /><input id='pfilter' type='text' value='' style='width: 99%'><br />");
+			}
+			opt.append("<br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
 		}
 	};
@@ -356,7 +382,7 @@ function ponychanx()
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "td.reply { margin-left: 25px; } .filtered { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; } #pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
+			s.innerHTML = "td.reply { margin-left: 25px; } .hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; } #pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
 			document.body.appendChild(s);
 		}
 	};
@@ -384,7 +410,8 @@ function ponychanx()
 			"Enable backlinks": {def: "true" },
 			"Enable autoupdate": { def: "true" },
 			"Show new post count in title": { def: "true" },
-			"Enable filter": { def: "true" },
+			"Enable filter": { def: "false" },
+			"Enable inline replies": { def: "true" },
 		}
 	};
 	
@@ -393,19 +420,41 @@ function ponychanx()
 		tlist: "",
 		plist: "",
 		init: function() {
+			Filter.load();
+		},
+		load: function() {
+			var n = Settings.get("x.filter.nlist");
+			if (n != null) Filter.nlist = n;
+			var t = Settings.get("x.filter.tlist");
+			if (t =! null) Filter.tlist = t;
+			var p = Settings.get("x.filter.plist");
+			if (p != null)  Filter.plist = p;
+		},
+		save: function() {
+			Filter.nlist = $jq("#nfilter").val();
+			Settings.set("x.filter.nlist", Filter.nlist);
+			Filter.tlist = $jq("#nfilter").val();
+			Settings.set("x.filter.tlist", Filter.nlist);
+			Filter.plist = $jq("#pfilter").val();
+			Settings.set("x.filter.plist", Filter.plist);
 		},
 		newhandle: function(p) {
+			if (Filter.filtered(0, $jq("span.postername", p).text())) {
+				Posts.hide(p);
+			}
 		},
 		filtered: function(t, s) {
+			if (s == "") return false;
+			s = s+";";
 			switch (t) {
 				case 0:
-					return;
+					if (Filter.nlist.indexOf(s) > -1) return true;
 				break;
 				case 1:
-					return;
+					if (Filter.tlist.indexOf(s) > -1) return true;
 				break;
 				case 2:
-					return;
+					if (Filter.plist.indexOf(s) > -1)  return true;
 				break;
 			}
 			return;
