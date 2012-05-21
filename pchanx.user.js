@@ -74,7 +74,7 @@ function ponychanx() {
 	
 	var QR = {
 		init: function() {
-			QR.keybinds();
+			if (Settings.gets("Quick reply key shortcuts")=="true") QR.keys();
 			Html.hidepostform();
 			if (Settings.get("x.show")=="true") QR.show();
 		},
@@ -241,17 +241,26 @@ function ponychanx() {
 			Settings.set("x.name", $jq("#qr :input[name='name']").val());
 			Settings.set("x.email", $jq("#qr :input[name='em']").val());
 		},
-		keybinds: function() {
+		keys: function() {
 			var isCtrl = false;
 			$jq(document).keyup(function (e) {
 				if(e.which == 17) isCtrl = false;
 			}).keydown(function (e) {
+				var t = null;
 				if(e.which == 17) isCtrl = true;
-				if(e.which == 83 && isCtrl == true) {
+				switch (e.which) {
+					case 83: t = "?"; break;
+					case 66: t = "b"; break;
+					case 73: t = "i"; break;
+					case 81: QR.show(); return false; break;
+				}
+				if (t != null && isCtrl) {
+					e.preventDefault();
 					var v = $jq("#qr textarea").val();
-					$jq("#qr textarea").val(v + "[?][/?]");
+					$jq("#qr textarea").val(v + "["+t+"][/"+t+"]");
 					var vv = $jq("#qr textarea").val().length-4;
 					document.getElementById("msg").setSelectionRange(vv,vv);
+					
 					return false;
 				}
 			});
@@ -450,6 +459,7 @@ function ponychanx() {
 			"Enable filter": { def: "false" },
 			"Enable inline replies": { def: "true" },
 			"Fix new post timestamps": { def: "true" },
+			"Quick reply key shortcuts": { def: "true" },
 		}
 	};
 	
