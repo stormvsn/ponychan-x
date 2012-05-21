@@ -73,6 +73,7 @@ function ponychanx() {
 	};
 	
 	var QR = {
+		cooldown: 15,
 		init: function() {
 			if (Settings.gets("Quick reply key shortcuts")=="true") QR.keys();
 			Html.hidepostform();
@@ -101,6 +102,7 @@ function ponychanx() {
 			<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
 			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accept="image/*" accesskey="f">\
 			<input type="button" value="Reply" accesskey="z">\
+			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
 			<div id="imagelist"></div>';
 			$jq("#qr .qrtop a").live("click", function() { QR.hide(); });
 			$jq("#qr > input[type='button']").live("click", function() { QR.send(); } );
@@ -140,6 +142,7 @@ function ponychanx() {
 			var e = $jq("#qr :input[name='em']").val();
 			var s = $jq("#qr :input[name='subject']").val();
 			var m = $jq("#qr :input[name='message']").val();
+			var sp = $jq("#qr .postopts :input[name='spoiler']").is(":checked");
 			var pp = $jq("#postform :input[name='postpassword']").val();
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
@@ -151,6 +154,7 @@ function ponychanx() {
 			d.append("em", e);
 			d.append("subject", s);
 			d.append("postpassword", pp);
+			if (sp) d.append("spoiler", sp);
 			d.append("message", m);
 			d.append("imagefile", i);
 			var xhr = new XMLHttpRequest();
@@ -173,13 +177,27 @@ function ponychanx() {
 			}
 			QR.storefields();
 		},
+		cooldowntimer: function() {
+			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.cooldown);
+			if (QR.cooldown > 0) {
+				setTimeout(function() { QR.cooldowntimer(); }, 1000);
+				$jq("#qr > input[type='button']").val(QR.cooldown);
+				QR.cooldown--;
+			} else {
+				$jq("#qr > input[type='button']").removeAttr("disabled").val("Reply");
+				QR.cooldown = 15;
+				if ($jq("#qr .postopts :input[name='auto']").is(":checked") && $jq(".listthumb").length > 0)
+					QR.send();
+			}
+		},
 		clear: function(fid) {
 			$jq(".qrtop span").html("");
 			$jq(".listthumb[name='"+fid+"']").remove();
 			QR.thumbreset();
 			$jq("#qr textarea").val("");
 			$jq("#qr :input[name='subject']").val("");
-			$jq("#qr > input[type='button']").val("Reply");
+			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
+			QR.cooldowntimer();
 		},
 		thumbreset: function() {
 			if ($jq("#thumbselected").length < 1) {
@@ -188,7 +206,7 @@ function ponychanx() {
 					document.getElementById("imagelist").scrollTop = 0;
 				} else {
 					$jq("#qr").css("height", "230px");
-					$jq("#imagelist").html("").css("display", "none");
+					$jq("#imagelist, .postopts").css("display", "none");
 					$jq("#qr input[type='file']").val("");
 				}
 			}
@@ -196,7 +214,7 @@ function ponychanx() {
 		thumb: function() {
 			var f = document.getElementById("imgfile").files;
 			if (f[0] == null) {
-				$jq("#imagelist").html("").css("display", "none");
+				$jq("#imagelist, .postopts").css("display", "none");
 				$jq("#qr").css("height", "230px");
 				return;
 			}
@@ -223,8 +241,8 @@ function ponychanx() {
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
-			$jq("#imagelist").fadeIn("fast");
-			$jq("#qr").css("height", "308px");
+			$jq("#imagelist, .postopts").fadeIn("fast");
+			$jq("#qr").css("height", "327px");
 		},
 		loadfields: function() {
 			var ln = Settings.get("x.name");
@@ -433,7 +451,10 @@ function ponychanx() {
 			var s = document.createElement('style');
 			s.innerHTML = "td.reply { margin-left: 25px; } .hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
-			#qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; }\
+			#qr * { margin: 0; padding: 0; }\
+			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
+			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
+			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
 			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
 			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
 			#qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; }\
@@ -474,7 +495,6 @@ function ponychanx() {
 			"Fix new post timestamps": { def: "true" },
 			"Quick reply key shortcuts": { def: "true" },
 			"Show spoilered images": { def: "false" },
-			"Show spoilered text": { def: "true" },
 		}
 	};
 	
