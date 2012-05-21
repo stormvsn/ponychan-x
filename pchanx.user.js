@@ -54,6 +54,7 @@ function ponychanx() {
 									$jq(".thread").append(this);
 									Posts.newhandle(this);
 									Posts.fixhover(this);
+									Posts.fixdate(this);
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
 								}
@@ -328,6 +329,15 @@ function ponychanx() {
 					this.addEventListener("mouseout", delreflinkpreview, false);
 				}
 			});
+		},
+		fixdate: function(p) {
+			if (Settings.gets("Fix new post timestamps") != "true") return;
+			var timezone = getCookie('timezone');
+			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
+			var twelvehour = true;
+			var timeFormat = 'ddd, MMM d, yyyy ' + (twelvehour !== '0' ? 'h:mm tt' : 'H:mm');
+			$jq(".posttime",p).html(Date.parse($jq(".posttime",p).text()).addHours(8 + timezone).toString(timeFormat)
+				.replace(/([AP]M)$/, '<span style="font-size:0.75em">$1</span>'));
 		}
 	}
 	
@@ -395,7 +405,17 @@ function ponychanx() {
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "td.reply { margin-left: 25px; } .hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; } #pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; } #qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; } .listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; } #imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; } #qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; } #qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; } #qr input[type='button'] { width: 90px; height: 23px; float: right; } #qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; } #qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; } #qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
+			s.innerHTML = "td.reply { margin-left: 25px; } .hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
+			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
+			#qr * { margin: 0; padding: 0; } #thumbselected { opacity: 1 !important; border: 1px solid black; }\
+			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
+			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
+			#qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; }\
+			#qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; }\
+			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
+			#qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; }\
+			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
+			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
 			document.body.appendChild(s);
 		}
 	};
@@ -425,6 +445,7 @@ function ponychanx() {
 			"Show new post count in title": { def: "true" },
 			"Enable filter": { def: "false" },
 			"Enable inline replies": { def: "true" },
+			"Fix new post timestamps": { def: "true" },
 		}
 	};
 	
