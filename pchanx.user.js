@@ -314,6 +314,15 @@ function ponychanx() {
 								.on("mouseover", addreflinkpreview)
 								.on("mouseout", delreflinkpreview)
 								.on("click", function() {
+									var n = $jq(this).next();
+									if (n.hasClass("inline"))
+										n.remove();
+									else {
+										var c = $jq("a[name='"+from+"']", ".thread").parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
+										$jq(c).find("a[name]").remove();
+										Posts.fixhover(c);
+										Posts.newhandle(c);
+									}
 								});
 								$jq(tto.parent().find(".reflink")[0]).append(bl);								
 							}
@@ -464,6 +473,8 @@ function ponychanx() {
 			"Enable inline replies": { def: "true" },
 			"Fix new post timestamps": { def: "true" },
 			"Quick reply key shortcuts": { def: "true" },
+			"Show spoilered images": { def: "false" },
+			"Show spoilered text": { def: "true" },
 		}
 	};
 	
