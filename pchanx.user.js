@@ -99,7 +99,7 @@ function ponychanx() {
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
 			<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
-			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accesskey="f">\
+			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accept="image/*" accesskey="f">\
 			<input type="button" value="Reply" accesskey="z">\
 			<div id="imagelist"></div>';
 			$jq("#qr .qrtop a").live("click", function() { QR.hide(); });
@@ -140,6 +140,7 @@ function ponychanx() {
 			var e = $jq("#qr :input[name='em']").val();
 			var s = $jq("#qr :input[name='subject']").val();
 			var m = $jq("#qr :input[name='message']").val();
+			var pp = $jq("#postform :input[name='postpassword']").val();
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
@@ -149,6 +150,7 @@ function ponychanx() {
 			d.append("name", n);
 			d.append("em", e);
 			d.append("subject", s);
+			d.append("postpassword", pp);
 			d.append("message", m);
 			d.append("imagefile", i);
 			var xhr = new XMLHttpRequest();
