@@ -82,7 +82,7 @@ function ponychanx() {
 			QR.show();
 			var v = $jq("#qr textarea").val();
 			var qs = "";
-			var s = window.getSelection();
+			var s = window.getSelection().toString();
 			if (s != "") { qs = ">"+s+"\n"; }
 			$jq("#qr textarea").val(v + ">>" + h + "\n" + qs).focus();
 			var vv = $jq("#qr textarea").val().length;
@@ -276,7 +276,8 @@ function ponychanx() {
 			}
 		},
 		newhandle: function(p) {
-			$jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			var ql = $jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			var toq = ql.html();
 			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 				Posts.addhide(hp);
 			});
@@ -320,6 +321,7 @@ function ponychanx() {
 						});
 					}
 				});
+				$jq(".postfooter a", p)[0].onclick = function() { QR.quote(toq); return false; };
 			}
 		},
 		fixhover: function(p) {
@@ -524,7 +526,7 @@ function ponychanx() {
 					}
 				break;
 			}
-			return;
+			return false;
 		}
 	};
 	
