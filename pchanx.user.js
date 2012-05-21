@@ -301,7 +301,10 @@ function ponychanx() {
 					if (this.className.substr(0, 4) == "ref|") {
 						to = this.innerHTML.substr(8, this.innerHTML.length);
 						from = $jq(this).parent().parent().find("a[name]").attr("name");
-						tto = $jq("a[name='"+to+"']");
+						try {
+							// why does ponychan include post content inside quote anchor...
+							tto = $jq("a[name='"+to+"']");
+						} catch(e) { return true; }
 						ffrom = $jq("a[name='"+from+"']");
 					}
 					if (!$jq(this).closest("td").hasClass("inline")) {
@@ -312,7 +315,7 @@ function ponychanx() {
 								.on("mouseout", delreflinkpreview)
 								.on("click", function() {
 								});
-								tto.parent().find(".reflink").append(bl);								
+								$jq(tto.parent().find(".reflink")[0]).append(bl);								
 							}
 							if (ei) $jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
 						}
@@ -324,6 +327,7 @@ function ponychanx() {
 								n.remove();
 							else {
 								var c = tto.parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
+								$jq(c).find("a[name]").remove();
 								Posts.fixhover(c);
 								Posts.newhandle(c);
 							}
@@ -336,7 +340,7 @@ function ponychanx() {
 			}
 		},
 		fixhover: function(p) {
-			$jq("blockquote a[class]", p).each(function() {
+			$jq("blockquote a[class], .reflink a[class]", p).each(function() {
 				if (this.className.substr(0, 4) == "ref|") {
 					this.addEventListener("mouseover", addreflinkpreview, false);
 					this.addEventListener("mouseout", delreflinkpreview, false);
