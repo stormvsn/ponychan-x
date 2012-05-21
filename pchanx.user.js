@@ -164,7 +164,7 @@ function ponychanx() {
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
-							$jq(".qrtop span").html("You are posting too quickly. Try again.");
+							$jq(".qrtop span").html(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 							$jq("#qr > input[type='button']").val("Retry");
 						}
 						else
