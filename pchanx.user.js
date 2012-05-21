@@ -369,13 +369,13 @@ function ponychanx() {
 			$jq("#updatetimer").live("change", function() { if (isNaN(parseInt($jq(this).val()))) return; Settings.set("x.updatetimer", $jq(this).val()); });
 			if (Settings.gets("Enable filter")=="true") {
 				opt.append("<br /><strong>Filter</strong><br />Seperate items with ;<br />");
-				opt.append("Names<br /><input name='nlist' type='text' value='' style='width: 99%'>");
-				opt.append("Tripcodes<br /><input name='tlist' type='text' value='' style='width: 99%'>");
-				opt.append("Posts<br /><input name='plist' type='text' value='' style='width: 99%'><br />");
-				$jq('#pxoptions input[name]').live("change", function() { Filter.save(); });
+				opt.append("Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%'>");
+				opt.append("Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%'>");
+				opt.append("Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%'><br />");
 			}
 			opt.append("<br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
+			$jq('#pxoptions > input[id][name]').keyup(function() { Filter.save(); }).change(function() { Filter.save(); });
 		}
 	};
 	
@@ -469,53 +469,59 @@ function ponychanx() {
 				$jq('#pxoptions input[type="text"][name="nlist"]').val(n);
 			}
 			var t = Settings.get("x.filter.tlist");
-			if (t =! null && n != "undefined") {
+			if (t != null && t != "undefined") {
 				Filter.tlist = t;
-				$jq('#pxoptions input[type="text"][name="tlist"').val(t);
+				$jq('#pxoptions input[type="text"][name="tlist"]').val(t);
 			}
 			var p = Settings.get("x.filter.plist");
-			if (p != null && n != "undefined") {
+			if (p != null && p != "undefined") {
 				Filter.plist = p;
-				$jq('#pxoptions input[type="text"][name="plist"').val(p);
+				$jq('#pxoptions input[type="text"][name="plist"]').val(p);
 			}
 		},
 		save: function() {
-			Filter.nlist = $jq('#pxoptions input[type="text"][name="nlist"]').val();
+			Filter.nlist = $jq('#pxoptions input[name="nlist"]').val();
 			Settings.set("x.filter.nlist", Filter.nlist);
-			Filter.tlist = $jq('#pxoptions input[type="text"][name="tlist"').val();
+			Filter.tlist = $jq('#pxoptions > input[name="tlist"]').val();
 			Settings.set("x.filter.tlist", Filter.tlist);
-			Filter.plist = $jq('#pxoptions input[type="text"][name="plist"').val();
+			Filter.plist = $jq('#pxoptions > input[name="plist"]').val();
 			Settings.set("x.filter.plist", Filter.plist);
 		},
 		filter: function(p) {
 			$jq(p).css("display", "none");
 		},
 		newhandle: function(p) {
-			if (Filter.filtered(0, $jq("span.postername", p).text())) {
+			if (Settings.gets("Enable filter") != "true") return;
+			if (Filter.filtered(0, $jq.trim($jq("span.postername", p).text()))) {
 				Filter.filter(p);
 				return;
 			}
-			if (Filter.filtered(0, $jq("span.trip", p).text())) {
+			if (Filter.filtered(1, $jq("span.postertrip", p).text())) {
 				Filter.filter(p);
 				return;
 			}
-			if (Filter.filtered(0, $jq("blockquote", p).html())) {
+			if (Filter.filtered(2, $jq("blockquote", p).html())) {
 				Filter.filter(p);
 				return;
 			}
 		},
 		filtered: function(t, s) {
 			if (s == "") return false;
-			s = s+";";
 			switch (t) {
 				case 0:
-					if (Filter.nlist.indexOf(s) > -1) return true;
+					if (Filter.nlist.indexOf(s+";") > -1) return true;
 				break;
 				case 1:
-					if (Filter.tlist.indexOf(s) > -1) return true;
+					if (Filter.tlist.indexOf(s+";") > -1) return true;
 				break;
 				case 2:
-					if (Filter.plist.indexOf(s) > -1)  return true;
+					if (Filter.plist.length <= 1) return false;
+					var sp = Filter.plist.split(";");
+					if (sp.length-1 == 0) return false;
+					for (var i = 0, len = sp.length -1; i < len; i++) {
+						if (s.indexOf(sp[i]) > -1)
+							return true;
+					}
 				break;
 			}
 			return;
