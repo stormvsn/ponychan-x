@@ -9,8 +9,7 @@
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // ==/UserScript==
 
-function ponychanx()
-{
+function ponychanx() {
 	$jq = jQuery.noConflict();
 	var durl = document.URL.split("#")[0];
 	var us = durl.split("/");
@@ -290,16 +289,22 @@ function ponychanx()
 						to = this.innerHTML.substr(8, this.innerHTML.length);
 						from = $jq(this).parent().parent().find("a[name]").attr("name");
 						tto = $jq("a[name='"+to+"']");
+						ffrom = $jq("a[name='"+from+"']");
 					}
 					if (!$jq(this).closest("td").hasClass("inline")) {
 						if (tto != null) {
 							if (eb)	{
-								tto.parent().find(".reflink").append("<a onclick='return highlight('"+from+"');' href='#"+from+"'>>>"+from+"</a> ");
-								$jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
+								var bl = $jq("<a href='javascript:;' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
+								.on("mouseover", addreflinkpreview)
+								.on("mouseout", delreflinkpreview)
+								.on("click", function() {
+								});
+								tto.parent().find(".reflink").append(bl);								
 							}
+							if (ei) $jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
 						}
 					}
-					if (ei) {
+					if (ei && tto != null) {
 						$jq(this).on("click", function() {
 							var n = $jq(this).next();
 							if (n.hasClass("inline"))
