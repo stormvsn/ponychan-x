@@ -58,7 +58,7 @@ function ponychanx() {
 							}
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
 								if (f) {
-									$jq(".thread").append(this);
+									$jq(".thread table:last").after(this);
 									Posts.newhandle(this);
 									Posts.fixhover(this);
 									Posts.fixdate(this);
