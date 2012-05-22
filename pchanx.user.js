@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*/res/*
-// @version       0.3
+// @version       0.4
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // ==/UserScript==
@@ -322,7 +322,11 @@ function ponychanx() {
 			}
 		},
 		newhandle: function(p) {
-			var ql = $jq($jq(".reflink a:odd", p)[0]).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			// Rewrite this entire block before 1.0
+			// Less setting checks, less event changes, stricter selectors
+			var ql = $jq($jq(".reflink a:odd", p)[0]);
+			if (Settings.gets("Enable quick reply")=="true")
+				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			var toq = ql.html();
 			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 				Posts.addhide(hp);
@@ -345,13 +349,16 @@ function ponychanx() {
 					if (!$jq(this).closest("td").hasClass("inline")) {
 						if (tto != null) {
 							if (eb)	{
-								var bl = $jq("<a href='javascript:;' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
+								var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
 								.on("mouseover", addreflinkpreview)
-								.on("mouseout", delreflinkpreview)
-								.on("click", function() {
-									QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-									return false;
-								});
+								.on("mouseout", delreflinkpreview);
+								if (Settings.gets("Enable quick reply")=="true") {
+									$jq(bl).attr("onclick","").unbind("click").removeAttr("onclick");
+									bl.on("click", function() {
+										QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+										return false;
+									});
+								}
 								$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
 							}
 							if (ei) $jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
@@ -368,18 +375,30 @@ function ponychanx() {
 								Posts.fixhover(c);
 								Posts.newhandle(c);
 							}
-								
 							return false;
 						});
 					}
 				});
 				$jq(".extrabtns > a[class]", p).each(function() {
-					$jq(this).on("click", function() {
-						QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-						return false;
-					});
+					$jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
+					if (Settings.gets("Enable quick reply")=="true") {
+						$jq(this).on("click", function() {
+							QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+							return false;
+						});
+					} else {
+						$jq(this).on("click", function() {
+							clickReflinkNum(event, this.innerHTML.substring(8,this.innerHTML.length));
+							return false;
+						});
+					}
 				});
-				$jq(".postfooter a", p)[0].onclick = function() { QR.quote(toq); return false; };
+			}
+			if (Settings.gets("Enable quick reply")=="true") {
+					$jq($jq(".postfooter > a", p)[0]).attr("onclick","").unbind("click").removeAttr("onclick");
+					$jq(".postfooter > a", p)[0].onclick = function() { QR.quote(toq); return false; };
+			} else {
+					$jq(".postfooter > a", p)[0].onclick = function() { clickReflinkNum(event, toq); return false; };
 			}
 		},
 		fixhover: function(p) {
