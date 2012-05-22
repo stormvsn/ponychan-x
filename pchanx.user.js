@@ -374,7 +374,6 @@ function ponychanx() {
 			});
 		},
 		fixdate: function(p) {
-			if (Settings.gets("Fix new post timestamps") != "true") return;
 			var timezone = getCookie('timezone');
 			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
 			var twelvehour = true;
@@ -491,9 +490,7 @@ function ponychanx() {
 			"Show new post count in title": { def: "true" },
 			"Enable filter": { def: "false" },
 			"Enable inline replies": { def: "true" },
-			"Fix new post timestamps": { def: "true" },
 			"Quick reply key shortcuts": { def: "true" },
-			"Show spoilered images": { def: "false" },
 		}
 	};
 	
