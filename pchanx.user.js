@@ -45,10 +45,17 @@ function ponychanx() {
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
 					Updater.last = xhr.getResponseHeader("Last-Modified");
+					setTimeout(function() { Updater.get(); }, Updater.tmr);
 					switch (xhr.status) {
 						case 200:
-							var l = $jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name;
-							var f = false;
+							var f, l;
+							if ($jq(".thread table").length == 0) {
+								l = "";
+								f = true;
+							} else {
+								l = $jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name;
+								f = false;
+							}
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
 								if (f) {
 									$jq(".thread").append(this);
@@ -58,15 +65,15 @@ function ponychanx() {
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
 								}
-								if ($jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
+								if (!f && $jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
 									f = true;
 							});
+							if (!f) $jq(".qrtop span").html("Error updating. Try refreshing.");
 						break;
 						case 404:
 							document.title = Html.title + "(404)";
 						break;
 					}
-					setTimeout(function() { Updater.get(); }, Updater.tmr);
 				}
 			}
 		}
