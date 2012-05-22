@@ -218,6 +218,7 @@ function ponychanx() {
 					$jq("#qr").css("height", "230px");
 					$jq("#imagelist, .postopts").css("display", "none");
 					$jq("#qr input[type='file']").val("");
+					$jq("#qr .postopts :input[name='auto']")[0].checked = false
 				}
 			}
 		},
