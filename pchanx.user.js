@@ -305,7 +305,7 @@ function ponychanx() {
 			}
 		},
 		newhandle: function(p) {
-			var ql = $jq(".reflink a:odd", p).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			var ql = $jq($jq(".reflink a:odd", p)[0]).attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			var toq = ql.html();
 			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 				Posts.addhide(hp);
@@ -332,15 +332,8 @@ function ponychanx() {
 								.on("mouseover", addreflinkpreview)
 								.on("mouseout", delreflinkpreview)
 								.on("click", function() {
-									var n = $jq(this).next();
-									if (n.hasClass("inline"))
-										n.remove();
-									else {
-										var c = $jq("a[name='"+from+"']", ".thread").parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
-										$jq(c).find("a[name]").remove();
-										Posts.fixhover(c);
-										Posts.newhandle(c);
-									}
+									QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+									return false;
 								});
 								$jq(tto.parent().find(".reflink")[0]).append(bl);								
 							}
@@ -362,6 +355,12 @@ function ponychanx() {
 							return false;
 						});
 					}
+				});
+				$jq(".reflink > a[class]", p).each(function() {
+					$jq(this).on("click", function() {
+						QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+						return false;
+					});
 				});
 				$jq(".postfooter a", p)[0].onclick = function() { QR.quote(toq); return false; };
 			}
