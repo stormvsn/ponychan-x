@@ -165,6 +165,12 @@ function ponychanx() {
 			d.append("message", m);
 			d.append("imagefile", i);
 			var xhr = new XMLHttpRequest();
+			xhr.upload.addEventListener("progress", function(evt) {
+				if (evt.lengthComputable) {
+					var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+					$jq("#qr > input[type='button']").val(percentComplete.toString() + '%');
+				}
+			}, false);
 			xhr.open("POST", "http://www.ponychan.net/chan/board.php");  
 			xhr.send(d);
 			xhr.onreadystatechange = function() {
@@ -346,7 +352,7 @@ function ponychanx() {
 									QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
 									return false;
 								});
-								$jq(tto.parent().find(".reflink")[0]).append(bl);								
+								$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
 							}
 							if (ei) $jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
 						}
@@ -367,7 +373,7 @@ function ponychanx() {
 						});
 					}
 				});
-				$jq(".reflink > a[class]", p).each(function() {
+				$jq(".extrabtns > a[class]", p).each(function() {
 					$jq(this).on("click", function() {
 						QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
 						return false;
@@ -377,7 +383,7 @@ function ponychanx() {
 			}
 		},
 		fixhover: function(p) {
-			$jq("blockquote a[class], .reflink a[class]", p).each(function() {
+			$jq("blockquote a[class], .extrabtns a[class]", p).each(function() {
 				if (this.className.substr(0, 4) == "ref|") {
 					this.addEventListener("mouseover", addreflinkpreview, false);
 					this.addEventListener("mouseout", delreflinkpreview, false);
@@ -466,12 +472,13 @@ function ponychanx() {
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
 			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
 			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
-			#qr .close a { width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; }\
-			#qr .qrtop { float: left; width: 374px; font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; }\
+			#qr .close a { font-weight:bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; }\
+			#qr .qrtop { float: left; width: 374px; font-size: small; color: white; padding-left: 5px; background-color: #123555; height: 20px; cursor: move; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
 			#qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
-			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }";
+			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
+			.extrabtns { vertical-align: top; }";
 			document.body.appendChild(s);
 		}
 	};
