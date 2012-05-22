@@ -102,7 +102,7 @@ function ponychanx() {
 			if ($jq("#qr").length) return;
 			var qr = document.createElement("div");
 			qr.setAttribute("id", "qr");
-			qr.innerHTML = '<div class="qrtop"><span></span><a href="javascript:;">X</a></div>\
+			qr.innerHTML = '<div class="qrtop"><span></span></div><div class="close"><a href="javascript:;">X</a></div>\
 			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" accesskey="n">\
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
@@ -111,7 +111,7 @@ function ponychanx() {
 			<input type="button" value="Reply" accesskey="z">\
 			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
 			<div id="imagelist"></div>';
-			$jq("#qr .qrtop a").live("click", function() { QR.hide(); });
+			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("#qr > input[type='button']").live("click", function() { QR.send(); } );
 			$jq("body").append(qr);
 			QR.loadfields();
@@ -188,7 +188,8 @@ function ponychanx() {
 			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.cooldown);
 			if (QR.cooldown > 0) {
 				setTimeout(function() { QR.cooldowntimer(); }, 1000);
-				$jq("#qr > input[type='button']").val(QR.cooldown);
+				var a = $jq("#qr .postopts :input[name='auto']")[0].checked ? "Auto " : "";
+				$jq("#qr > input[type='button']").val(a+QR.cooldown);
 				QR.cooldown--;
 			} else {
 				$jq("#qr > input[type='button']").removeAttr("disabled").val("Reply");
@@ -204,6 +205,8 @@ function ponychanx() {
 			$jq("#qr textarea").val("");
 			$jq("#qr :input[name='subject']").val("");
 			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
+			if (Settings.gets("Hide quick reply after posting")=="true" && $jq("#qr .postopts :input[name='auto']")[0].checked == false)
+				QR.hide();
 			QR.cooldowntimer();
 		},
 		thumbreset: function() {
@@ -462,8 +465,8 @@ function ponychanx() {
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
 			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
 			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
-			#qr .qrtop a { padding: 1px 4px 0 2px; color: white; float: right; }\
-			#qr .qrtop { font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; }\
+			#qr .close a { width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; }\
+			#qr .qrtop { float: left; width: 374px; font-size: small; color: white; padding-left: 5px; background-color: darkgray; height: 20px; cursor: move; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
 			#qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
@@ -498,6 +501,7 @@ function ponychanx() {
 			"Enable filter": { def: "false" },
 			"Enable inline replies": { def: "true" },
 			"Quick reply key shortcuts": { def: "true" },
+			"Hide quick reply after posting": { def: "true" },
 		}
 	};
 	
