@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
-// @version       0.4
+// @version       0.5
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -62,7 +62,11 @@ function ponychanx() {
 							}
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
 								if (f) {
-									$jq(".thread table:last").after(this);
+									var tal = $jq(".thread table:last");
+									if (tal.length > 0)
+										tal.after(this);
+									else
+										$jq(".thread .op").after(this);
 									Posts.newhandle(this);
 									Posts.fixhover(this);
 									Posts.fixdate(this);
@@ -88,10 +92,10 @@ function ponychanx() {
 	var QR = {
 		cooldown: 15,
 		init: function() {
-			if (Settings.gets("Quick reply key shortcuts")=="true") QR.keys();
 			Html.hidepostform();
 			if (Settings.get("x.show")=="true") QR.show();
 			if (rto != null) QR.quote(rto);
+			if (Settings.gets("Quick reply key shortcuts")=="true") QR.keys();
 		},
 		quote: function(h) {
 			QR.show();
@@ -287,25 +291,25 @@ function ponychanx() {
 			Settings.set("x.email", $jq("#qr :input[name='em']").val());
 		},
 		keys: function() {
-			var isCtrl = false;
-			$jq(document).keyup(function (e) {
-				if(e.which == 17) isCtrl = false;
-			}).keydown(function (e) {
-				var t = null;
-				if(e.which == 17) isCtrl = true;
-				switch (e.which) {
-					case 83: t = "?"; break;
-					case 66: t = "b"; break;
-					case 73: t = "i"; break;
-					case 81: QR.show(); break;
-				}
-				if (t != null && isCtrl) {
-					e.preventDefault();
-					var v = $jq("#qr textarea").val();
-					$jq("#qr textarea").val(v + "["+t+"][/"+t+"]");
-					var vv = $jq("#qr textarea").val().length-4;
-					document.getElementById("msg").setSelectionRange(vv,vv);
-					return false;
+			$jq(document).bind("keydown", function (e) {
+				if (e.ctrlKey) {
+					var t = null;
+					switch (e.which) {
+						case 83: t = "?"; break;
+						case 66: t = "b"; break;
+						case 73: t = "i"; break;
+						case 85: t = "u"; break;
+						case 82: t = "s"; break;
+						case 81: QR.show(); return false; break;
+						default: return false;
+					}
+					if (t != null) {
+						var v = $jq("#qr textarea").val();
+						$jq("#qr textarea").val(v + "["+t+"][/"+t+"]");
+						var vv = $jq("#qr textarea").val().length-4;
+						document.getElementById("msg").setSelectionRange(vv,vv);
+						return e.preventDefault();
+					}
 				}
 			});
 		}
@@ -504,6 +508,9 @@ function ponychanx() {
 				opt.append("Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%'>");
 				opt.append("Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%'><br />");
 			}
+			opt.append("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
+				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
+			});
 			opt.append("<br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
 			$jq('#pxoptions > input[id][name]').keyup(function() { Filter.save(); }).change(function() { Filter.save(); });
@@ -536,7 +543,8 @@ function ponychanx() {
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = ".hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
+			s.innerHTML = "h2 { padding: 17px 0 17px 0; }\
+			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
 			#qr * { margin: 0; padding: 0; }\
 			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
