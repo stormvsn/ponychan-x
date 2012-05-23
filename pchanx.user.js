@@ -311,9 +311,10 @@ function ponychanx() {
 				Posts.newhandle(this);
 			});
 		},
-		addhide: function(hp) {
+		hide: function(hp) {
+			hp = $jq(hp);
 			var c = hp.closest("table");
-			if ($jq(hp).html() == "[ - ]") {
+			if (hp.html() == "[ - ]") {
 				hp.html("[ + ]");
 				$jq(".reply", c).addClass("hidden");
 			} else {
@@ -322,49 +323,46 @@ function ponychanx() {
 			}
 		},
 		newhandle: function(p) {
-			// Rewrite this entire block before 1.0
-			// Less setting checks, less event changes, stricter selectors
-			var ql = $jq($jq(".reflink a:odd", p)[0]);
-			if (Settings.gets("Enable quick reply")=="true")
-				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
-			var toq = ql.html();
-			var hp = $jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
-				Posts.addhide(hp);
-			});
-			$jq(".doubledash", p).css("display", "block").html("").append(hp);
+			var eq = (Settings.gets("Enable quick reply") == "true");
 			var eb = (Settings.gets("Enable backlinks") == "true");
 			var ei = (Settings.gets("Enable inline replies") == "true");
-			if (eb || ei) {
+			var eh = (Settings.gets("Enable hide post buttons") == "true");
+			if (eh) {
+				$jq(".doubledash", p).html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
+					Posts.hide(this);
+				}));
+			}
+			var ql = $jq($jq(".reflink a", p)[1]);
+			if (eq) {
+				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
+			}
+			var from = ql.html();
+			if (eb || ei || eq) {
 				$jq("blockquote a[class]", p).each(function() {
-					var tto, to, from;
+					var tto, to, ffrom;
 					if (this.className.substr(0, 4) == "ref|") {
 						to = this.innerHTML.substr(8, this.innerHTML.length);
-						from = $jq(this).parent().parent().find("a[name]").attr("name");
 						try {
-							// why does ponychan include post content inside quote anchor...
+							// To do: move text out of anchor
 							tto = $jq("a[name='"+to+"']");
 						} catch(e) { return true; }
 						ffrom = $jq("a[name='"+from+"']");
 					}
-					if (!$jq(this).closest("td").hasClass("inline")) {
-						if (tto != null) {
-							if (eb)	{
-								var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
-								.on("mouseover", addreflinkpreview)
-								.on("mouseout", delreflinkpreview);
-								if (Settings.gets("Enable quick reply")=="true") {
-									$jq(bl).attr("onclick","").unbind("click").removeAttr("onclick");
-									bl.on("click", function() {
-										QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-										return false;
-									});
-								}
-								$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
-							}
-							if (ei) $jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
+					if (!$jq(this).closest("td").hasClass("inline") && tto != null && eb) {
+						var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
+						.on("mouseover", addreflinkpreview)
+						.on("mouseout", delreflinkpreview);
+						if (eq) {
+							bl.removeAttr("onclick");
+							bl.on("click", function() {
+								QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+								return false;
+							});
 						}
+						$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
 					}
 					if (ei && tto != null) {
+						$jq(this).removeAttr("onclick");
 						$jq(this).on("click", function() {
 							var n = $jq(this).next();
 							if (n.hasClass("inline"))
@@ -379,26 +377,19 @@ function ponychanx() {
 						});
 					}
 				});
-				$jq(".extrabtns > a[class]", p).each(function() {
-					$jq(this).attr("onclick","").unbind("click").removeAttr("onclick");
-					if (Settings.gets("Enable quick reply")=="true") {
-						$jq(this).on("click", function() {
-							QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-							return false;
-						});
-					} else {
-						$jq(this).on("click", function() {
-							clickReflinkNum(event, this.innerHTML.substring(8,this.innerHTML.length));
-							return false;
-						});
-					}
-				});
 			}
-			if (Settings.gets("Enable quick reply")=="true") {
-					$jq($jq(".postfooter > a", p)[0]).attr("onclick","").unbind("click").removeAttr("onclick");
-					$jq(".postfooter > a", p)[0].onclick = function() { QR.quote(toq); return false; };
-			} else {
-					$jq(".postfooter > a", p)[0].onclick = function() { clickReflinkNum(event, toq); return false; };
+			if (eq) {
+				$jq(".extrabtns a[class]", p).each(function() {
+					$jq(this).removeAttr("onclick");
+					$jq(this).on("click", function() {
+						QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+						return false;
+					});
+				});
+				
+				var rb = $jq(".postfooter > a", p)[0];
+				$jq(rb).removeAttr("onclick");
+				rb.onclick = function() { QR.quote(from); return false; };
 			}
 		},
 		fixhover: function(p) {
@@ -483,7 +474,7 @@ function ponychanx() {
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "td.reply { margin-left: 25px; } .hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
+			s.innerHTML = ".hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
 			#qr * { margin: 0; padding: 0; }\
 			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
@@ -498,6 +489,7 @@ function ponychanx() {
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }";
+			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { display: block !important; }";
 			document.body.appendChild(s);
 		}
 	};
@@ -529,6 +521,7 @@ function ponychanx() {
 			"Enable inline replies": { def: "true" },
 			"Quick reply key shortcuts": { def: "true" },
 			"Hide quick reply after posting": { def: "true" },
+			"Enable hide post buttons": { def: "true" },
 		}
 	};
 	
