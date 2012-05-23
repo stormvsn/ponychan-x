@@ -66,13 +66,15 @@ function ponychanx() {
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
 								}
-								if (!f && $jq("tbody tr td.reply[id] a[name]", this)[0].name == l)
+								var fne = $jq("tbody tr td[id] a[name]", this)[0];
+								if (!f && fne != null && fne.name == l)
 									f = true;
 							});
-							if (!f) $jq(".qrtop span").html("Error updating. Try refreshing.");
+							if (!f) $jq(".qrtop span").html("Error autoupdating <a href=''>Refresh manually</a>");
 						break;
 						case 404:
 							document.title = Html.title + "(404)";
+							$jq(".qrtop span").html("404");
 						break;
 					}
 				}
@@ -309,6 +311,11 @@ function ponychanx() {
 			Posts.addhandles();
 		},
 		addhandles: function() {
+			var oe = $jq(".thread").contents(":not(table,span:last)");
+			var op = $jq("<div class='op'></div>");
+			$jq(".thread").prepend(op);
+			op.append(oe);
+			Posts.newhandle(".op");
 			$jq("table:not(.postform):not(.userdelete)").each(function() {
 				Posts.newhandle(this);
 			});
@@ -325,7 +332,6 @@ function ponychanx() {
 			}
 		},
 		getcrossthread: function(anc, pid) {
-			var p = null;
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", anc.href);
 			xhr.setRequestHeader("Accept", "*/*");
@@ -346,7 +352,9 @@ function ponychanx() {
 								return false;
 							}
 						});
-						if (!f) $jq(".qrtop span").html("Could not load post.");
+						if (!f) $jq(".qrtop span").html("Could not load post <a target='_blank' href='"+anc.href+"'>Open in new tab</a>");
+					} else {
+						$jq(".qrtop span").html("Post not found ("+xhr.status+")");
 					}
 				}
 			}
@@ -421,8 +429,10 @@ function ponychanx() {
 				});
 				
 				var rb = $jq(".postfooter > a", p)[0];
-				$jq(rb).removeAttr("onclick");
-				rb.onclick = function() { QR.quote(from); return false; };
+				if (rb != null) {
+					$jq(rb).removeAttr("onclick");
+					rb.onclick = function() { QR.quote(from); return false; };
+				}
 			}
 		},
 		fixhover: function(p) {
