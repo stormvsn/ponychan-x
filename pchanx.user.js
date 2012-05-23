@@ -291,7 +291,7 @@ function ponychanx() {
 					case 83: t = "?"; break;
 					case 66: t = "b"; break;
 					case 73: t = "i"; break;
-					case 81: QR.show(); return false; break;
+					case 81: QR.show(); break;
 				}
 				if (t != null && isCtrl) {
 					e.preventDefault();
