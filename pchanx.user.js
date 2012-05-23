@@ -374,6 +374,15 @@ function ponychanx() {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
+			if (Settings.gets("Animate gif thumbnails") == "true") {
+				var im = $jq(p).find("img", p)[0];
+				if (im != null && im.src.indexOf("s.gif") > 0) {
+					var ns = im.src;
+					ns = ns.replace("/thumb/", "/src/");
+					ns = ns.replace("s.gif", ".gif");
+					im.src = ns;
+				}
+			}
 			if (eb || ei || eq) {
 				$jq("blockquote a[class]", p).each(function() {
 					var tto, to, ffrom;
@@ -566,6 +575,7 @@ function ponychanx() {
 			"Hide quick reply after posting": { def: "true" },
 			"Enable hide post buttons": { def: "true" },
 			"Enable cross-thread inline replies": { def: "true" },
+			"Animate gif thumbnails": { def: "true" },
 		}
 	};
 	
