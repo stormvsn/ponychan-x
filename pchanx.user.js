@@ -15,6 +15,7 @@ function ponychanx() {
 	var us = durl.split("/");
 	var bid = us[4];
 	var tid = us[6].split(".html")[0];
+	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
 		init: function() {
@@ -85,6 +86,7 @@ function ponychanx() {
 			if (Settings.gets("Quick reply key shortcuts")=="true") QR.keys();
 			Html.hidepostform();
 			if (Settings.get("x.show")=="true") QR.show();
+			if (rto != null) QR.quote(rto);
 		},
 		quote: function(h) {
 			QR.show();
@@ -322,6 +324,33 @@ function ponychanx() {
 				$jq(".reply", c).removeClass("hidden");
 			}
 		},
+		getcrossthread: function(anc, pid) {
+			var p = null;
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", anc.href);
+			xhr.setRequestHeader("Accept", "*/*");
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					if (xhr.status == 200) {
+						var f = false;
+						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
+							if (!f && $jq("tbody tr td.reply[id] a[name]", this)[0].name == pid)
+								f = true;
+							if (f) {
+								var c = $jq("td.reply[id]", this).addClass("inline").insertAfter(anc);
+								Posts.newhandle(c);
+								c.find("a[name], .postfooter").remove();
+								c.find(".reflink a").removeAttr("onclick").unbind("click");
+								c.find(".reflink a:not(:first)").removeAttr("href").css("cursor","not-allowed");
+								return false;
+							}
+						});
+						if (!f) $jq(".qrtop span").html("Could not load post.");
+					}
+				}
+			}
+		},
 		newhandle: function(p) {
 			var eq = (Settings.gets("Enable quick reply") == "true");
 			var eb = (Settings.gets("Enable backlinks") == "true");
@@ -343,7 +372,6 @@ function ponychanx() {
 					if (this.className.substr(0, 4) == "ref|") {
 						to = this.innerHTML.substr(8, this.innerHTML.length);
 						try {
-							// To do: move text out of anchor
 							tto = $jq("a[name='"+to+"']");
 						} catch(e) { return true; }
 						ffrom = $jq("a[name='"+from+"']");
@@ -368,10 +396,15 @@ function ponychanx() {
 							if (n.hasClass("inline"))
 								n.remove();
 							else {
-								var c = tto.parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
-								$jq(c).find("a[name]").remove();
-								Posts.fixhover(c);
-								Posts.newhandle(c);
+								var ca = this.className.split("|");
+								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")=="true") {
+									Posts.getcrossthread(this, ca[3]);
+								} else {
+									var c = tto.parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
+									$jq(c).find("a[name]").remove();
+									Posts.fixhover(c);
+									Posts.newhandle(c);
+								}
 							}
 							return false;
 						});
@@ -522,6 +555,7 @@ function ponychanx() {
 			"Quick reply key shortcuts": { def: "true" },
 			"Hide quick reply after posting": { def: "true" },
 			"Enable hide post buttons": { def: "true" },
+			"Enable cross-thread inline replies": { def: "true" },
 		}
 	};
 	
