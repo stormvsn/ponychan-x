@@ -7,6 +7,7 @@
 // @version       0.4
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
+// @homepage      http://www.ponychan.net/chan/meta/res/115168.html
 // ==/UserScript==
 
 function ponychanx() {
@@ -96,8 +97,11 @@ function ponychanx() {
 			QR.show();
 			var v = $jq("#qr textarea").val();
 			var qs = "";
-			var s = window.getSelection().toString();
-			if (s != "") { qs = ">"+s+"\n"; }
+			if (Settings.gets("Quote selected text on quick reply") == "true") {
+				var s = window.getSelection().toString();
+				if (s != "")
+					qs = ">"+s+"\n";
+			}
 			$jq("#qr textarea").val(v + ">>" + h + "\n" + qs).focus();
 			var vv = $jq("#qr textarea").val().length;
 			document.getElementById("msg").setSelectionRange(vv,vv);
@@ -583,6 +587,7 @@ function ponychanx() {
 			"Enable cross-thread inline replies": { def: "true" },
 			"Animate gif thumbnails": { def: "true" },
 			"Add google image search to posts": { def: "true" },
+			"Quote selected text on quick reply": { def: "false" },
 		}
 	};
 	
