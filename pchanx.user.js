@@ -377,8 +377,9 @@ function ponychanx() {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
+			var im;
 			if (Settings.gets("Animate gif thumbnails") == "true") {
-				var im = $jq(p).find("img", p)[0];
+				im = $jq(p).find("img", p)[0];
 				if (im != null && im.src.indexOf("s.gif") > 0) {
 					var ns = im.src;
 					ns = ns.replace("/thumb/", "/src/");
@@ -440,10 +441,12 @@ function ponychanx() {
 					});
 				});
 				
-				var rb = $jq(".postfooter > a", p)[0];
-				if (rb != null) {
-					$jq(rb).removeAttr("onclick");
-					rb.onclick = function() { QR.quote(from); return false; };
+				var rb = $jq(".postfooter > a", p);
+				if (rb[0] != null) {
+					$jq(rb[0]).removeAttr("onclick");
+					rb[0].onclick = function() { QR.quote(from); return false; };
+					if (rb[2] == null && im != null && Settings.gets("Add google image search to posts") == "true")
+						$jq(".postfooter", p).append(unescape("&nbsp;%u2022 <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a>"));
 				}
 			}
 		},
@@ -579,6 +582,7 @@ function ponychanx() {
 			"Enable hide post buttons": { def: "true" },
 			"Enable cross-thread inline replies": { def: "true" },
 			"Animate gif thumbnails": { def: "true" },
+			"Add google image search to posts": { def: "true" },
 		}
 	};
 	
