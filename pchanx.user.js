@@ -3,7 +3,7 @@
 // @name          Ponychan X
 // @description   Adds various bloat.
 // @author        milky
-// @include       http://www.ponychan.net/chan/*/res/*
+// @include       http://www.ponychan.net/chan/*
 // @version       0.4
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
@@ -14,15 +14,17 @@ function ponychanx() {
 	var durl = document.URL.split("#")[0];
 	var us = durl.split("/");
 	var bid = us[4];
-	var tid = us[6].split(".html")[0];
+	var tid = us[6] == null ? 0 : us[6].split(".html")[0];
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
 		init: function() {
-			if (Settings.gets("Enable quick reply")=="true") QR.init();
 			Html.init();
 			Css.init();
-			if (Settings.gets("Enable autoupdate")=="true") Updater.init();
+			if (tid != 0) {
+				if (Settings.gets("Enable autoupdate")=="true") Updater.init();
+				if (Settings.gets("Enable quick reply")=="true") QR.init();
+			}
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
 			Posts.init();
 			if (Settings.gets("Enable filter")=="true") Filter.init();
@@ -299,7 +301,6 @@ function ponychanx() {
 					$jq("#qr textarea").val(v + "["+t+"][/"+t+"]");
 					var vv = $jq("#qr textarea").val().length-4;
 					document.getElementById("msg").setSelectionRange(vv,vv);
-					
 					return false;
 				}
 			});
@@ -311,14 +312,15 @@ function ponychanx() {
 			Posts.addhandles();
 		},
 		addhandles: function() {
+			$jq("table:not(.postform):not(.userdelete)").each(function() {
+				Posts.newhandle(this);
+			});
+			if (tid == 0) return;
 			var oe = $jq(".thread").contents(":not(table,span:last)");
 			var op = $jq("<div class='op'></div>");
 			$jq(".thread").prepend(op);
 			op.append(oe);
 			Posts.newhandle(".op");
-			$jq("table:not(.postform):not(.userdelete)").each(function() {
-				Posts.newhandle(this);
-			});
 		},
 		hide: function(hp) {
 			hp = $jq(hp);
@@ -364,13 +366,14 @@ function ponychanx() {
 			var eb = (Settings.gets("Enable backlinks") == "true");
 			var ei = (Settings.gets("Enable inline replies") == "true");
 			var eh = (Settings.gets("Enable hide post buttons") == "true");
+			var bp = (tid == 0);
 			if (eh) {
 				$jq(".doubledash", p).html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 					Posts.hide(this);
 				}));
 			}
 			var ql = $jq($jq(".reflink a", p)[1]);
-			if (eq) {
+			if (eq && !bp) {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
@@ -397,7 +400,7 @@ function ponychanx() {
 						var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
 						.on("mouseover", addreflinkpreview)
 						.on("mouseout", delreflinkpreview);
-						if (eq) {
+						if (eq && !bp) {
 							bl.removeAttr("onclick");
 							bl.on("click", function() {
 								QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
@@ -428,7 +431,7 @@ function ponychanx() {
 					}
 				});
 			}
-			if (eq) {
+			if (eq && !bp) {
 				$jq(".extrabtns a[class]", p).each(function() {
 					$jq(this).removeAttr("onclick");
 					$jq(this).on("click", function() {
@@ -571,7 +574,7 @@ function ponychanx() {
 			"Show new post count in title": { def: "true" },
 			"Enable filter": { def: "false" },
 			"Enable inline replies": { def: "true" },
-			"Quick reply key shortcuts": { def: "true" },
+			"Quick reply key shortcuts": { def: "false" },
 			"Hide quick reply after posting": { def: "true" },
 			"Enable hide post buttons": { def: "true" },
 			"Enable cross-thread inline replies": { def: "true" },
