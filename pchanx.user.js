@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
-// @version       0.5
+// @version       0.6
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -80,7 +80,7 @@ function ponychanx() {
 							if (!f) $jq(".qrtop span").html("Error autoupdating <a href=''>Refresh manually</a>");
 						break;
 						case 404:
-							document.title = Html.title + "(404)";
+							document.title = Html.title + " (404)";
 							$jq(".qrtop span").html("404");
 						break;
 					}
@@ -301,7 +301,6 @@ function ponychanx() {
 						case 85: t = "u"; break;
 						case 82: t = "s"; break;
 						case 81: QR.show(); return false; break;
-						default: return false;
 					}
 					if (t != null) {
 						var v = $jq("#qr textarea").val();
@@ -544,6 +543,7 @@ function ponychanx() {
 		init: function() {
 			var s = document.createElement('style');
 			s.innerHTML = "h2 { padding: 17px 0 17px 0; }\
+			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
 			#qr * { margin: 0; padding: 0; }\
