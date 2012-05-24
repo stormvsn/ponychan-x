@@ -23,10 +23,10 @@ function ponychanx() {
 			Html.init();
 			Css.init();
 			if (tid != 0) {
-				if (Settings.gets("Enable autoupdate")=="true") Updater.init();
-				if (Settings.gets("Enable quick reply")=="true") QR.init();
+				if (Settings.gets("Enable autoupdate")=="true") Updater.init();	
 				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true") Dialog.init();
 			}
+			if (Settings.gets("Enable quick reply")=="true") QR.init();
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
 			Posts.init();
 			if (Settings.gets("Enable filter")=="true") Filter.init();
@@ -133,8 +133,13 @@ function ponychanx() {
 			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
 			<div id="imagelist"></div>';
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
-			$jq("#qr > input[type='button']").live("click", function() { QR.send(); } );
 			$jq("body").append(qr);
+			var btn = $jq("#qr > input[type='button']");
+			if (tid == 0) {
+				btn.val("Thread"); 
+				$jq("#qr .postopts label").css("display", "none");
+			}
+			btn.live("click", function() { QR.send(); } );
 			if (bid == "test" || bid == "show" || bid == "media" || bid == "collab" || bid == "phoenix" || bid == "vinyl")
 				$jq("#qr .embedwrap").css("display", "block");
 			QR.loadfields();
@@ -166,7 +171,7 @@ function ponychanx() {
 			$jq("#qr").css("display", "none");
 		},
 		send: function() {
-			if (!$jq("#qr").length) return;
+			if (!$jq("#qr").length) return;			
 			$jq("#qr > input[type='button']").val("...");
 			var n = $jq("#qr :input[name='name']").val();
 			var e = $jq("#qr :input[name='em']").val();
@@ -195,7 +200,7 @@ function ponychanx() {
 			}
 			if (sp) d.append("spoiler", sp);
 			d.append("message", m);
-			d.append("imagefile", i);
+			d.append("imagefile", i);			
 			var xhr = new XMLHttpRequest();
 			xhr.upload.addEventListener("progress", function(evt) {
 				if (evt.lengthComputable) {
@@ -212,9 +217,11 @@ function ponychanx() {
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
 							$jq(".qrtop span").html(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 							$jq("#qr > input[type='button']").val("Retry");
-						}
-						else
+						} else {
 							QR.clear(fid);
+							if (tid == 0)
+								location.reload(true);
+						}
 					} else {
 						$jq(".qrtop span").html("An error occured while posting.");
 						$jq("#qr > input[type='button']").val("Error");
@@ -525,7 +532,7 @@ function ponychanx() {
 			if (Settings.gets("Hide original post form") == "true") {
 				$jq("#postform").css("display", "none");
 				var a = document.createElement("a");
-				a.innerHTML = "<h2>Quick Reply</h2>";
+				tid == 0 ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
 				a.href = "javascript:;";
 				a.onclick = function() { QR.show(); };
 				$jq(".postarea").prepend(a);
@@ -565,12 +572,14 @@ function ponychanx() {
 		_me: false,
 		init: function() {
 			$jq(window).bind("focus", function() {
-				Notifier._new = 0;
-				Notifier._focus = true;
-				setTimeout(function() {
-					document.title = ".";
-					document.title = Html.title;
-				}, 500);
+				if (Notifier._new > 0) {
+					Notifier._new = 0;
+					Notifier._focus = true;
+					setTimeout(function() {
+						document.title = ".";
+						document.title = Html.title;
+					}, 500);
+				}
 			});
 			$jq(window).bind("blur", function() {
 				Notifier._focus = false;
