@@ -4,6 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
+// @include       *lunachan.net/*
 // @version       0.9
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
@@ -14,15 +15,18 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	var durl = document.URL.split("#")[0];
 	var us = durl.split("/");
-	var bid = us[4];
-	var tid = us[6] == null ? 0 : us[6].split(".html")[0];
+	var purl = us[2].indexOf("ponychan") > 1 ? us[2]+"/chan" : us[2];
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
+		bid: null,
+		tid: null,
 		init: function() {
+			Main.tid = $jq("#postform :input[name='replythread']").val();
+			Main.bid = $jq("#postform :input[name='board']").val();
 			Html.init();
 			Css.init();
-			if (tid != 0) {
+			if (Main.tid != "0") {
 				if (Settings.gets("Enable autoupdate")=="true") Updater.init();	
 				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true") Dialog.init();
 			}
@@ -135,12 +139,12 @@ function ponychanx() {
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("body").append(qr);
 			var btn = $jq("#qr > input[type='button']");
-			if (tid == 0) {
+			if (Main.tid == "0") {
 				btn.val("Thread"); 
 				$jq("#qr .postopts label").css("display", "none");
 			}
 			btn.live("click", function() { QR.send(); } );
-			if (bid == "test" || bid == "show" || bid == "media" || bid == "collab" || bid == "phoenix" || bid == "vinyl")
+			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl")
 				$jq("#qr .embedwrap").css("display", "block");
 			QR.loadfields();
 			document.getElementById("imgfile").onchange = function() { QR.thumb(); };
@@ -183,8 +187,8 @@ function ponychanx() {
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
-			d.append("board", bid);
-			d.append("replythread", tid);
+			d.append("board", Main.bid);
+			d.append("replythread", Main.tid);
 			d.append("quickreply", "");
 			d.append("name", n);
 			d.append("em", e);
@@ -192,7 +196,7 @@ function ponychanx() {
 			d.append("postpassword", pp);
 			d.append("how_much_pony_can_you_handle", hmpcyh);
 			d.append("stats_referrer", "");
-			if (bid == "test" || bid == "show" || bid == "media" || bid == "collab" || bid == "phoenix" || bid == "vinyl") {
+			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
 				var em = $jq("#qr :input[name='embed']").val();
 				var emt = $jq("#qr select").val();
 				d.append("embed", em);
@@ -208,7 +212,7 @@ function ponychanx() {
 					$jq("#qr > input[type='button']").val(percentComplete.toString() + '%');
 				}
 			}, false);
-			xhr.open("POST", "http://www.ponychan.net/chan/board.php");  
+			xhr.open("POST", "http://" + purl + "/board.php");  
 			xhr.send(d);
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
@@ -219,7 +223,7 @@ function ponychanx() {
 							$jq("#qr > input[type='button']").val("Retry");
 						} else {
 							QR.clear(fid);
-							if (tid == 0)
+							if (Main.tid == "0")
 								location.reload(true);
 						}
 					} else {
@@ -365,7 +369,7 @@ function ponychanx() {
 			Posts.addhandles();
 		},
 		addhandles: function() {
-			if (tid != 0) {
+			if (Main.tid != "0") {
 				var oe = $jq(".thread").contents(":not(table,span:last)");
 				var op = $jq("<div class='op'></div>");
 				$jq(".thread").prepend(op);
@@ -422,7 +426,7 @@ function ponychanx() {
 			var eb = (Settings.gets("Enable backlinks") == "true");
 			var ei = (Settings.gets("Enable inline replies") == "true");
 			var eh = (Settings.gets("Enable hide post buttons") == "true");
-			var bp = (tid == 0);
+			var bp = (Main.tid == "0");
 			if (eh) {
 				$jq(".doubledash", p).html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 					Posts.hide(this);
@@ -453,7 +457,7 @@ function ponychanx() {
 						ffrom = $jq("a[name='"+from+"']");
 					}
 					if (!$jq(this).closest("td").hasClass("inline") && tto != null && eb) {
-						var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+bid+"|"+tid+"|"+from+"'>>>"+from+"</a> ")
+						var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+Main.bid+"|"+Main.tid+"|"+from+"'>>>"+from+"</a> ")
 						.on("mouseover", addreflinkpreview)
 						.on("mouseout", delreflinkpreview);
 						if (eq && !bp) {
@@ -535,7 +539,7 @@ function ponychanx() {
 			if (Settings.gets("Hide original post form") == "true") {
 				$jq("#postform").css("display", "none");
 				var a = document.createElement("a");
-				tid == 0 ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
+				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
 				a.href = "javascript:;";
 				a.onclick = function() { QR.show(); };
 				$jq(".postarea").prepend(a);
