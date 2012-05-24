@@ -101,16 +101,19 @@ function ponychanx() {
 		},
 		quote: function(h) {
 			QR.show();
-			var v = $jq("#qr textarea").val();
 			var qs = "";
 			if (Settings.gets("Quote selected text on quick reply") == "true") {
-				var s = window.getSelection().toString();
-				if (s != "")
+				var s = $jq.trim(window.getSelection().toString());
+				if (s.trim() != "")
 					qs = ">"+s+"\n";
 			}
-			$jq("#qr textarea").val(v + ">>" + h + "\n" + qs).focus();
-			var vv = $jq("#qr textarea").val().length;
-			document.getElementById("msg").setSelectionRange(vv,vv);
+			h = ">>" + h + "\n" + qs;
+			var ta = $jq("#qr textarea")[0];
+			var cp = ta.selectionStart;
+			ta.value = ta.value.slice(0, cp) + h + ta.value.slice(ta.selectionEnd);
+			ta.focus();
+			var r = cp + h.length;
+			ta.setSelectionRange(r, r);
 		},
 		show: function() {
 			Settings.set("x.show", "true");
@@ -316,10 +319,13 @@ function ponychanx() {
 						case 81: $jq("#qr").css("display") == "block" ? QR.hide() : QR.show(); return false; break;
 					}
 					if (t != null) {
-						var v = $jq("#qr textarea").val();
-						$jq("#qr textarea").val(v + "["+t+"][/"+t+"]");
-						var vv = $jq("#qr textarea").val().length-4;
-						document.getElementById("msg").setSelectionRange(vv,vv);
+						var ins = "["+t+"][/"+t+"]";
+						var ta = $jq("#qr textarea")[0];
+						var cp = ta.selectionStart;
+						ta.value = ta.value.slice(0, cp) + ins + ta.value.slice(ta.selectionEnd);
+						ta.focus();
+						var r = cp + ins.length;
+						ta.setSelectionRange(r, r);
 						return e.preventDefault();
 					}
 				}
