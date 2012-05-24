@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
-// @version       0.8
+// @version       0.9
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -355,7 +355,7 @@ function ponychanx() {
 				setTimeout(function() {	Dialog.countdown(); }, 1000);
 			} else {
 				Dialog.left = Updater.tmr/1000;
-				$jq("#dialog").html("Autoupdate: ...");
+				$jq("#dialog").html("Autoupdate: ..");
 			}
 		}
 	};
@@ -365,15 +365,18 @@ function ponychanx() {
 			Posts.addhandles();
 		},
 		addhandles: function() {
+			if (tid != 0) {
+				var oe = $jq(".thread").contents(":not(table,span:last)");
+				var op = $jq("<div class='op'></div>");
+				$jq(".thread").prepend(op);
+				op.append(oe);
+				var bs = $jq("<span class='extrabtns'></span>");
+				$jq(".reflink:first").after(bs);
+				Posts.newhandle(".op");
+			}
 			$jq("table:not(.postform):not(.userdelete)").each(function() {
 				Posts.newhandle(this);
-			});
-			if (tid == 0) return;
-			var oe = $jq(".thread").contents(":not(table,span:last)");
-			var op = $jq("<div class='op'></div>");
-			$jq(".thread").prepend(op);
-			op.append(oe);
-			Posts.newhandle(".op");
+			});			
 		},
 		hide: function(hp) {
 			hp = $jq(hp);
@@ -552,7 +555,7 @@ function ponychanx() {
 			opt.append("Update every <input type='text' id='updatetimer' value='"+s+"'> seconds<br />");
 			$jq("#updatetimer").live("change", function() { if (isNaN(parseInt($jq(this).val()))) return; Settings.set("x.updatetimer", $jq(this).val()); });
 			if (Settings.gets("Enable filter")=="true") {
-				opt.append("<br /><strong>Filter</strong><br />Seperate items with ;<br />");
+				opt.append("<br /><strong>Filter</strong><br />Insert ; after each item<br />");
 				opt.append("Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%'>");
 				opt.append("Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%'>");
 				opt.append("Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%'><br />");
@@ -578,7 +581,7 @@ function ponychanx() {
 					setTimeout(function() {
 						document.title = ".";
 						document.title = Html.title;
-					}, 500);
+					}, 1000);
 				}
 			});
 			$jq(window).bind("blur", function() {
