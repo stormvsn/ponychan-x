@@ -138,6 +138,8 @@ function ponychanx() {
 			<div id="imagelist"></div>';
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("body").append(qr);
+			if (Settings.gets("Hide quick reply when top button clicked") == "true")
+				$jq("#qr .top a:first").on("click", function() { QR.hide(); });
 			var btn = $jq("#qr > input[type='button']");
 			if (Main.tid == "0") {
 				btn.val("Thread"); 
@@ -673,6 +675,7 @@ function ponychanx() {
 			"Hide original post form": { def: "true" },
 			"Show autoupdate countdown dialog": { def: "true" },
 			"Sync original post form and quick reply": { def: "false" },
+			"Hide quick reply when top button clicked": { def: "false" },
 		}
 	};
 	
