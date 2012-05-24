@@ -208,6 +208,7 @@ function ponychanx() {
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
+						Notifier._me = true;
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
 							$jq(".qrtop span").html(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 							$jq("#qr > input[type='button']").val("Retry");
@@ -561,6 +562,7 @@ function ponychanx() {
 	var Notifier = {
 		_new: 0,
 		_focus: true,
+		_me: false,
 		init: function() {
 			$jq(window).bind("focus", function() {
 				Notifier._new = 0;
@@ -575,6 +577,7 @@ function ponychanx() {
 			});
 		},
 		newhandle: function(e) {
+			if (Notifier._me) { Notifier._me = false; return; }
 			if (Notifier._focus) return;
 			++Notifier._new;
 			document.title = "("+Notifier._new+") "+ Html.title;
