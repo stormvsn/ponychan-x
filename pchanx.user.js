@@ -165,6 +165,7 @@ function ponychanx() {
 			var m = $jq("#qr :input[name='message']").val();
 			var sp = $jq("#qr .postopts :input[name='spoiler']").is(":checked");
 			var pp = $jq("#postform :input[name='postpassword']").val();
+			var hmpcyh = $jq("#postform :input[name='how_much_pony_can_you_handle']").val();
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
@@ -175,6 +176,8 @@ function ponychanx() {
 			d.append("em", e);
 			d.append("subject", s);
 			d.append("postpassword", pp);
+			d.append("how_much_pony_can_you_handle", hmpcyh);
+			d.append("stats_referrer", "");
 			if (sp) d.append("spoiler", sp);
 			d.append("message", m);
 			d.append("imagefile", i);
