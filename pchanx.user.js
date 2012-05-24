@@ -59,7 +59,7 @@ function ponychanx() {
 					switch (xhr.status) {
 						case 200:
 							var f, l;
-							if ($jq(".thread table").length == 0) {
+							if ($jq("#delform div[id]:first table").length == 0) {
 								l = "";
 								f = true;
 							} else {
@@ -68,7 +68,7 @@ function ponychanx() {
 							}
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
 								if (f) {
-									var tal = $jq(".thread table:last");
+									var tal = $jq("#delform div[id]:first table:last");
 									if (tal.length > 0)
 										tal.after(this);
 									else
