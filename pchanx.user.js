@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
-// @version       0.7
+// @version       0.8
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -82,7 +82,7 @@ function ponychanx() {
 							if (!f) $jq(".qrtop span").html("Error autoupdating <a href=''>Refresh manually</a>");
 						break;
 						case 404:
-							document.title = Html.title + " (404)";
+							document.title = "(404) " + Html.title;
 							$jq(".qrtop span").html("404");
 						break;
 					}
@@ -305,7 +305,7 @@ function ponychanx() {
 						case 73: t = "i"; break;
 						case 85: t = "u"; break;
 						case 82: t = "s"; break;
-						case 81: QR.show(); return false; break;
+						case 81: $jq("#qr").css("display") == "block" ? QR.hide() : QR.show(); return false; break;
 					}
 					if (t != null) {
 						var v = $jq("#qr textarea").val();
@@ -408,15 +408,14 @@ function ponychanx() {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
-			var im;
-			if (Settings.gets("Animate gif thumbnails") == "true") {
-				im = $jq(p).find("img", p)[0];
-				if (im != null && im.src.indexOf("s.gif") > 0) {
-					var ns = im.src;
-					ns = ns.replace("/thumb/", "/src/");
-					ns = ns.replace("s.gif", ".gif");
+			var im = $jq(p).find("img", p)[0];
+			var ns;
+			if (im != null) {
+				ns = im.src;
+				ns = ns.replace("/thumb/", "/src/");
+				ns = ns.replace("s.", ".");
+				if (Settings.gets("Animate gif thumbnails") == "true" && im.src.indexOf("s.gif") > 0)
 					im.src = ns;
-				}
 			}
 			if (eb || ei || eq) {
 				$jq("blockquote a[class]", p).each(function() {
@@ -478,8 +477,12 @@ function ponychanx() {
 					rb[0].onclick = function() { QR.quote(from); return false; };
 				}
 			}
-			if (rb[2] == null && im != null && Settings.gets("Add google image search to posts") == "true")
-					$jq(".postfooter", p).append(unescape("&nbsp;%u2022 <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a>"));
+			if (im != null && Settings.gets("Add image shortcuts to posts") == "true") {
+				if (rb[2] == null)
+					$jq(".postfooter", p).append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
+				if (rb[3] == null)
+					$jq(".postfooter", p).append(unescape(" &nbsp;%u2022&nbsp; <a href='"+ns+"' target='_blank'>Download</a>"));
+			}
 		},
 		fixhover: function(p) {
 			$jq("blockquote a[class], .extrabtns a[class]", p).each(function() {
@@ -509,7 +512,7 @@ function ponychanx() {
 				$jq("#postform").css("display", "none");
 				var a = document.createElement("a");
 				a.innerHTML = "<h2>Quick Reply</h2>";
-				a.href = "#";
+				a.href = "javascript:;";
 				a.onclick = function() { QR.show(); };
 				$jq(".postarea").prepend(a);
 			}
@@ -561,7 +564,7 @@ function ponychanx() {
 		newhandle: function(e) {
 			if (Notifier._focus) return;
 			++Notifier._new;
-			document.title = Html.title + " ("+Notifier._new+")";
+			document.title = "("+Notifier._new+") "+ Html.title;
 		},
 	}
 	
@@ -622,7 +625,7 @@ function ponychanx() {
 			"Enable hide post buttons": { def: "true" },
 			"Enable cross-thread inline replies": { def: "true" },
 			"Animate gif thumbnails": { def: "true" },
-			"Add google image search to posts": { def: "true" },
+			"Add image shortcuts to posts": { def: "true" },
 			"Quote selected text on quick reply": { def: "false" },
 			"Hide original post form": { def: "true" },
 			"Show autoupdate countdown dialog": { def: "true" },
