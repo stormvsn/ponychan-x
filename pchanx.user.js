@@ -122,6 +122,8 @@ function ponychanx() {
 			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" accesskey="n">\
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
+			<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" accesskey="e">\
+			<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option></select></div>\
 			<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
 			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accept="image/*" accesskey="f">\
 			<input type="button" value="Reply" accesskey="z">\
@@ -130,6 +132,8 @@ function ponychanx() {
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("#qr > input[type='button']").live("click", function() { QR.send(); } );
 			$jq("body").append(qr);
+			if (bid == "test" || bid == "show" || bid == "media" || bid == "collab" || bid == "phoenix" || bid == "vinyl")
+				$jq("#qr .embedwrap").css("display", "block");
 			QR.loadfields();
 			document.getElementById("imgfile").onchange = function() { QR.thumb(); };
 			var x = Settings.get("x.qrpos_x");
@@ -180,6 +184,12 @@ function ponychanx() {
 			d.append("postpassword", pp);
 			d.append("how_much_pony_can_you_handle", hmpcyh);
 			d.append("stats_referrer", "");
+			if (bid == "test" || bid == "show" || bid == "media" || bid == "collab" || bid == "phoenix" || bid == "vinyl") {
+				var em = $jq("#qr :input[name='embed']").val();
+				var emt = $jq("#qr select").val();
+				d.append("embed", em);
+				d.append("embedtype", emt);
+			}
 			if (sp) d.append("spoiler", sp);
 			d.append("message", m);
 			d.append("imagefile", i);
@@ -229,6 +239,7 @@ function ponychanx() {
 			QR.thumbreset();
 			$jq("#qr textarea").val("");
 			$jq("#qr :input[name='subject']").val("");
+			$jq("#qr .embedwrap :input[name='embed']").val("");
 			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
 			if (Settings.gets("Hide quick reply after posting")=="true" && $jq("#qr .postopts :input[name='auto']")[0].checked == false)
 				QR.hide();
@@ -240,7 +251,6 @@ function ponychanx() {
 					$jq($jq(".listthumb")[0]).attr("id", "thumbselected")
 					document.getElementById("imagelist").scrollTop = 0;
 				} else {
-					$jq("#qr").css("height", "230px");
 					$jq("#imagelist, .postopts").css("display", "none");
 					$jq("#qr input[type='file']").val("");
 					$jq("#qr .postopts :input[name='auto']")[0].checked = false
@@ -251,7 +261,6 @@ function ponychanx() {
 			var f = document.getElementById("imgfile").files;
 			if (f[0] == null) {
 				$jq("#imagelist, .postopts").css("display", "none");
-				$jq("#qr").css("height", "230px");
 				return;
 			}
 			$jq("#imagelist").html("");
@@ -278,7 +287,6 @@ function ponychanx() {
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
 			$jq("#imagelist, .postopts").fadeIn("fast");
-			$jq("#qr").css("height", "327px");
 		},
 		loadfields: function() {
 			var ln = Settings.get("x.name");
@@ -471,7 +479,6 @@ function ponychanx() {
 						return false;
 					});
 				});
-				
 				if (rb[0] != null) {
 					$jq(rb[0]).removeAttr("onclick");
 					rb[0].onclick = function() { QR.quote(from); return false; };
@@ -572,6 +579,9 @@ function ponychanx() {
 		init: function() {
 			var s = document.createElement('style');
 			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; }\
+			#embed { width: 314px !important; }\
+			#qr .embedwrap select { padding: 3px 0 2px 0; }\
+			#qr .embedwrap { display: none; }\
 			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
 			h2 { padding: 17px 0 17px 0; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
@@ -586,7 +596,7 @@ function ponychanx() {
 			#qr .close a { font-weight:bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; }\
 			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #123555; height: 20px; cursor: move; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
-			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; height: 230px; background: #eee; border: 1px solid #000; }\
+			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; background: #eee; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }";
