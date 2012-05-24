@@ -4,7 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
-// @version       0.6
+// @version       0.7
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -25,6 +25,7 @@ function ponychanx() {
 			if (tid != 0) {
 				if (Settings.gets("Enable autoupdate")=="true") Updater.init();
 				if (Settings.gets("Enable quick reply")=="true") QR.init();
+				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true") Dialog.init();
 			}
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
 			Posts.init();
@@ -50,6 +51,7 @@ function ponychanx() {
 				if (xhr.readyState == 4) {
 					Updater.last = xhr.getResponseHeader("Last-Modified");
 					setTimeout(function() { Updater.get(); }, Updater.tmr);
+					if (Settings.gets("Show autoupdate countdown dialog") == "true") { Dialog.countdown(); }
 					switch (xhr.status) {
 						case 200:
 							var f, l;
@@ -317,6 +319,25 @@ function ponychanx() {
 		}
 	};
 	
+	var Dialog = {
+		left: 0,
+		init: function() {
+			Dialog.left = Updater.tmr/1000;
+			$jq("body").append($jq("<div id='dialog'></div>"));
+			Dialog.countdown();
+		},
+		countdown: function() {
+			if (Dialog.left > -1) {
+				$jq("#dialog").html("Autoupdate: " + Dialog.left);
+				Dialog.left--;
+				setTimeout(function() {	Dialog.countdown(); }, 1000);
+			} else {
+				Dialog.left = Updater.tmr/1000;
+				$jq("#dialog").html("Autoupdate: ...");
+			}
+		}
+	};
+	
 	var Posts = {
 		init: function() {
 			Posts.addhandles();
@@ -547,7 +568,8 @@ function ponychanx() {
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "h2 { padding: 17px 0 17px 0; }\
+			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; }\
+			h2 { padding: 17px 0 17px 0; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
@@ -560,7 +582,7 @@ function ponychanx() {
 			#qr .close a { font-weight:bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; }\
 			#qr .qrtop { float: left; width: 374px; font-size: small; color: white; padding-left: 5px; background-color: #123555; height: 20px; cursor: move; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
-			#qr { padding: 2px; margin-right: 10px; margin-bottom: 10px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; bottom: 0; right: 0; width: 400px; height:230px; background: #eee; border: 1px solid #000; }\
+			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; height: 230px; background: #eee; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }";
@@ -602,6 +624,7 @@ function ponychanx() {
 			"Add google image search to posts": { def: "true" },
 			"Quote selected text on quick reply": { def: "false" },
 			"Hide original post form": { def: "true" },
+			"Show autoupdate countdown dialog": { def: "true" },
 		}
 	};
 	
