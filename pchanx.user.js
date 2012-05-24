@@ -118,7 +118,7 @@ function ponychanx() {
 			if ($jq("#qr").length) return;
 			var qr = document.createElement("div");
 			qr.setAttribute("id", "qr");
-			qr.innerHTML = '<div class="qrtop"><span></span></div><div class="close"><a href="javascript:;">X</a></div>\
+			qr.innerHTML = '<div class="qrtop"><span></span></div><div class="top"><a href="#" title="Top">\u25b2</a><a href="javascript:;" onclick="javascript:window.scrollTo(0, document.body.scrollHeight);" title="Bottom">&#9660;</a></div><div class="close"><a href="javascript:;" title="Close">X</a></div>\
 			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" accesskey="n">\
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
@@ -569,6 +569,7 @@ function ponychanx() {
 		init: function() {
 			var s = document.createElement('style');
 			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; }\
+			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
 			h2 { padding: 17px 0 17px 0; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
@@ -580,7 +581,7 @@ function ponychanx() {
 			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
 			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
 			#qr .close a { font-weight:bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; }\
-			#qr .qrtop { float: left; width: 374px; font-size: small; color: white; padding-left: 5px; background-color: #123555; height: 20px; cursor: move; }\
+			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #123555; height: 20px; cursor: move; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
 			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; height: 230px; background: #eee; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
