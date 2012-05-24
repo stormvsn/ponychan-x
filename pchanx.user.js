@@ -26,7 +26,7 @@ function ponychanx() {
 			Main.bid = $jq("#postform :input[name='board']").val();
 			Html.init();
 			Css.init();
-			if (Main.tid != "0") {
+			if (Main.tid != "0" && $jq("#postform").length > 0) {
 				if (Settings.gets("Enable autoupdate")=="true") Updater.init();	
 				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true") Dialog.init();
 			}
@@ -379,7 +379,7 @@ function ponychanx() {
 			Posts.addhandles();
 		},
 		addhandles: function() {
-			if (Main.tid != "0") {
+			if (Main.tid != "0" && $jq("#postform").length > 0) {
 				var oe = $jq(".thread").contents(":not(table,span:last)");
 				var op = $jq("<div class='op'></div>");
 				$jq(".thread").prepend(op);
@@ -546,7 +546,7 @@ function ponychanx() {
 			Html.addoptions();
 		},
 		hidepostform: function() {
-			if (Settings.gets("Hide original post form") == "true") {
+			if (Settings.gets("Hide original post form") == "true" && $jq("#postform").length > 0) {
 				$jq("#postform").css("display", "none");
 				var a = document.createElement("a");
 				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
