@@ -439,6 +439,7 @@ function ponychanx() {
 					}
 				});
 			}
+			var rb = $jq(".postfooter > a", p);
 			if (eq && !bp) {
 				$jq(".extrabtns a[class]", p).each(function() {
 					$jq(this).removeAttr("onclick");
@@ -448,14 +449,13 @@ function ponychanx() {
 					});
 				});
 				
-				var rb = $jq(".postfooter > a", p);
 				if (rb[0] != null) {
 					$jq(rb[0]).removeAttr("onclick");
 					rb[0].onclick = function() { QR.quote(from); return false; };
-					if (rb[2] == null && im != null && Settings.gets("Add google image search to posts") == "true")
-						$jq(".postfooter", p).append(unescape("&nbsp;%u2022 <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a>"));
 				}
 			}
+			if (rb[2] == null && im != null && Settings.gets("Add google image search to posts") == "true")
+					$jq(".postfooter", p).append(unescape("&nbsp;%u2022 <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a>"));
 		},
 		fixhover: function(p) {
 			$jq("blockquote a[class], .extrabtns a[class]", p).each(function() {
