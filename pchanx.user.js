@@ -143,6 +143,14 @@ function ponychanx() {
 				btn.val("Thread"); 
 				$jq("#qr .postopts label").css("display", "none");
 			}
+			if (Settings.gets("Sync original post form and quick reply")=="true") {
+				$jq("#qr > input[name], #qr textarea").on("keyup change", function() {
+					$jq("#postform").find("[name='"+this.name+"']").val(this.value);
+				});
+				$jq("#postform input[name], #postform textarea").on("keyup change", function() {
+					$jq("#qr").find("[name='"+this.name+"']").val(this.value);
+				});
+			}
 			btn.live("click", function() { QR.send(); } );
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl")
 				$jq("#qr .embedwrap").css("display", "block");
@@ -549,7 +557,7 @@ function ponychanx() {
 			$jq(".adminbar").prepend($jq('<a class="adminbaritem" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			}));
-			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div");
+			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div>");
 			for (s in Settings.settings) {
 				opt.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
 			}
@@ -664,6 +672,7 @@ function ponychanx() {
 			"Quote selected text on quick reply": { def: "false" },
 			"Hide original post form": { def: "true" },
 			"Show autoupdate countdown dialog": { def: "true" },
+			"Sync original post form and quick reply": { def: "false" },
 		}
 	};
 	
