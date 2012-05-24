@@ -689,6 +689,10 @@ function ponychanx() {
 				Filter.filter(p);
 				return;
 			}
+			if (Filter.filtered(0, $jq.trim($jq("span.postername a", p).text()))) {
+				Filter.filter(p);
+				return;
+			}
 			if (Filter.filtered(1, $jq("span.postertrip", p).text())) {
 				Filter.filter(p);
 				return;
