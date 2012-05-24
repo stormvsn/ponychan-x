@@ -481,12 +481,14 @@ function ponychanx() {
 			Html.addoptions();
 		},
 		hidepostform: function() {
-			$jq("#postform").css("display", "none");
-			var a = document.createElement("a");
-			a.innerHTML = "<h2>Quick Reply</h2>";
-			a.href = "#";
-			a.onclick = function() { QR.show(); };
-			$jq(".postarea").prepend(a);
+			if (Settings.gets("Hide original post form") == "true") {
+				$jq("#postform").css("display", "none");
+				var a = document.createElement("a");
+				a.innerHTML = "<h2>Quick Reply</h2>";
+				a.href = "#";
+				a.onclick = function() { QR.show(); };
+				$jq(".postarea").prepend(a);
+			}
 		},
 		addoptions: function() {
 			$jq(".adminbar").prepend($jq('<a class="adminbaritem" href="javascript:;">Ponychan X</a>').bind("click", function() {
@@ -507,9 +509,9 @@ function ponychanx() {
 				opt.append("Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%'>");
 				opt.append("Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%'><br />");
 			}
-			opt.append("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
+			opt.append($jq("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
 				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
-			});
+			}));
 			opt.append("<br /><a href='' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
 			$jq('#pxoptions > input[id][name]').keyup(function() { Filter.save(); }).change(function() { Filter.save(); });
@@ -596,6 +598,7 @@ function ponychanx() {
 			"Animate gif thumbnails": { def: "true" },
 			"Add google image search to posts": { def: "true" },
 			"Quote selected text on quick reply": { def: "false" },
+			"Hide original post form": { def: "true" },
 		}
 	};
 	
