@@ -9,7 +9,7 @@
 // @exclude       http://www.ponychan.net/chan/board.php
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.10
+// @version       0.11
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
