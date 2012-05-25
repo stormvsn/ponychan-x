@@ -66,6 +66,7 @@ function ponychanx() {
 								l = $jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name;
 								f = false;
 							}
+							var sat = (parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100);
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
 								if (f) {
 									var tal = $jq("#delform div[id]:first table:last");
@@ -78,11 +79,14 @@ function ponychanx() {
 									Posts.fixdate(this);
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
+									if (sat && Settings.gets("Scroll on new post") == "true")
+										window.scrollTo(0, document.body.scrollHeight);
 								}
 								var fne = $jq("tbody tr td[id] a[name]", this)[0];
 								if (!f && fne != null && fne.name == l)
 									f = true;
 							});
+							
 							if (!f) $jq(".qrtop span").html("Error autoupdating <a href=''>Refresh manually</a>");
 						break;
 						case 404:
@@ -589,14 +593,12 @@ function ponychanx() {
 		_me: false,
 		init: function() {
 			$jq(window).bind("focus", function() {
-				if (Notifier._new > 0) {
-					Notifier._new = 0;
-					Notifier._focus = true;
-					setTimeout(function() {
-						document.title = ".";
-						document.title = Html.title;
-					}, 1000);
-				}
+				Notifier._new = 0;
+				Notifier._focus = true;
+				setTimeout(function() {
+					document.title = ".";
+					document.title = Html.title;
+				}, 1000);
 			});
 			$jq(window).bind("blur", function() {
 				Notifier._focus = false;
@@ -676,6 +678,7 @@ function ponychanx() {
 			"Show autoupdate countdown dialog": { def: "true" },
 			"Sync original post form and quick reply": { def: "false" },
 			"Hide quick reply when top button clicked": { def: "false" },
+			"Scroll on new post": { def: "false" },
 		}
 	};
 	
