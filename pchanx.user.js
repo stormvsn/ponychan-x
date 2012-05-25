@@ -540,10 +540,15 @@ function ponychanx() {
 								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")=="true") {
 									Posts.getcrossthread(this, ca[3]);
 								} else {
-									var c = tto.parent().clone().addClass("inline").removeAttr("id").insertAfter(this);
-									$jq(c).find("a[name]").remove();
-									Posts.fixhover(c);
-									Posts.newhandle(c);
+									var pc = tto.parent();
+									if (pc[0].nodeName != "DIV" || Main.tid != "0") {
+										var c = pc.clone().addClass("inline").removeAttr("id").insertAfter(this);
+										$jq(c).find("a[name]").remove();
+										Posts.fixhover(c);
+										Posts.newhandle(c);
+									} else {
+										return;
+									}
 								}
 							}
 							return false;
