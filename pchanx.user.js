@@ -5,6 +5,10 @@
 // @author        milky
 // @include       http://www.ponychan.net/chan/*
 // @include       *lunachan.net/*
+// @exclude       http://www.ponychan.net/chan/
+// @exclude       http://www.ponychan.net/chan/board.php
+// @exclude       *lunachan.net/
+// @exclude       *lunachan.net/board.php
 // @version       0.9
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
