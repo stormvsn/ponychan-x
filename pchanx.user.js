@@ -9,7 +9,7 @@
 // @exclude       http://www.ponychan.net/chan/board.php
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.9
+// @version       0.10
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -289,7 +289,9 @@ function ponychanx() {
 			$jq(".qrtop span").html("");
 			$jq(".listthumb[name='"+fid+"']").remove();
 			QR.thumbreset();
-			$jq("#qr textarea").val("");
+			var ts = $jq("#thumbselected");
+			var tsp = ts.length > 0 ? ts.attr("data-post") : "";
+			$jq("#qr textarea").val(tsp);
 			$jq("#qr :input[name='subject']").val("");
 			$jq("#qr .embedwrap :input[name='embed']").val("");
 			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
@@ -300,8 +302,9 @@ function ponychanx() {
 		thumbreset: function() {
 			if ($jq("#thumbselected").length < 1) {
 				if ($jq(".listthumb").length > 0) {
-					$jq($jq(".listthumb")[0]).attr("id", "thumbselected")
+					$jq($jq(".listthumb")[0]).attr("id", "thumbselected");
 					document.getElementById("imagelist").scrollTop = 0;
+					$jq("#qr textarea").val($jq("#thumbselected").attr("data-post"));
 				} else {
 					$jq("#imagelist, .postopts").css("display", "none");
 					$jq("#qr input[type='file']").val("");
@@ -313,6 +316,7 @@ function ponychanx() {
 			var f = document.getElementById("imgfile").files;
 			if (f[0] == null) {
 				$jq("#imagelist, .postopts").css("display", "none");
+				$jq("#imagelist").html("");
 				return;
 			}
 			$jq("#imagelist").html("");
@@ -324,8 +328,13 @@ function ponychanx() {
 				$jq("#imagelist").append(thumb);
 				$jq(thumb).on("mousedown", function(e) {
 					if (e.which == 1) {
+						var upc = (Settings.gets("Unique post content per image")=="true");
+						if (upc)
+							$jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
 						$jq("#thumbselected").removeAttr("id");
 						this.id = "thumbselected";
+						if (upc)
+							$jq("#qr textarea").val(this.getAttribute("data-post"));;
 					} else if (e.which == 2) {
 						$jq(this).remove();
 						QR.thumbreset();
@@ -715,6 +724,7 @@ function ponychanx() {
 			"Sync original post form and quick reply": { def: "false" },
 			"Hide quick reply when top button clicked": { def: "false" },
 			"Scroll on new post": { def: "false" },
+			"Unique post content per image": { def: "false" },
 		}
 	};
 	
