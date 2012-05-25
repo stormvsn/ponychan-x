@@ -123,6 +123,9 @@ function ponychanx() {
 			var r = cp + h.length;
 			ta.setSelectionRange(r, r);
 		},
+		settitle: function(t) {
+			$jq(".qrtop span").html(t);
+		},
 		show: function() {
 			Settings.set("x.show", "true");
 			$jq("#qr").css("display", "block");
@@ -197,19 +200,34 @@ function ponychanx() {
 			var m = $jq("#qr :input[name='message']").val();
 			var sp = $jq("#qr .postopts :input[name='spoiler']").is(":checked");
 			var pp = $jq("#postform :input[name='postpassword']").val();
+			var qri = $jq("#postform :input[name='quickreply']").val();
 			var hmpcyh = $jq("#postform :input[name='how_much_pony_can_you_handle']").val();
+			// Mod
+			var mp = $jq("#postform :input[name='modpassword']").val();
+			var lop = $jq("#postform :input[name='lockonpost']").val();
+			var sop = $jq("#postform :input[name='stickyonpost']").val();
+			var rh = $jq("#postform :input[name='rawhtml']").val();
+			var usn = $jq("#postform :input[name='usestaffname']").val();
+			// End mod
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
 			d.append("board", Main.bid);
 			d.append("replythread", Main.tid);
-			d.append("quickreply", "");
+			d.append("quickreply", qri);
 			d.append("name", n);
 			d.append("em", e);
 			d.append("subject", s);
 			d.append("postpassword", pp);
 			d.append("how_much_pony_can_you_handle", hmpcyh);
 			d.append("stats_referrer", "");
+			// Mod
+			d.append("modpassword", mp);
+			d.append("lockonpost", lop);
+			d.append("stickyonpost", sop);
+			d.append("rawhtml", rh);
+			d.append("usestaffname", usn);
+			// End mod
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
 				var em = $jq("#qr :input[name='embed']").val();
 				var emt = $jq("#qr select").val();
@@ -236,9 +254,9 @@ function ponychanx() {
 							$jq(".qrtop span").html(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 							$jq("#qr > input[type='button']").val("Retry");
 						} else {
-							QR.clear(fid);
-							if (Main.tid == "0")
+							if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 								location.reload(true);
+							QR.clear(fid);
 						}
 					} else {
 						$jq(".qrtop span").html("An error occured while posting.");
@@ -256,13 +274,14 @@ function ponychanx() {
 				$jq("#qr > input[type='button']").val(a+QR.cooldown);
 				QR.cooldown--;
 			} else {
-				$jq("#qr > input[type='button']").removeAttr("disabled").val("Reply");
+				$jq("#qr > input[type='button']").removeAttr("disabled").val(Main.tid == "0" ? "Thread" : "Reply");
 				QR.cooldown = 15;
 				if ($jq("#qr .postopts :input[name='auto']").is(":checked") && $jq(".listthumb").length > 0)
 					QR.send();
 			}
 		},
 		clear: function(fid) {
+			$jq("#postform :input[name='quickreply']").val("");
 			$jq(".qrtop span").html("");
 			$jq(".listthumb[name='"+fid+"']").remove();
 			QR.thumbreset();
@@ -391,6 +410,20 @@ function ponychanx() {
 				var bs = $jq("<span class='extrabtns'></span>");
 				$jq(".reflink:first").after(bs);
 				Posts.newhandle(".op");
+			}
+			if (Main.tid == "0" && Settings.gets("Enable quick reply")=="true") {
+				$jq(".postfooter > a[title='Quick Reply']").each(function() {
+					var to = $jq(this).attr("onclick");
+					to = to.replace("javascript:quickreply('", "");
+					to = to.replace("');", "");
+					$jq(this).attr("href", "javascript:;").removeAttr("onclick");
+					$jq(this).on("click", function() {
+						QR.show();
+						$jq("#qr > input[type='button']").val("Reply");
+						QR.settitle("Quick replying to >>"+to)
+						$jq("#postform :input[name='quickreply']").val(to);
+					});
+				});
 			}
 			$jq("table:not(.postform):not(.userdelete)").each(function() {
 				Posts.newhandle(this);
