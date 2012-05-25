@@ -508,16 +508,16 @@ function ponychanx() {
 						ffrom = $jq("a[name='"+from+"']");
 					}
 					if (!$jq(this).closest("td").hasClass("inline") && tto != null && eb) {
-						var bl = $jq("<a href='javascript:;' onclick='return clickReflinkNum(event, "+from+");' class='ref|"+Main.bid+"|"+Main.tid+"|"+from+"'>>>"+from+"</a> ")
+						var bl = $jq("<a href='#"+from+"' onclick='return highlight("+from+", true);' class='ref|"+Main.bid+"|"+Main.tid+"|"+from+"'>>>"+from+"</a> ")
 						.on("mouseover", addreflinkpreview)
 						.on("mouseout", delreflinkpreview);
-						if (eq && !bp) {
-							bl.removeAttr("onclick");
-							bl.on("click", function() {
-								QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-								return false;
-							});
-						}
+						// if (eq && !bp) {
+							// bl.removeAttr("onclick");
+							// bl.on("click", function() {
+								// QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+								// return false;
+							// });
+						// }
 						$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
 					}
 					if (ei && tto != null) {
@@ -544,13 +544,13 @@ function ponychanx() {
 			}
 			var rb = $jq(".postfooter > a", p);
 			if (eq && !bp) {
-				$jq(".extrabtns a[class]", p).each(function() {
-					$jq(this).removeAttr("onclick");
-					$jq(this).on("click", function() {
-						QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-						return false;
-					});
-				});
+				// $jq(".extrabtns a[class]", p).each(function() {
+					// $jq(this).removeAttr("onclick");
+					// $jq(this).on("click", function() {
+						// QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
+						// return false;
+					// });
+				// });
 				if (rb[0] != null) {
 					$jq(rb[0]).removeAttr("onclick");
 					rb[0].onclick = function() { QR.quote(from); return false; };
@@ -574,8 +574,7 @@ function ponychanx() {
 		fixdate: function(p) {
 			var timezone = getCookie('timezone');
 			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
-			var twelvehour = true;
-			var timeFormat = 'ddd, MMM d, yyyy ' + (twelvehour !== '0' ? 'h:mm tt' : 'H:mm');
+			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
 			$jq(".posttime",p).html(Date.parse($jq(".posttime",p).text()).addHours(8 + timezone).toString(timeFormat)
 				.replace(/([AP]M)$/, '<span style="font-size:0.75em">$1</span>'));
 		}
