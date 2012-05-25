@@ -64,14 +64,17 @@ function ponychanx() {
 							Updater.last = xhr.getResponseHeader("Last-Modified");
 							var f, l;
 							if ($jq("#delform div[id]:first table").length == 0) {
-								l = "";
+								l = -1;
 								f = true;
 							} else {
-								l = $jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name;
+								l = parseInt($jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name);
 								f = false;
 							}
 							var sat = (parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100);
 							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
+								var fne = $jq("tbody tr td[id] a[name]", this)[0];
+								if (!f && fne != null && parseInt(fne.name) > l)
+									f = true;
 								if (f) {
 									var tal = $jq("#delform div[id]:first table:last");
 									if (tal.length > 0)
@@ -86,18 +89,14 @@ function ponychanx() {
 									if (sat && Settings.gets("Scroll on new post") == "true")
 										window.scrollTo(0, document.body.scrollHeight);
 								}
-								var fne = $jq("tbody tr td[id] a[name]", this)[0];
-								if (!f && fne != null && fne.name == l)
-									f = true;
 							});
-							if (!f) $jq(".qrtop span").html("Error autoupdating <a href='#' onclick='javascript:location.reload(true);'>Refresh manually</a>");
 						break;
 						case 404:
 							document.title = "(404) " + Html.title;
 							$jq(".qrtop span").html("404");
 						break;
 						case 503:
-							$jq(".qrtop span").html("Error autoupdating <a href='#' onclick='javascript:location.reload(true);'>Refresh manually</a>");
+							$jq(".qrtop span").html("(503) Error autoupdating <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
 						break;
 					}
 				}
