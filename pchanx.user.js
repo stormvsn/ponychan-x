@@ -90,13 +90,14 @@ function ponychanx() {
 										window.scrollTo(0, document.body.scrollHeight);
 								}
 							});
+							QR.settitle("");
 						break;
 						case 404:
 							document.title = "(404) " + Html.title;
-							$jq(".qrtop span").html("404");
+							QR.settitle("404");
 						break;
 						case 503:
-							$jq(".qrtop span").html("(503) Error autoupdating <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
+							QR.settitle("(503) Error autoupdating <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
 						break;
 					}
 				}
@@ -256,7 +257,7 @@ function ponychanx() {
 					if (xhr.status == 200) {
 						Notifier._me = true;
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
-							$jq(".qrtop span").html(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
+							QR.settitle(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 							$jq("#qr > input[type='button']").val("Retry");
 						} else {
 							if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
@@ -264,7 +265,7 @@ function ponychanx() {
 							QR.clear(fid);
 						}
 					} else {
-						$jq(".qrtop span").html("An error occured while posting.");
+						QR.settitle("An error occured while posting.");
 						$jq("#qr > input[type='button']").val("Error");
 					}
 				}
@@ -287,7 +288,7 @@ function ponychanx() {
 		},
 		clear: function(fid) {
 			$jq("#postform :input[name='quickreply']").val("");
-			$jq(".qrtop span").html("");
+			QR.settitle("");
 			$jq(".listthumb[name='"+fid+"']").remove();
 			QR.thumbreset();
 			var ts = $jq("#thumbselected");
@@ -475,9 +476,9 @@ function ponychanx() {
 								return false;
 							}
 						});
-						if (!f) $jq(".qrtop span").html("Could not load post <a target='_blank' href='"+anc.href+"'>Open in new tab</a>");
+						if (!f) QR.settitle("Could not load post <a target='_blank' href='"+anc.href+"'>Open in new tab</a>");
 					} else {
-						$jq(".qrtop span").html("Post not found ("+xhr.status+")");
+						QR.settitle("Post not found ("+xhr.status+")");
 					}
 				}
 			}
