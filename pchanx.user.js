@@ -57,11 +57,11 @@ function ponychanx() {
 			xhr.send();
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
-					Updater.last = xhr.getResponseHeader("Last-Modified");
 					setTimeout(function() { Updater.get(); }, Updater.tmr);
 					if (Settings.gets("Show autoupdate countdown dialog") == "true") { Dialog.countdown(); }
 					switch (xhr.status) {
 						case 200:
+							Updater.last = xhr.getResponseHeader("Last-Modified");
 							var f, l;
 							if ($jq("#delform div[id]:first table").length == 0) {
 								l = "";
@@ -90,12 +90,14 @@ function ponychanx() {
 								if (!f && fne != null && fne.name == l)
 									f = true;
 							});
-							
-							if (!f) $jq(".qrtop span").html("Error autoupdating <a href=''>Refresh manually</a>");
+							if (!f) $jq(".qrtop span").html("Error autoupdating <a href='#' onclick='javascript:location.reload(true);'>Refresh manually</a>");
 						break;
 						case 404:
 							document.title = "(404) " + Html.title;
 							$jq(".qrtop span").html("404");
+						break;
+						case 503:
+							$jq(".qrtop span").html("Error autoupdating <a href='#' onclick='javascript:location.reload(true);'>Refresh manually</a>");
 						break;
 					}
 				}
@@ -520,13 +522,6 @@ function ponychanx() {
 						var bl = $jq("<a href='#"+from+"' onclick='return highlight("+from+", true);' class='ref|"+Main.bid+"|"+Main.tid+"|"+from+"'>>>"+from+"</a> ")
 						.on("mouseover", addreflinkpreview)
 						.on("mouseout", delreflinkpreview);
-						// if (eq && !bp) {
-							// bl.removeAttr("onclick");
-							// bl.on("click", function() {
-								// QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-								// return false;
-							// });
-						// }
 						$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
 					}
 					if (ei && tto != null) {
@@ -557,18 +552,9 @@ function ponychanx() {
 				});
 			}
 			var rb = $jq(".postfooter > a", p);
-			if (eq && !bp) {
-				// $jq(".extrabtns a[class]", p).each(function() {
-					// $jq(this).removeAttr("onclick");
-					// $jq(this).on("click", function() {
-						// QR.quote(this.innerHTML.substring(8,this.innerHTML.length));
-						// return false;
-					// });
-				// });
-				if (rb[0] != null) {
-					$jq(rb[0]).removeAttr("onclick");
-					rb[0].onclick = function() { QR.quote(from); return false; };
-				}
+			if (eq && !bp && rb[0] != null) {
+				$jq(rb[0]).removeAttr("onclick");
+				rb[0].onclick = function() { QR.quote(from); return false; };
 			}
 			if (im != null && Settings.gets("Add image shortcuts to posts") == "true") {
 				if (rb[2] == null)
