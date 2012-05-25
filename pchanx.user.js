@@ -620,7 +620,7 @@ function ponychanx() {
 			#qr .embedwrap select { padding: 3px 0 2px 0; }\
 			#qr .embedwrap { display: none; }\
 			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
-			h2 { padding: 17px 0 17px 0; }\
+			.postarea a h2 { padding: 17px 0 17px 0; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
