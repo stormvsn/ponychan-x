@@ -7,6 +7,7 @@
 // @include       *lunachan.net/*
 // @exclude       http://www.ponychan.net/chan/
 // @exclude       http://www.ponychan.net/chan/board.php
+// @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
 // @version       0.11
@@ -90,14 +91,13 @@ function ponychanx() {
 										window.scrollTo(0, document.body.scrollHeight);
 								}
 							});
-							QR.settitle("");
 						break;
 						case 404:
 							document.title = "(404) " + Html.title;
-							QR.settitle("404");
+							QR.settitle("(404)");
 						break;
 						case 503:
-							QR.settitle("(503) Error autoupdating <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
+							QR.settitle("(503) <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
 						break;
 					}
 				}
@@ -151,6 +151,12 @@ function ponychanx() {
 			<div id="imagelist"></div>';
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("body").append(qr);
+			$jq(window).resize(function() {
+				if ($jq("#qr").position().left+410 > document.documentElement.clientWidth) {
+					$jq("#qr").css("left", document.documentElement.clientWidth-410);
+					Settings.set("x.qrpos_x", $jq("#qr").css("left"));
+				}
+			});
 			if (Settings.gets("Hide quick reply when top button clicked") == "true")
 				$jq("#qr .top a:first").on("click", function() { QR.hide(); });
 			var btn = $jq("#qr > input[type='button']");
@@ -173,8 +179,8 @@ function ponychanx() {
 			document.getElementById("imgfile").onchange = function() { QR.thumb(); };
 			var x = Settings.get("x.qrpos_x");
 			var y = Settings.get("x.qrpos_y");
-			if (x!=null) $jq("#qr").css("left", x)
-			if (y!=null) $jq("#qr").css("top", y)
+			if (x!=null) $jq("#qr").css("left", x);
+			if (y!=null) $jq("#qr").css("top", y);
 			$jq("#qr .qrtop").mousedown(function(e) {
 				e.originalEvent.preventDefault();
 				$jq("#qr").css("opacity", "0.8");
