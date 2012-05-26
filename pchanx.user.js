@@ -370,7 +370,9 @@ function ponychanx() {
 		},
 		storefields: function() {
 			Settings.set("x.name", $jq("#qr :input[name='name']").val());
-			Settings.set("x.email", $jq("#qr :input[name='em']").val());
+			var emailUsed = $jq("#qr :input[name='em']").val();
+			if(emailUsed != "sage" && emailUsed != "\u4E0B\u3052")
+				Settings.set("x.email", emailUsed);
 		},
 		keys: function() {
 			$jq(document).bind("keydown", function (e) {
