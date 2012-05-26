@@ -10,7 +10,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.11
+// @version       0.12
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -39,6 +39,7 @@ function ponychanx() {
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
 			Posts.init();
 			if (Settings.gets("Enable filter")=="true") Filter.init();
+			if (Settings.gets("Autoupdate watched threads list")=="true") Updater.getwatched();
 		},
 	};
 	
@@ -101,6 +102,12 @@ function ponychanx() {
 						break;
 					}
 				}
+			}
+		},
+		getwatched: function() {
+			if (getCookie("showwatchedthreads") == "1") {
+				getwatchedthreads("0", Main.bid);
+				setTimeout(function() { Updater.getwatched(); }, 30000);
 			}
 		}
 	};
@@ -722,6 +729,7 @@ function ponychanx() {
 			"Hide quick reply when top button clicked": { def: "false" },
 			"Scroll on new post": { def: "false" },
 			"Unique post content per image": { def: "false" },
+			"Autoupdate watched threads list": { def: "false" },
 		}
 	};
 	
