@@ -28,7 +28,12 @@ function ponychanx() {
 		bid: null,
 		tid: null,
 		init: function() {
-			if ($jq("h1").length > 0 && $jq("h1").html() == "404 Not Found") return;
+			if ($jq("h1").length > 0 && $jq("h1").html() == "404 Not Found") {
+				if (durl.indexOf("+50") > -1) {
+					return window.location = durl.replace("+50", "");
+				}
+				return;
+			}
 			Main.tid = $jq("#postform :input[name='replythread']").val();
 			Main.bid = $jq("#postform :input[name='board']").val();
 			Html.init();
