@@ -11,7 +11,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.13
+// @version       0.14
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -28,6 +28,7 @@ function ponychanx() {
 		bid: null,
 		tid: null,
 		init: function() {
+			if ($jq("h1").length > 0 && $jq("h1").html() == "404 Not Found") return;
 			Main.tid = $jq("#postform :input[name='replythread']").val();
 			Main.bid = $jq("#postform :input[name='board']").val();
 			Html.init();
@@ -605,6 +606,7 @@ function ponychanx() {
 		title: document.title,
 		init: function() {
 			Html.addoptions();
+			Html.catalog();
 		},
 		hidepostform: function() {
 			if (Settings.gets("Hide original post form") == "true" && $jq("#postform").length > 0) {
@@ -630,10 +632,10 @@ function ponychanx() {
 			opt.append("Update every <input type='text' id='updatetimer' value='"+s+"'> seconds<br />");
 			$jq("#updatetimer").live("change", function() { if (isNaN(parseInt($jq(this).val()))) return; Settings.set("x.updatetimer", $jq(this).val()); });
 			if (Settings.gets("Enable filter")=="true") {
-				opt.append("<br /><strong>Filter</strong><br />Insert ; after each item<br />");
-				opt.append("Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%'>");
-				opt.append("Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%'>");
-				opt.append("Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%'><br />");
+				opt.append("<br /><strong>Filter</strong><br />Insert ; after each item<br />\
+				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
+				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
+				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' />");
 			}
 			opt.append($jq("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
 				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
@@ -641,6 +643,24 @@ function ponychanx() {
 			opt.append("<br /><a href='javascript:;' onclick='location.reload(true);' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
 			opt.insertAfter(".adminbar");
 			$jq('#pxoptions > input[id][name]').keyup(function() { Filter.save(); }).change(function() { Filter.save(); });
+		},
+		catalog: function() {
+			if ($jq(".catalogtable").length > 0) {
+				$jq("#SearchText").on("keyup", function(e) {
+					if (e.keyCode == 13) Html.cataloglasts();
+				});
+				$jq("#SearchBtn").on("click", function() {
+					Html.cataloglasts();
+				});
+			}
+		},
+		cataloglasts: function() {
+			var rt = $jq(".catalogtable").next();
+			$jq("div a[href]", rt).each(function() {
+				var h = this.href.replace(".html", "+50.html");
+				var at = $jq("<a href='"+h+"' style='margin-left: 6px;'>[+50]</a>");
+				$jq(this).after(at);
+			});
 		}
 	};
 	
