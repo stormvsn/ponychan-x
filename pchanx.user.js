@@ -3,6 +3,7 @@
 // @name          Ponychan X
 // @description   Adds various bloat.
 // @author        milky
+// @contributor   Storm Vision
 // @include       http://www.ponychan.net/chan/*
 // @include       *lunachan.net/*
 // @exclude       http://www.ponychan.net/chan/
@@ -39,7 +40,8 @@ function ponychanx() {
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
 			Posts.init();
 			if (Settings.gets("Enable filter")=="true") Filter.init();
-			if (Settings.gets("Autoupdate watched threads list")=="true") Updater.getwatched();
+			if (Settings.gets("Autoupdate watched threads list")=="true")
+				setTimeout(function() { Updater.getwatched(); }, 10000);
 		},
 	};
 	
