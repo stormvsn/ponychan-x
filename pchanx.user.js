@@ -536,10 +536,14 @@ function ponychanx() {
 						ffrom = $jq("a[name='"+from+"']");
 					}
 					if (!$jq(this).closest("td").hasClass("inline") && tto != null && eb) {
-						var bl = $jq("<a href='#"+from+"' onclick='return highlight("+from+", true);' class='ref|"+Main.bid+"|"+Main.tid+"|"+from+"'>>>"+from+"</a> ")
-						.on("mouseover", addreflinkpreview)
-						.on("mouseout", delreflinkpreview);
-						$jq(tto.parent().find(".extrabtns")[0]).append(bl);								
+						var blcl = "ref|"+Main.bid+"|"+Main.tid+"|"+from;
+						var blat = tto.parent().find(".extrabtns")[0];
+						if ($jq("a[class='"+blcl+"']", blat).length == 0) {
+							var bl = $jq("<a href='#"+from+"' onclick='return highlight("+from+", true);' class='"+blcl+"'>>>"+from+"</a> ")
+							.on("mouseover", addreflinkpreview)
+							.on("mouseout", delreflinkpreview);
+							$jq(blat).append(bl);
+						}
 					}
 					if (ei && tto != null) {
 						$jq(this).removeAttr("onclick");
