@@ -841,7 +841,7 @@ function ponychanx() {
 			$jq(p).css("display", "none");
 		},
 		newhandle: function(p) {
-			if (Settings.gets("Enable filter") != "true") return;
+			if (Settings.gets("Enable filter") != "true" || $jq("span.mod", p).length > 0) return;
 			if (Filter.filtered(0, $jq.trim($jq("span.postername", p).text()))) {
 				Filter.filter(p);
 				return;
