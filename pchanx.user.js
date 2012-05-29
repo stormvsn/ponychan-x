@@ -4,6 +4,7 @@
 // @description   Adds various bloat.
 // @author        milky
 // @contributor   Storm Vision
+// @contributor   onekopaka
 // @include       http://www.ponychan.net/chan/*
 // @include       *lunachan.net/*
 // @exclude       http://www.ponychan.net/chan/
@@ -11,7 +12,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.15
+// @version       0.16
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -25,7 +26,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 15,
+		version: 16,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -648,11 +649,16 @@ function ponychanx() {
 		},
 		hidepostform: function() {
 			if (Settings.gets("Hide original post form") == "true" && $jq("#postform").length > 0) {
-				$jq("#postform").css("display", "none");
+				$jq("#postform").hide();
 				var a = document.createElement("a");
 				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
 				a.href = "javascript:;";
 				a.onclick = function() { QR.show(); };
+				var topf = document.createElement("a");
+				topf.innerHTML = "<h5>Show/Hide Original Post Form</h5>";
+				topf.href = "javascript:;";
+				topf.onclick = function() { $jq("#postform").toggle(); };
+				$jq(".postarea").prepend(topf);
 				$jq(".postarea").prepend(a);
 			}
 		},
@@ -752,7 +758,8 @@ function ponychanx() {
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }\
-			#pxbtn { margin-right: -4px; }";
+			#pxbtn { margin-right: -4px; }\
+			#postform a h5 { margin: 0; }";
 			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { display: block !important; }";
 			document.body.appendChild(s);
 		}
