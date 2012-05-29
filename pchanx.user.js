@@ -11,7 +11,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.14
+// @version       0.15
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -25,6 +25,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
+		version: 15,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -48,7 +49,38 @@ function ponychanx() {
 			if (Settings.gets("Enable filter")=="true") Filter.init();
 			if (Settings.gets("Autoupdate watched threads list")=="true")
 				setTimeout(function() { Updater.getwatched(); }, 10000);
+			Main.update();
 		},
+		update: function() {
+			var d = new Date().getTime();
+			var lu = Settings.get("x.update.lastcheck");
+			var lv = Settings.get("x.update.latestversion");
+			if (lu == null) {
+				lu = d;
+				Settings.set("x.update.lastcheck", lu);
+			}
+			if (lv == null) lv = Main.version;
+			if (d > parseInt(lu)+172800000 && lv == Main.version) {
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "http://nassign.heliohost.org/s/latest.php");
+				xhr.send();
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4) {
+						if (xhr.status == 200) {
+							lv = parseInt(xhr.responseText);
+							Settings.set("x.update.latestversion", lv);
+						}
+					}
+				}
+				Settings.set("x.update.lastcheck", d);
+			}
+			if (lv > Main.version) {
+				$jq("#pxbtn").append(" (Update)");
+				$jq("#pxoptions").prepend("<strong>Update</strong><br />A new update for Ponchan X is available.<br />\
+				Update applies on your next refresh.<br />\
+				<a href='javascript:;' onclick='window.location = \"https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js\"'>Click here to install the update</a>.<br /><br />");
+			}
+		}
 	};
 	
 	Updater = {
@@ -624,7 +656,7 @@ function ponychanx() {
 			}
 		},
 		addoptions: function() {
-			$jq(".adminbar").prepend($jq('<a class="adminbaritem" href="javascript:;">Ponychan X</a>').bind("click", function() {
+			$jq(".adminbar").prepend($jq('<a class="adminbaritem" id="pxbtn" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			}));
 			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div>");
@@ -705,7 +737,7 @@ function ponychanx() {
 			.postarea a h2 { padding: 17px 0 17px 0; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
-			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: medium; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
+			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
 			#qr * { margin: 0; padding: 0; }\
 			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
 			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
