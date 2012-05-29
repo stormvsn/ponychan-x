@@ -547,7 +547,12 @@ function ponychanx() {
 			var eh = (Settings.gets("Enable hide post buttons") == "true");
 			var bp = (Main.tid == "0");
 			if (eh) {
-				$jq(".doubledash", p).html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
+				var dd = $jq(".doubledash", p);
+				if (dd.length == 0) {
+					dd = $jq("<td class='doubledash'></td>");
+					$jq("tbody > tr:first", p).prepend(dd);
+				}
+				dd.html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 					Posts.hide(this);
 				}));
 			}
