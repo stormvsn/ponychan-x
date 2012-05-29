@@ -496,7 +496,7 @@ function ponychanx() {
 					});
 				});
 			}
-			$jq("table:not(.postform):not(.userdelete):not(.catalogtable)").each(function() {
+			$jq("table:not(.postform):not(.userdelete)").each(function() {
 				Posts.newhandle(this);
 			});			
 		},
@@ -548,7 +548,7 @@ function ponychanx() {
 			var bp = (Main.tid == "0");
 			if (eh) {
 				var dd = $jq(".doubledash", p);
-				if (dd.length == 0) {
+				if (durl.indexOf("lunachan") > -1 && dd.length == 0) {
 					dd = $jq("<td class='doubledash'></td>");
 					$jq("tbody > tr:first", p).prepend(dd);
 				}
