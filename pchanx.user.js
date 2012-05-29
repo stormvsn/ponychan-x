@@ -1,6 +1,6 @@
 // ==UserScript==
-// @namespace     milky
 // @name          Ponychan X
+// @namespace     milky
 // @description   Adds various bloat.
 // @author        milky
 // @contributor   Storm Vision
