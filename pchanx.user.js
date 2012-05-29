@@ -655,6 +655,7 @@ function ponychanx() {
 			im.src = im.src == os ? ns : os;
 			im.removeAttribute("width");
 			im.removeAttribute("height");
+			im.style.maxWidth = document.documentElement.clientWidth-100+"px";
 		},
 	}
 	
@@ -820,7 +821,7 @@ function ponychanx() {
 			"Hide quick reply when top button clicked": { def: "false" },
 			"Scroll on new post": { def: "false" },
 			"Unique post content per image": { def: "false" },
-			"Autoupdate watched threads list": { def: "false" },
+			"Autoupdate watched threads list": { def: "false" }
 		}
 	};
 	
