@@ -12,7 +12,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.16
+// @version       0.17
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -26,7 +26,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 16,
+		version: 17,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -564,11 +564,18 @@ function ponychanx() {
 			var im = $jq(p).find("img", p)[0];
 			var ns;
 			if (im != null) {
+				var os = im.src;
 				ns = im.src;
 				ns = ns.replace("/thumb/", "/src/");
 				ns = ns.replace("s.", ".");
 				if (Settings.gets("Animate gif thumbnails") == "true" && im.src.indexOf("s.gif") > 0)
 					im.src = ns;
+				var fsa = $jq(".filesize", p).find("a");
+				if (fsa.length > 0) {
+					fsa.attr("href", "javascript:;");
+					fsa.removeAttr("onclick");
+					fsa.on("click", function() { Posts.expandimg(im, ns, os); });
+				}
 			}
 			if (eb || ei || eq) {
 				$jq("blockquote a[class]", p).each(function() {
@@ -643,7 +650,12 @@ function ponychanx() {
 			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
 			$jq(".posttime",p).html(Date.parse($jq(".posttime",p).text()).addHours(8 + timezone).toString(timeFormat)
 				.replace(/([AP]M)$/, '<span style="font-size:0.75em">$1</span>'));
-		}
+		},
+		expandimg: function(im, ns, os) {
+			im.src = im.src == os ? ns : os;
+			im.removeAttribute("width");
+			im.removeAttribute("height");
+		},
 	}
 	
 	var Html = {
