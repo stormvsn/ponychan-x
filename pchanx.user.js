@@ -765,7 +765,7 @@ function ponychanx() {
 			.extrabtns { vertical-align: top; }\
 			#pxbtn { margin-right: -4px; }\
 			.postarea a h5 { margin: 0 0 12px 0; }";
-			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { display: block !important; }";
+			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			document.body.appendChild(s);
 		}
 	};
