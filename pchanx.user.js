@@ -440,7 +440,7 @@ function ponychanx() {
 						var cp = ta.selectionStart;
 						ta.value = ta.value.slice(0, cp) + ins + ta.value.slice(ta.selectionEnd);
 						ta.focus();
-						var r = cp + ins.length;
+						var r = cp + ins.length - 4;
 						ta.setSelectionRange(r, r);
 						return e.preventDefault();
 					}
