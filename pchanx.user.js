@@ -496,7 +496,7 @@ function ponychanx() {
 					});
 				});
 			}
-			$jq("table:not(.postform):not(.userdelete)").each(function() {
+			$jq("table:not(.postform):not(.userdelete):not(.catalogtable)").each(function() {
 				Posts.newhandle(this);
 			});			
 		},
