@@ -263,11 +263,11 @@ function ponychanx() {
 			var qri = $jq("#postform :input[name='quickreply']").val();
 			var hmpcyh = $jq("#postform :input[name='how_much_pony_can_you_handle']").val();
 			// Mod
-			var mp = $jq("#postform :input[name='modpassword']").val();
-			var lop = $jq("#postform :input[name='lockonpost']").val();
-			var sop = $jq("#postform :input[name='stickyonpost']").val();
-			var rh = $jq("#postform :input[name='rawhtml']").val();
-			var usn = $jq("#postform :input[name='usestaffname']").val();
+			// var mp = $jq("#postform :input[name='modpassword']").val();
+			// var lop = $jq("#postform :input[name='lockonpost']").val();
+			// var sop = $jq("#postform :input[name='stickyonpost']").val();
+			// var rh = $jq("#postform :input[name='rawhtml']").val();
+			// var usn = $jq("#postform :input[name='usestaffname']").val();
 			// End mod
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
@@ -282,11 +282,11 @@ function ponychanx() {
 			d.append("how_much_pony_can_you_handle", hmpcyh);
 			d.append("stats_referrer", "");
 			// Mod
-			d.append("modpassword", mp);
-			d.append("lockonpost", lop);
-			d.append("stickyonpost", sop);
-			d.append("rawhtml", rh);
-			d.append("usestaffname", usn);
+			// d.append("modpassword", mp);
+			// d.append("lockonpost", lop);
+			// d.append("stickyonpost", sop);
+			// d.append("rawhtml", rh);
+			// d.append("usestaffname", usn);
 			// End mod
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
 				var em = $jq("#qr :input[name='embed']").val();
