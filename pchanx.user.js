@@ -741,7 +741,7 @@ function ponychanx() {
 			#qr .embedwrap select { padding: 3px 0 2px 0; }\
 			#qr .embedwrap { display: none; }\
 			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
-			.postarea a h2 { padding: 17px 0 17px 0; }\
+			.postarea a h2 { padding-bottom: 4px; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
 			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 185px; border: 1px solid black; }\
@@ -759,7 +759,7 @@ function ponychanx() {
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }\
 			#pxbtn { margin-right: -4px; }\
-			#postform a h5 { margin: 0; }";
+			.postarea a h5 { margin: 0 0 12px 0; }";
 			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { display: block !important; }";
 			document.body.appendChild(s);
 		}
