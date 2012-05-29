@@ -531,9 +531,10 @@ function ponychanx() {
 								return false;
 							}
 						});
-						if (!f) QR.settitle("Could not load post <a target='_blank' href='"+anc.href+"'>Open in new tab</a>");
+						if (!f)
+							$jq("<td class='reply inline'>Reply not found<br /><a target='_blank' style='font-family: \"Trebuchet MS\";' href='"+anc.href+"'>Open thread in new tab</a></td>").insertAfter(anc);
 					} else {
-						QR.settitle("Post not found ("+xhr.status+")");
+						$jq("<td class='reply inline'>Reply not found ("+xhr.status+")</td>").insertAfter(anc);
 					}
 				}
 			}
