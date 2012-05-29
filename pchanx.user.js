@@ -656,7 +656,7 @@ function ponychanx() {
 			}
 		},
 		addoptions: function() {
-			$jq(".adminbar").prepend($jq('<a class="adminbaritem" id="pxbtn" href="javascript:;">Ponychan X</a>').bind("click", function() {
+			$jq(".adminbar").append($jq('<a class="adminbaritem" id="pxbtn" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			}));
 			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div>");
@@ -737,7 +737,7 @@ function ponychanx() {
 			.postarea a h2 { padding: 17px 0 17px 0; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
-			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 192px; border: 1px solid black; }\
+			#pxoptions { box-shadow: 0 0 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 0; border: 1px solid black; }\
 			#qr * { margin: 0; padding: 0; }\
 			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
 			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
