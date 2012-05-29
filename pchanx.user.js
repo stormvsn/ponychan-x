@@ -93,7 +93,7 @@ function ponychanx() {
 		},
 		get: function() {
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", durl+"?"+new Date().getTime());
+			xhr.open("GET", durl+(durl.indexOf("lunachan") > -1 ? "" : "?"+new Date().getTime()));
 			xhr.setRequestHeader("If-Modified-Since", Updater.last);
 			xhr.setRequestHeader("Accept", "*/*");
 			xhr.send();
@@ -648,23 +648,11 @@ function ponychanx() {
 		},
 		hidepostform: function() {
 			if (Settings.gets("Hide original post form") == "true" && $jq("#postform").length > 0) {
-				// Hide the original post form
-				$jq("#postform").hide();
-				
-				// Create element to open QR box.
+				$jq("#postform").css("display", "none");
 				var a = document.createElement("a");
 				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
 				a.href = "javascript:;";
 				a.onclick = function() { QR.show(); };
-
-				// Create element to toggle original post box.		
-				var toggleOrigPF = document.createElement("a");
-				toggleOrigPF.innerHTML = "<h5>Toggle original post box.</h5>";
-				toggleOrigPF.href = "javascript:;";
-				toggleOrigPF.onclick = function() { $jq("#postform").toggle(); };
-
-				// Add elements into the DOM.
-				$jq(".postarea").prepend(toggleOrigPF);
 				$jq(".postarea").prepend(a);
 			}
 		},
