@@ -197,10 +197,10 @@ function ponychanx() {
 			<input type="button" value="Reply" accesskey="z">\
 			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
 			<div id="imagelist"></div>';
-			if (checkMod()) {
+			if (QR.checkmod()) {
 				qr.innerHTML += '<div id="modpanel">\
-				<input name="modpassword" placeholder="Mod Password" value="" size="28" maxlength="75" type="text" /> \
-				<acronym title="Lock"><input name="lockonpost" type="checkbox" checked="checked" /> Lock Thread</acronym> \
+				<input name="modpassword" placeholder="Mod Password" value="'+getCookie("modpassword")+'" size="28" maxlength="75" type="text" /> \
+				<acronym title="Lock"><input name="lockonpost" type="checkbox" /> Lock Thread</acronym> \
 				<acronym title="Sticky"><input name="stickyonpost" type="checkbox" /> Sticky</acronym> \
 				<acronym title="Raw HTML"><input name="rawhtml" type="checkbox" /> Raw HTML</acronym> \
 				<acronym title="Name"><input name="usestaffname" type="checkbox" /> Name</acronym> \
@@ -261,7 +261,7 @@ function ponychanx() {
 			$jq("#qr").css("display", "none");
 		},
 		send: function() {
-			if (!$jq("#qr").length) return;			
+			if (!$jq("#qr").length) return;
 			$jq("#qr > input[type='button']").val("...");
 			var n = $jq("#qr :input[name='name']").val();
 			var e = $jq("#qr :input[name='em']").val();
@@ -271,15 +271,6 @@ function ponychanx() {
 			var pp = $jq("#postform :input[name='postpassword']").val();
 			var qri = $jq("#postform :input[name='quickreply']").val();
 			var hmpcyh = $jq("#postform :input[name='how_much_pony_can_you_handle']").val();
-			// Mod
-			if (checkMod()) {
-				var mp = $jq("#qr #modpanel :input[name='modpassword']").val();
-				var lop = $jq("#qr #modpanel :input[name='lockonpost']").is(":checked");
-				var sop = $jq("#qr #modpanel :input[name='stickyonpost']").is(":checked");
-				var rh = $jq("#qr #modpanel :input[name='rawhtml']").is(":checked");
-				var usn = $jq("#qr #modpanel :input[name='usestaffname']").is(":checked");
-			}
-			// End mod
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
@@ -292,15 +283,18 @@ function ponychanx() {
 			d.append("postpassword", pp);
 			d.append("how_much_pony_can_you_handle", hmpcyh);
 			d.append("stats_referrer", "");
-			// Mod
-			if (checkMod()) {
+			if (QR.checkmod()) {
+				var mp = $jq("#qr #modpanel :input[name='modpassword']").val();
+				var lop = $jq("#qr #modpanel :input[name='lockonpost']").is(":checked");
+				var sop = $jq("#qr #modpanel :input[name='stickyonpost']").is(":checked");
+				var rh = $jq("#qr #modpanel :input[name='rawhtml']").is(":checked");
+				var usn = $jq("#qr #modpanel :input[name='usestaffname']").is(":checked");
 				d.append("modpassword", mp);
 				d.append("lockonpost", lop);
 				d.append("stickyonpost", sop);
 				d.append("rawhtml", rh);
 				d.append("usestaffname", usn);
 			}
-			// End mod
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
 				var em = $jq("#qr :input[name='embed']").val();
 				var emt = $jq("#qr select").val();
@@ -459,6 +453,12 @@ function ponychanx() {
 					}
 				}
 			});
+		},
+		checkmod: function() {
+			if (durl.indexOf("ponychan") > -1)
+				return checkMod();
+			else
+				return false;
 		}
 	};
 	
