@@ -200,10 +200,10 @@ function ponychanx() {
 			if (QR.checkmod()) {
 				qr.innerHTML += '<div id="modpanel">\
 				<input name="modpassword" placeholder="Mod Password" value="'+getCookie("modpassword")+'" size="28" maxlength="75" type="text" /> \
-				<acronym title="Lock"><input name="lockonpost" type="checkbox" /> Lock Thread</acronym> \
-				<acronym title="Sticky"><input name="stickyonpost" type="checkbox" /> Sticky</acronym> \
-				<acronym title="Raw HTML"><input name="rawhtml" type="checkbox" /> Raw HTML</acronym> \
-				<acronym title="Name"><input name="usestaffname" type="checkbox" /> Name</acronym> \
+				<label title="Lock"><input name="lockonpost" type="checkbox" /> Lock Thread</label> \
+				<label title="Sticky"><input name="stickyonpost" type="checkbox" /> Sticky</label> \
+				<label title="Raw HTML"><input name="rawhtml" type="checkbox" /> Raw HTML</label> \
+				<label title="Name"><input name="usestaffname" type="checkbox" /> Name</label> \
 				</div>';
 			}
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
@@ -792,8 +792,7 @@ function ponychanx() {
 			#pxbtn { margin-right: -4px; }\
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
-			#modpanel acronym { border-bottom-width: 0; }\
-			#modpanel acronym input { position: relative; top: 2px; }";
+			#modpanel label input { position: relative; top: 2px; }";
 			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			document.body.appendChild(s);
 		}
