@@ -791,7 +791,9 @@ function ponychanx() {
 			.extrabtns { vertical-align: top; }\
 			#pxbtn { margin-right: -4px; }\
 			.postarea a h5 { margin: 0 0 12px 0; }\
-			#modpanel { clear: both; font-size: small; }";
+			#modpanel { clear: both; font-size: small; }\
+			#modpanel acronym { border-bottom-width: 0; }\
+			#modpanel acronym input { position: relative; top: 2px; }";
 			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			document.body.appendChild(s);
 		}
