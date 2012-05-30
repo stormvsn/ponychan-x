@@ -509,7 +509,7 @@ function ponychanx() {
 					});
 				});
 			}
-			$jq("table:not(.postform):not(.userdelete)").each(function() {
+			$jq("#delform table:not(.postform):not(.userdelete)").each(function() {
 				Posts.newhandle(this);
 			});			
 		},
