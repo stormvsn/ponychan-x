@@ -197,6 +197,15 @@ function ponychanx() {
 			<input type="button" value="Reply" accesskey="z">\
 			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
 			<div id="imagelist"></div>';
+			if (checkMod()) {
+				qr.innerHTML += '<div id="modpanel">\
+				<input name="modpassword" placeholder="Mod Password" value="" size="28" maxlength="75" type="text" /> \
+				<acronym title="Lock"><input name="lockonpost" type="checkbox" checked="checked" /> Lock Thread</acronym> \
+				<acronym title="Sticky"><input name="stickyonpost" type="checkbox" /> Sticky</acronym> \
+				<acronym title="Raw HTML"><input name="rawhtml" type="checkbox" /> Raw HTML</acronym> \
+				<acronym title="Name"><input name="usestaffname" type="checkbox" /> Name</acronym> \
+				</div>';
+			}
 			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("body").append(qr);
 			$jq(window).resize(function() {
@@ -263,11 +272,13 @@ function ponychanx() {
 			var qri = $jq("#postform :input[name='quickreply']").val();
 			var hmpcyh = $jq("#postform :input[name='how_much_pony_can_you_handle']").val();
 			// Mod
-			// var mp = $jq("#postform :input[name='modpassword']").val();
-			// var lop = $jq("#postform :input[name='lockonpost']").val();
-			// var sop = $jq("#postform :input[name='stickyonpost']").val();
-			// var rh = $jq("#postform :input[name='rawhtml']").val();
-			// var usn = $jq("#postform :input[name='usestaffname']").val();
+			if (checkMod()) {
+				var mp = $jq("#qr #modpanel :input[name='modpassword']").val();
+				var lop = $jq("#qr #modpanel :input[name='lockonpost']").is(":checked");
+				var sop = $jq("#qr #modpanel :input[name='stickyonpost']").is(":checked");
+				var rh = $jq("#qr #modpanel :input[name='rawhtml']").is(":checked");
+				var usn = $jq("#qr #modpanel :input[name='usestaffname']").is(":checked");
+			}
 			// End mod
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
@@ -282,11 +293,13 @@ function ponychanx() {
 			d.append("how_much_pony_can_you_handle", hmpcyh);
 			d.append("stats_referrer", "");
 			// Mod
-			// d.append("modpassword", mp);
-			// d.append("lockonpost", lop);
-			// d.append("stickyonpost", sop);
-			// d.append("rawhtml", rh);
-			// d.append("usestaffname", usn);
+			if (checkMod()) {
+				d.append("modpassword", mp);
+				d.append("lockonpost", lop);
+				d.append("stickyonpost", sop);
+				d.append("rawhtml", rh);
+				d.append("usestaffname", usn);
+			}
 			// End mod
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
 				var em = $jq("#qr :input[name='embed']").val();
@@ -777,7 +790,8 @@ function ponychanx() {
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }\
 			#pxbtn { margin-right: -4px; }\
-			.postarea a h5 { margin: 0 0 12px 0; }";
+			.postarea a h5 { margin: 0 0 12px 0; }\
+			#modpanel { clear: both; font-size: small; }";
 			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			document.body.appendChild(s);
 		}
