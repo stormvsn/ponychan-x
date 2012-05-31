@@ -934,9 +934,7 @@ function ponychanx() {
 		}
 	};
 	
-	$jq(document).ready(function() {
-		Main.init();
-	});
+	Main.init();
 }
 
 function loadjQ(s)
