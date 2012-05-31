@@ -12,7 +12,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.17
+// @version       0.18
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -26,14 +26,13 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 17,
+		version: 18,
 		bid: null,
 		tid: null,
 		init: function() {
 			if ($jq("h1").length > 0 && $jq("h1").html() == "404 Not Found") {
-				if (durl.indexOf("+50") > -1) {
+				if (durl.indexOf("+50") > -1)
 					return window.location = durl.replace("+50", "");
-				}
 				return;
 			}
 			Main.tid = $jq("#postform :input[name='replythread']").val();
