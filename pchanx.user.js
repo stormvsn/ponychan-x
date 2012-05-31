@@ -586,9 +586,10 @@ function ponychanx() {
 					im.src = ns;
 				var fsa = $jq(".filesize", p).find("a");
 				if (fsa.length > 0) {
+					var imp = $jq("a[href] span[id] img", p).parent();
 					fsa.attr("href", "javascript:;");
 					fsa.removeAttr("onclick");
-					fsa.on("click", function() { Posts.expandimg(im, ns, os); });
+					fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
 				}
 			}
 			if (eb || ei || eq) {
@@ -675,11 +676,11 @@ function ponychanx() {
 					mt.html() = '<img src="/chan/css/images/rock-sm.png" alt="!!" width=15 height=20 style="vertical-align:top">Rarity';
 			}
 		},
-		expandimg: function(im, ns, os) {
-			im.src = im.src == os ? ns : os;
-			im.removeAttribute("width");
-			im.removeAttribute("height");
-			im.style.maxWidth = document.documentElement.clientWidth-100+"px";
+		expandimg: function(imp, ns, os) {
+			var img = $jq("img", imp)[0];
+			var nns = img.src == os ? ns : os;
+			var mw = document.documentElement.clientWidth-100+"px";
+			imp.html("<img src='"+nns+"' class='thumb' style='max-width: "+mw+";' />");
 		},
 	}
 	
