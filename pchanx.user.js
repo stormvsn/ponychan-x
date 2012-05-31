@@ -574,7 +574,7 @@ function ponychanx() {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
-			var im = $jq(p).find("img", p)[0];
+			var im = $jq("a[href] span[id] img", p)[0];
 			var ns;
 			if (im != null) {
 				var os = im.src;
@@ -585,7 +585,7 @@ function ponychanx() {
 					im.src = ns;
 				var fsa = $jq(".filesize", p).find("a");
 				if (fsa.length > 0) {
-					var imp = $jq("a[href] span[id] img", p).parent();
+					var imp = $jq(im).parent();
 					fsa.attr("href", "javascript:;");
 					fsa.removeAttr("onclick");
 					fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
