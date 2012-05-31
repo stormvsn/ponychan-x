@@ -126,7 +126,7 @@ function ponychanx() {
 										$jq(".thread .op").after(this);
 									Posts.newhandle(this);
 									Posts.fixhover(this);
-									Posts.fixdate(this);
+									Posts.newpostupdate(this);
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
 									if (sat && Settings.gets("Scroll on new post") == "true")
@@ -539,6 +539,7 @@ function ponychanx() {
 							if (f) {
 								var c = $jq("td.reply[id]", this).addClass("inline").insertAfter(anc);
 								Posts.newhandle(c);
+								Posts.newpostupdate(c);
 								c.find("a[name], .postfooter").remove();
 								c.find(".reflink a").removeAttr("onclick").unbind("click");
 								c.find(".reflink a:not(:first)").removeAttr("href").css("cursor","not-allowed");
@@ -657,12 +658,22 @@ function ponychanx() {
 				}
 			});
 		},
-		fixdate: function(p) {
+		newpostupdate: function(p) {
 			var timezone = getCookie('timezone');
 			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
 			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
 			$jq(".posttime",p).html(Date.parse($jq(".posttime",p).text()).addHours(8 + timezone).toString(timeFormat)
 				.replace(/([AP]M)$/, '<span style="font-size:0.75em">$1</span>'));
+			var mt = $jq(".postertrip",p);
+			var rd = $jq(".rd", mt);
+			if (rd.length > 0)
+				new Rainbow(rd[0],224,true,100,-20);
+			else {
+				if (mt.html() === '!!PinkiePie')
+					mt.html() = '<img src="/chan/css/images/pinkie-cutie-sm.png" alt="!!" width=12 height=20 style="position:relative;top:3px"><span style="color:#e4a">PinkiePie</span>';
+				if (mt.html() === '!!Rarity')
+					mt.html() = '<img src="/chan/css/images/rock-sm.png" alt="!!" width=15 height=20 style="vertical-align:top">Rarity';
+			}
 		},
 		expandimg: function(im, ns, os) {
 			im.src = im.src == os ? ns : os;
