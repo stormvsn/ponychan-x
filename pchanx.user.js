@@ -12,7 +12,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.18
+// @version       0.19
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -26,7 +26,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 18,
+		version: 19,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -664,15 +664,26 @@ function ponychanx() {
 			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
 			$jq(".posttime",p).html(Date.parse($jq(".posttime",p).text()).addHours(8 + timezone).toString(timeFormat)
 				.replace(/([AP]M)$/, '<span style="font-size:0.75em">$1</span>'));
-			var mt = $jq(".postertrip",p);
-			var rd = $jq(".rd", mt);
+			var tc = $jq(".postertrip", p);
+			var rd = $jq(".rd", tc);
 			if (rd.length > 0)
 				new Rainbow(rd[0],224,true,100,-20);
 			else {
-				if (mt.html() === '!!PinkiePie')
-					mt.html() = '<img src="/chan/css/images/pinkie-cutie-sm.png" alt="!!" width=12 height=20 style="position:relative;top:3px"><span style="color:#e4a">PinkiePie</span>';
-				if (mt.html() === '!!Rarity')
-					mt.html() = '<img src="/chan/css/images/rock-sm.png" alt="!!" width=15 height=20 style="vertical-align:top">Rarity';
+				if (tc.html() === "!!PinkiePie")
+					tc.html('<img src="/chan/css/images/pinkie-cutie-sm.png" alt="!!" width=12 height=20 style="position:relative;top:3px"><span style="color:#e4a">PinkiePie</span>');
+				if (tc.html() === "!!Rarity")
+					tc.html('<img src="/chan/css/images/rock-sm.png" alt="!!" width=15 height=20 style="vertical-align:top">Rarity');
+			}
+			var pn = $jq(".postername", p);
+			if ($jq(".mod, .admin", pn).length > 0) return;
+			var hn = getCookie("hidenames");
+			if (hn == "1") {
+				pn.html("Anonpony");
+				tc.html("");
+			} else if (hn == "3") {
+				var hnt = pn.html() + (tc.length > 0 ? tc.html() : "");
+				pn.html("<a title='"+hnt+"'>Anonpony</a>");
+				tc.html("");
 			}
 		},
 		expandimg: function(imp, ns, os) {
