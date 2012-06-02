@@ -632,7 +632,7 @@ function ponychanx() {
 				if (Settings.gets("Add google image shortcut to posts") == "true")
 					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
 				if (Settings.gets("Add download image shortcut to posts") == "true")
-					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+ns+"' target='_blank'>Download</a>"));
+					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+im.src+"' target='_blank'>Download</a>"));
 			}
 		},
 		addhover: function(p) {
