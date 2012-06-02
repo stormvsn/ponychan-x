@@ -611,7 +611,7 @@ function ponychanx() {
 							$jq(blat).append(bl);
 						}
 					}
-					if (ei && tto != null) {
+					if (ei && tto != null && $jq(this).parent().attr("class") != "extrabtns") {
 						$jq(this).removeAttr("onclick");
 						$jq(this).on("click", function() {
 							var n = $jq(this).next();
