@@ -124,7 +124,7 @@ function ponychanx() {
 									else
 										$jq(".thread .op").after(this);
 									Posts.newhandle(this);
-									Posts.fixhover(this);
+									Posts.addhover(this);
 									Posts.newpostupdate(this);
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
@@ -575,22 +575,7 @@ function ponychanx() {
 			}
 			var from = ql.html();
 			var im = $jq("a[href] span[id] img", p)[0];
-			var ns;
-			if (im != null) {
-				var os = im.src;
-				ns = im.src;
-				ns = ns.replace("/thumb/", "/src/");
-				ns = ns.replace("s.", ".");
-				if (Settings.gets("Animate gif thumbnails") == "true" && im.src.indexOf("s.gif") > 0)
-					im.src = ns;
-				var fsa = $jq(".filesize", p).find("a");
-				if (fsa.length > 0) {
-					var imp = $jq(im).parent();
-					fsa.attr("href", "javascript:;");
-					fsa.removeAttr("onclick");
-					fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
-				}
-			}
+			Posts.addexpandimg(p);
 			if (eb || ei || eq) {
 				$jq("blockquote a[class]", p).each(function() {
 					var tto, to, ffrom;
@@ -601,7 +586,7 @@ function ponychanx() {
 						} catch(e) { return true; }
 						ffrom = $jq("a[name='"+from+"']");
 					}
-					if (!$jq(this).closest("td").hasClass("inline") && tto != null && eb) {
+					if (tto != null && eb) {
 						var blcl = "ref|"+Main.bid+"|"+Main.tid+"|"+from;
 						var blat = tto.parent().find(".extrabtns")[0];
 						if ($jq("a[class='"+blcl+"']", blat).length == 0) {
@@ -619,15 +604,15 @@ function ponychanx() {
 								n.remove();
 							else {
 								var ca = this.className.split("|");
-								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")=="true") {
+								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies") == "true") {
 									Posts.getcrossthread(this, ca[3]);
 								} else {
 									var pc = tto.parent();
 									if (pc[0].nodeName != "DIV" || Main.tid != "0") {
-										var c = pc.clone().addClass("inline").removeAttr("id").insertAfter(this);
+										var c = pc.clone(true).addClass("inline").removeAttr("id").insertAfter(this);
 										$jq("a[name]", c).remove();
-										Posts.fixhover(c);
-										Posts.newhandle(c);
+										Posts.addhover(c);
+										Posts.addexpandimg(c);
 									} else {
 										return;
 									}
@@ -638,19 +623,19 @@ function ponychanx() {
 					}
 				});
 			}
-			var rb = $jq(".postfooter > a", p);
-			if (eq && !bp && rb[0] != null) {
-				$jq(rb[0]).removeAttr("onclick").attr("href", "javascript:;")
+			var rb = $jq(".postfooter", p);
+			if (eq && !bp) {
+				$jq("a:first", rb).removeAttr("onclick").attr("href", "javascript:;")
 				.on("click", function() { QR.quote(from); return false; });
 			}
-			if (im != null && !rb.closest("td").hasClass("inline")) {
+			if (im != null) {
 				if (Settings.gets("Add google image shortcut to posts") == "true")
-					$jq(".postfooter", p).append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
+					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
 				if (Settings.gets("Add download image shortcut to posts") == "true")
-					$jq(".postfooter", p).append(unescape(" &nbsp;%u2022&nbsp; <a href='"+ns+"' target='_blank'>Download</a>"));
+					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+ns+"' target='_blank'>Download</a>"));
 			}
 		},
-		fixhover: function(p) {
+		addhover: function(p) {
 			$jq("blockquote a[class], .extrabtns a[class]", p).each(function() {
 				if (this.className.substr(0, 4) == "ref|") {
 					this.addEventListener("mouseover", addreflinkpreview, false);
@@ -685,6 +670,21 @@ function ponychanx() {
 				pn.html("<a title='"+hnt+"'>Anonpony</a>");
 				tc.html("");
 			}
+		},
+		addexpandimg: function(p) {
+			$jq("a[href] span[id] img", p).each(function() {
+				var os = this.src;
+				var ns = this.src;
+				ns = ns.replace("/thumb/", "/src/");
+				ns = ns.replace("s.", ".");
+				if (Settings.gets("Animate gif thumbnails") == "true" && this.src.indexOf("s.gif") > 0)
+					this.src = ns;
+				var fsa = $jq(".filesize", p).find("a");
+				var imp = $jq(this).parent();
+				fsa.attr("href", "javascript:;");
+				fsa.removeAttr("onclick").unbind("click").on("click", "");
+				fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
+			});
 		},
 		expandimg: function(imp, ns, os) {
 			var img = $jq("img", imp)[0];
