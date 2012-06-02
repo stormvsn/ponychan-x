@@ -76,7 +76,7 @@ function ponychanx() {
 			}
 			if (lv > Main.version) {
 				$jq("#pxbtn").append(" (Update)");
-				$jq("#pxoptions").prepend("<strong>Update</strong><br />A new update for Ponchan X is available.<br />\
+				$jq("#pxoptions").prepend("<strong>Update</strong><br />A new update for Ponychan X is available.<br />\
 				Update applies on your next refresh.<br />\
 				<a href='javascript:;' onclick='window.location = \"https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js\"'>Click here to install the update</a>.<br /><br />");
 			}
@@ -625,7 +625,7 @@ function ponychanx() {
 									var pc = tto.parent();
 									if (pc[0].nodeName != "DIV" || Main.tid != "0") {
 										var c = pc.clone().addClass("inline").removeAttr("id").insertAfter(this);
-										$jq(c).find("a[name]").remove();
+										$jq("a[name]", c).remove();
 										Posts.fixhover(c);
 										Posts.newhandle(c);
 									} else {
@@ -640,10 +640,10 @@ function ponychanx() {
 			}
 			var rb = $jq(".postfooter > a", p);
 			if (eq && !bp && rb[0] != null) {
-				$jq(rb[0]).removeAttr("onclick");
-				rb[0].onclick = function() { QR.quote(from); return false; };
+				$jq(rb[0]).removeAttr("onclick").attr("href", "javascript:;")
+				.on("click", function() { QR.quote(from); return false; });
 			}
-			if (im != null && !$jq(rb).closest("td").hasClass("inline")) {
+			if (im != null && !rb.closest("td").hasClass("inline")) {
 				if (Settings.gets("Add google image shortcut to posts") == "true")
 					$jq(".postfooter", p).append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
 				if (Settings.gets("Add download image shortcut to posts") == "true")
