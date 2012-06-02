@@ -684,6 +684,21 @@ function ponychanx() {
 				fsa.attr("href", "javascript:;");
 				fsa.removeAttr("onclick").unbind("click");
 				fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
+				if (Settings.gets("Expand images on hover") == "true") {
+					var img = $jq(this).unbind("mouseover").on("mouseover", function(e) {
+						var hi = document.createElement("img");
+						hi.id = "hoverimg";
+						hi.src = ns;
+						hi.style.position = "absolute";
+						hi.style.left = e.pageX+125+"px";
+						hi.style.top = e.pageY-125+"px";
+						$jq("body").append(hi);
+						img.on("mouseout", function(e) {
+							$jq("#hoverimg").remove();
+							img.unbind("mouseout");
+						});
+					});
+				}
 			});
 		},
 		expandimg: function(imp, ns, os) {
@@ -859,7 +874,8 @@ function ponychanx() {
 			"Hide quick reply when top button clicked": { def: "false" },
 			"Scroll on new post": { def: "false" },
 			"Unique post content per image": { def: "false" },
-			"Autoupdate watched threads list": { def: "false" }
+			"Autoupdate watched threads list": { def: "false" },
+			"Expand images on hover": { def: "false" }
 		}
 	};
 	
