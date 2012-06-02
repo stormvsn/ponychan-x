@@ -694,6 +694,7 @@ function ponychanx() {
 						hi.style.top = e.pageY-125+"px";
 						$jq("body").append(hi);
 						hi.style.maxWidth = document.documentElement.clientWidth-300+"px";
+						hi.style.maxHeight = document.documentElement.clientHeight-300+"px";
 						img.on("mouseout", function(e) {
 							$jq("#hoverimg").remove();
 							img.unbind("mouseout").unbind("mousemove");
