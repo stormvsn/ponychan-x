@@ -636,7 +636,7 @@ function ponychanx() {
 			}
 		},
 		addhover: function(p) {
-			$jq("blockquote a[class], .extrabtns a[class]", p).each(function() {
+			$jq("blockquote a[class]", p).each(function() {
 				if (this.className.substr(0, 4) == "ref|") {
 					this.addEventListener("mouseover", addreflinkpreview, false);
 					this.addEventListener("mouseout", delreflinkpreview, false);
@@ -679,10 +679,10 @@ function ponychanx() {
 				ns = ns.replace("s.", ".");
 				if (Settings.gets("Animate gif thumbnails") == "true" && this.src.indexOf("s.gif") > 0)
 					this.src = ns;
-				var fsa = $jq(".filesize", p).find("a");
 				var imp = $jq(this).parent();
+				var fsa = $jq(this).closest("td").find(".filesize:first a");
 				fsa.attr("href", "javascript:;");
-				fsa.removeAttr("onclick").unbind("click").on("click", "");
+				fsa.removeAttr("onclick").unbind("click");
 				fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
 			});
 		},
@@ -732,7 +732,7 @@ function ponychanx() {
 				opt.append("<br /><strong>Filter</strong><br />Insert ; after each item<br />\
 				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
 				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
-				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' />");
+				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br />");
 			}
 			opt.append($jq("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
 				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
@@ -905,7 +905,7 @@ function ponychanx() {
 			$jq(p).css("display", "none");
 		},
 		newhandle: function(p) {
-			if (Settings.gets("Enable filter") != "true" || $jq("span.mod", p).length > 0) return;
+			if (Settings.gets("Enable filter") != "true" || $jq("span.mod, span.admin", p).length > 0) return;
 			if (Filter.filtered(0, $jq.trim($jq("span.postername", p).text()))) {
 				Filter.filter(p);
 				return;
