@@ -643,10 +643,10 @@ function ponychanx() {
 				$jq(rb[0]).removeAttr("onclick");
 				rb[0].onclick = function() { QR.quote(from); return false; };
 			}
-			if (im != null && Settings.gets("Add image shortcuts to posts") == "true") {
-				if (rb[2] == null)
+			if (im != null && !$jq(rb).closest("td").hasClass("inline")) {
+				if (Settings.gets("Add google image shortcut to posts") == "true")
 					$jq(".postfooter", p).append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
-				if (rb[3] == null)
+				if (Settings.gets("Add download image shortcut to posts") == "true")
 					$jq(".postfooter", p).append(unescape(" &nbsp;%u2022&nbsp; <a href='"+ns+"' target='_blank'>Download</a>"));
 			}
 		},
@@ -850,7 +850,8 @@ function ponychanx() {
 			"Enable hide post buttons": { def: "true" },
 			"Enable cross-thread inline replies": { def: "true" },
 			"Animate gif thumbnails": { def: "true" },
-			"Add image shortcuts to posts": { def: "true" },
+			"Add google image shortcut to posts": { def: "true" },
+			"Add download image shortcut to posts": { def: "true" },
 			"Quote selected text on quick reply": { def: "false" },
 			"Hide original post form": { def: "true" },
 			"Show autoupdate countdown dialog": { def: "true" },
