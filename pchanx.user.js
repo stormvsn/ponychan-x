@@ -5,6 +5,7 @@
 // @author        milky
 // @contributor   Storm Vision
 // @contributor   onekopaka
+// @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @include       *lunachan.net/*
 // @exclude       http://www.ponychan.net/chan/
@@ -12,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.19
+// @version       0.20
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168.html
@@ -26,7 +27,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 19,
+		version: 20,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -698,8 +699,7 @@ function ponychanx() {
 						img.on("mouseout", function(e) {
 							$jq("#hoverimg").remove();
 							img.unbind("mouseout").unbind("mousemove");
-						});
-						img.on("mousemove", function(e) {
+						}).on("mousemove", function(e) {
 							hi.style.left = e.pageX+125+"px";
 							hi.style.top = e.pageY-125+"px";
 						});
@@ -722,8 +722,9 @@ function ponychanx() {
 			Html.catalog();
 		},
 		hidepostform: function() {
-			if (Settings.gets("Hide original post form") == "true" && $jq("#postform").length > 0) {
-				$jq("#postform").hide();
+			var pf = $jq("#postform");
+			if (Settings.gets("Hide original post form") == "true" && pf.length > 0) {
+				pf.css({"visibility":"hidden", "height":"0"});
 				var a = document.createElement("a");
 				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
 				a.href = "javascript:;";
@@ -731,7 +732,9 @@ function ponychanx() {
 				var topf = document.createElement("a");
 				topf.innerHTML = "<h5>Show/Hide Original Post Form</h5>";
 				topf.href = "javascript:;";
-				topf.onclick = function() { $jq("#postform").toggle(); };
+				topf.onclick = function() { 
+					pf.css("height") == "0px" ? pf.css({"visibility":"visible", "height":"auto"}) : pf.css({"visibility":"hidden", "height":"0"});
+				};
 				$jq(".postarea").prepend(topf);
 				$jq(".postarea").prepend(a);
 			}
