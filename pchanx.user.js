@@ -61,7 +61,7 @@ function ponychanx() {
 				Settings.set("x.update.lastcheck", lu);
 			}
 			if (lv == null) lv = Main.version;
-			if (d > parseInt(lu)+172800000 && lv == Main.version) {
+			if (d > parseInt(lu)+86400000 && lv == Main.version) {
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", "http://nassign.heliohost.org/s/latest.php");
 				xhr.send();
@@ -682,8 +682,8 @@ function ponychanx() {
 					this.src = ns;
 					this.removeAttribute("height");
 					this.removeAttribute("width");
-					this.style.maxWidth = "125px";
-					this.style.maxHeight = "125px";
+					this.style.maxWidth = "126px";
+					this.style.maxHeight = "126px";
 				}
 				var imp = $jq(this).parent();
 				var fsa = $jq(this).closest("td").find(".filesize:first a");
@@ -696,8 +696,8 @@ function ponychanx() {
 						hi.id = "hoverimg";
 						hi.src = ns;
 						hi.style.position = "absolute";
-						hi.style.left = e.pageX+125+"px";
-						hi.style.top = e.pageY-125+"px";
+						hi.style.left = e.pageX+126+"px";
+						hi.style.top = e.pageY-126+"px";
 						$jq("body").append(hi);
 						hi.style.maxWidth = document.documentElement.clientWidth-300+"px";
 						hi.style.maxHeight = document.documentElement.clientHeight-300+"px";
@@ -705,8 +705,8 @@ function ponychanx() {
 							$jq("#hoverimg").remove();
 							img.unbind("mouseout").unbind("mousemove");
 						}).on("mousemove", function(e) {
-							hi.style.left = e.pageX+125+"px";
-							hi.style.top = e.pageY-125+"px";
+							hi.style.left = e.pageX+126+"px";
+							hi.style.top = e.pageY-126+"px";
 						});
 					});
 				}
