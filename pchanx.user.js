@@ -840,7 +840,8 @@ function ponychanx() {
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
 			#modpanel label input { position: relative; top: 2px; }";
-			if (Settings.gets("Enable hide post buttons")=="true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
+			if (Settings.gets("Enable hide post buttons") == "true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
+			if (Settings.gets("Hide namefields") == "true") s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
 			document.body.appendChild(s);
 		}
 	};
@@ -885,7 +886,8 @@ function ponychanx() {
 			"Scroll on new post": { def: "false" },
 			"Unique post content per image": { def: "false" },
 			"Autoupdate watched threads list": { def: "false" },
-			"Expand images on hover": { def: "false" }
+			"Expand images on hover": { def: "false" },
+			"Hide namefields": { def: "false" }
 		}
 	};
 	
