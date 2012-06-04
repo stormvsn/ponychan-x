@@ -61,7 +61,7 @@ function ponychanx() {
 				Settings.set("x.update.lastcheck", lu);
 			}
 			if (lv == null) lv = Main.version;
-			if (d > parseInt(lu)+86400000 && lv == Main.version) {
+			if (d > parseInt(lu)+86400000 && lv <= Main.version) {
 				var xhr = new XMLHttpRequest();
 				xhr.open("GET", "http://nassign.heliohost.org/s/latest.php");
 				xhr.send();
