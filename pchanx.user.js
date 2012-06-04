@@ -13,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.20
+// @version       0.21
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -27,7 +27,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 20,
+		version: 21,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -413,21 +413,16 @@ function ponychanx() {
 			$jq("#imagelist, .postopts").fadeIn("fast");
 		},
 		loadfields: function() {
-			var ln = Settings.get("x.name");
-			var le = Settings.get("x.email");
-			if (ln == null && le == null) {
-				$jq("#qr :input[name='name']").val($jq("#postform :input[name='name']").val());
-				$jq("#qr :input[name='em']").val($jq("#postform :input[name='em']").val());
-			} else {
-				$jq("#qr :input[name='name']").val(ln);
-				$jq("#qr :input[name='em']").val(le);
-			}
+			var ln = getCookie("name");
+			var le = getCookie("email");
+			$jq("#qr :input[name='name']").val(ln == null ? "" : ln);
+			$jq("#qr :input[name='em']").val(le == null ? "" : le);
 		},
 		storefields: function() {
-			Settings.set("x.name", $jq("#qr :input[name='name']").val());
-			var emailUsed = $jq("#qr :input[name='em']").val();
-			if(emailUsed != "sage" && emailUsed != "\u4E0B\u3052")
-				Settings.set("x.email", emailUsed);
+			set_cookie("name", $jq("#qr :input[name='name']").val(), -1);
+			var eu = $jq("#qr :input[name='em']").val();
+			if(eu != "sage" && eu != "\u4E0B\u3052")
+				set_cookie("email", eu, -1);
 		},
 		keys: function() {
 			$jq(document).bind("keydown", function (e) {
