@@ -678,7 +678,8 @@ function ponychanx() {
 				var ns = this.src;
 				ns = ns.replace("/thumb/", "/src/");
 				ns = ns.replace("s.", ".");
-				if (Settings.gets("Animate gif thumbnails") == "true" && this.src.indexOf("s.gif") > 0) {
+				var fs = $jq(this).closest("td").find(".filesize");
+				if (Settings.gets("Animate gif thumbnails") == "true" && fs.text().indexOf(", spoiler.gif") == -1 && this.src.indexOf("s.gif") > 0) {
 					this.src = ns;
 					this.removeAttribute("height");
 					this.removeAttribute("width");
@@ -686,7 +687,7 @@ function ponychanx() {
 					this.style.maxHeight = "126px";
 				}
 				var imp = $jq(this).parent();
-				var fsa = $jq(this).closest("td").find(".filesize:first a");
+				var fsa = $jq("a:first", fs);
 				fsa.attr("href", "javascript:;");
 				fsa.removeAttr("onclick").unbind("click");
 				fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
