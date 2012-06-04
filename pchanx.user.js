@@ -16,7 +16,7 @@
 // @version       0.20
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
-// @homepage      http://www.ponychan.net/chan/meta/res/115168.html
+// @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
 // ==/UserScript==
 
 function ponychanx() {
@@ -678,8 +678,13 @@ function ponychanx() {
 				var ns = this.src;
 				ns = ns.replace("/thumb/", "/src/");
 				ns = ns.replace("s.", ".");
-				if (Settings.gets("Animate gif thumbnails") == "true" && this.src.indexOf("s.gif") > 0)
+				if (Settings.gets("Animate gif thumbnails") == "true" && this.src.indexOf("s.gif") > 0) {
 					this.src = ns;
+					this.removeAttribute("height");
+					this.removeAttribute("width");
+					this.style.maxWidth = "125px";
+					this.style.maxHeight = "125px";
+				}
 				var imp = $jq(this).parent();
 				var fsa = $jq(this).closest("td").find(".filesize:first a");
 				fsa.attr("href", "javascript:;");
