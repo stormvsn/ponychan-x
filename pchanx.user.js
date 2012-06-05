@@ -223,7 +223,7 @@ function ponychanx() {
 				btn.val("Thread"); 
 				$jq("#qr .postopts label").css("display", "none");
 			}
-			if (Settings.gets("Sync original post form and quick reply")=="true") {
+			if (Settings.gets("Sync original post form and quick reply") == "true") {
 				$jq("#qr > input[name], #qr textarea").on("keyup change", function() {
 					$jq("#postform").find("[name='"+this.name+"']").val(this.value);
 				});
@@ -733,27 +733,30 @@ function ponychanx() {
 			$jq(".adminbar").prepend($jq('<a class="adminbaritem" id="pxbtn" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			}));
-			var opt = $jq("<div id='pxoptions'><strong>Settings</strong><br /></div>");
+			var ow = $jq("<div id='pxoptions'></div>");
+			var ol = $jq("<div style='float: left;'><strong>Settings</strong><br /></div>");
+			var or = $jq("<div style='float: right;'></div>");
+			ow.append(ol);
+			ow.append(or);
 			for (s in Settings.settings) {
-				opt.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
+				ol.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
 			}
-			$jq('#pxoptions input[type="checkbox"]').live("click", function() { Settings.sets($jq(this).attr("name"), String($jq(this).is(":checked"))); });
 			var s = Settings.get("x.updatetimer");
-			if (s == null) s = "10";
-			opt.append("Update every <input type='text' id='updatetimer' value='"+s+"'> seconds<br />");
+			ol.append("Update every <input type='text' id='updatetimer' value='"+(s == null ? "10" : s)+"'> seconds<br />");
 			$jq("#updatetimer").live("change", function() { if (isNaN(parseInt($jq(this).val()))) return; Settings.set("x.updatetimer", $jq(this).val()); });
-			if (Settings.gets("Enable filter")=="true") {
-				opt.append("<br /><strong>Filter</strong><br />Insert ; after each item<br />\
+			$jq('#pxoptions input[type="checkbox"]').live("click", function() { Settings.sets($jq(this).attr("name"), String($jq(this).is(":checked"))); });
+			if (Settings.gets("Enable filter") == "true") {
+				or.append("<strong>Filter</strong><br />Insert ; after each item<br />\
 				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
 				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
-				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br />");
+				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br />")
+				.on("keyup change", function() { Filter.save(); });
 			}
-			opt.append($jq("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
+			or.append($jq("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
 				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
 			}));
-			opt.append("<br /><a href='javascript:;' onclick='location.reload(true);' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
-			opt.insertAfter(".adminbar");
-			$jq('#pxoptions > input[id][name]').keyup(function() { Filter.save(); }).change(function() { Filter.save(); });
+			or.append("<br /><a href='javascript:;' onclick='location.reload(true);' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
+			ow.insertAfter(".adminbar");
 		},
 		catalog: function() {
 			if ($jq(".catalogtable").length > 0) {
@@ -897,25 +900,25 @@ function ponychanx() {
 			var n = Settings.get("x.filter.nlist");
 			if (n != null && n != "undefined") {
 				Filter.nlist = n;
-				$jq('#pxoptions input[type="text"][name="nlist"]').val(n);
+				$jq('#pxoptions > div input[name="nlist"]').val(n);
 			}
 			var t = Settings.get("x.filter.tlist");
 			if (t != null && t != "undefined") {
 				Filter.tlist = t;
-				$jq('#pxoptions input[type="text"][name="tlist"]').val(t);
+				$jq('#pxoptions > div input[name="tlist"]').val(t);
 			}
 			var p = Settings.get("x.filter.plist");
 			if (p != null && p != "undefined") {
 				Filter.plist = p;
-				$jq('#pxoptions input[type="text"][name="plist"]').val(p);
+				$jq('#pxoptions > div input[name="plist"]').val(p);
 			}
 		},
 		save: function() {
-			Filter.nlist = $jq('#pxoptions input[name="nlist"]').val();
+			Filter.nlist = $jq('#pxoptions > div input[name="nlist"]').val();
 			Settings.set("x.filter.nlist", Filter.nlist);
-			Filter.tlist = $jq('#pxoptions > input[name="tlist"]').val();
+			Filter.tlist = $jq('#pxoptions > div input[name="tlist"]').val();
 			Settings.set("x.filter.tlist", Filter.tlist);
-			Filter.plist = $jq('#pxoptions > input[name="plist"]').val();
+			Filter.plist = $jq('#pxoptions > div input[name="plist"]').val();
 			Settings.set("x.filter.plist", Filter.plist);
 		},
 		filter: function(p) {
