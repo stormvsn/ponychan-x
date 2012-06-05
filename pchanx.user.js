@@ -266,47 +266,32 @@ function ponychanx() {
 			if (!$jq("#qr").length) return;
 			if (QR.ajax != null) { QR.ajax.abort(); QR.ajax = null; return; }
 			var sb = $jq("#qr > input[type='button']");
-			var n = $jq("#qr :input[name='name']").val();
-			var e = $jq("#qr :input[name='em']").val();
-			var s = $jq("#qr :input[name='subject']").val();
-			var m = $jq("#qr :input[name='message']").val();
-			var sp = $jq("#qr .postopts :input[name='spoiler']").is(":checked");
-			var pp = $jq("#postform :input[name='postpassword']").val();
-			var qri = $jq("#postform :input[name='quickreply']").val();
-			var hmpcyh = $jq("#postform :input[name='how_much_pony_can_you_handle']").val();
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
 			d.append("board", Main.bid);
 			d.append("replythread", Main.tid);
-			d.append("quickreply", qri);
-			d.append("name", n);
-			d.append("em", e);
-			d.append("subject", s);
-			d.append("postpassword", pp);
-			d.append("how_much_pony_can_you_handle", hmpcyh);
+			d.append("quickreply", $jq("#postform :input[name='quickreply']").val());
+			d.append("name", $jq("#qr :input[name='name']").val());
+			d.append("em", $jq("#qr :input[name='em']").val());
+			d.append("subject", $jq("#qr :input[name='subject']").val());
+			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
+			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
 			d.append("stats_referrer", "");
+			d.append("message", $jq("#qr :input[name='message']").val());
+			d.append("imagefile", i);
+			if ($jq("#qr .postopts :input[name='spoiler']").is(":checked")) d.append("spoiler", "true");
 			if (QR.checkmod()) {
-				var mp = $jq("#qr #modpanel :input[name='modpassword']").val();
-				var lop = $jq("#qr #modpanel :input[name='lockonpost']").is(":checked");
-				var sop = $jq("#qr #modpanel :input[name='stickyonpost']").is(":checked");
-				var rh = $jq("#qr #modpanel :input[name='rawhtml']").is(":checked");
-				var usn = $jq("#qr #modpanel :input[name='usestaffname']").is(":checked");
-				d.append("modpassword", mp);
-				d.append("lockonpost", lop);
-				d.append("stickyonpost", sop);
-				d.append("rawhtml", rh);
-				d.append("usestaffname", usn);
+				d.append("modpassword", $jq("#qr #modpanel :input[name='modpassword']").val());
+				d.append("lockonpost", $jq("#qr #modpanel :input[name='lockonpost']").is(":checked"));
+				d.append("stickyonpost", $jq("#qr #modpanel :input[name='stickyonpost']").is(":checked"));
+				d.append("rawhtml", $jq("#qr #modpanel :input[name='rawhtml']").is(":checked"));
+				d.append("usestaffname", $jq("#qr #modpanel :input[name='usestaffname']").is(":checked"));
 			}
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
-				var em = $jq("#qr :input[name='embed']").val();
-				var emt = $jq("#qr select").val();
-				d.append("embed", em);
-				d.append("embedtype", emt);
+				d.append("embed", $jq("#qr :input[name='embed']").val());
+				d.append("embedtype", $jq("#qr select").val());
 			}
-			if (sp) d.append("spoiler", sp);
-			d.append("message", m);
-			d.append("imagefile", i);
 			var xhr = QR.ajax = new XMLHttpRequest();
 			xhr.upload.addEventListener("progress", function(evt) {
 				if (evt.lengthComputable) {
