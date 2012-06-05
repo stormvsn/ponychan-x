@@ -155,6 +155,7 @@ function ponychanx() {
 	
 	var QR = {
 		cooldown: 15,
+		ajax: null,
 		init: function() {
 			Html.hidepostform();
 			if (Settings.get("x.show")=="true") QR.show();
@@ -260,9 +261,14 @@ function ponychanx() {
 			Settings.set("x.show", "false");
 			$jq("#qr").css("display", "none");
 		},
+		abort: function() {
+			QR.ajax.abort();
+			$jq("#qr > input[type='button']").die("click").live("click", function() { QR.send(); });
+		},
 		send: function() {
 			if (!$jq("#qr").length) return;
-			$jq("#qr > input[type='button']").val("...");
+			var sb = $jq("#qr > input[type='button']");
+			sb.die("click").val("...").live("click", function() { QR.abort(); });
 			var n = $jq("#qr :input[name='name']").val();
 			var e = $jq("#qr :input[name='em']").val();
 			var s = $jq("#qr :input[name='subject']").val();
@@ -303,12 +309,12 @@ function ponychanx() {
 			}
 			if (sp) d.append("spoiler", sp);
 			d.append("message", m);
-			d.append("imagefile", i);			
-			var xhr = new XMLHttpRequest();
+			d.append("imagefile", i);
+			var xhr = QR.ajax = new XMLHttpRequest();
 			xhr.upload.addEventListener("progress", function(evt) {
 				if (evt.lengthComputable) {
 					var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-					$jq("#qr > input[type='button']").val(percentComplete.toString() + '%');
+					sb.val(percentComplete.toString() + '%');
 				}
 			}, false);
 			xhr.open("POST", "http://" + purl + "/board.php");  
@@ -319,19 +325,19 @@ function ponychanx() {
 						Notifier._me = true;
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
 							QR.settitle(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
-							$jq("#qr > input[type='button']").val("Retry");
+							sb.die("click").val("Retry").live("click", function() { QR.send(); });
 						} else {
 							if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 								location.reload(true);
 							QR.clear(fid);
 						}
 					} else {
-						QR.settitle("An error occured while posting.");
-						$jq("#qr > input[type='button']").val("Error");
+						QR.settitle(xhr.status == 0 ? "Post aborted" : "An error occured while posting");
+						sb.val("Retry");
 					}
+					QR.storefields();
 				}
 			}
-			QR.storefields();
 		},
 		cooldowntimer: function() {
 			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.cooldown);
@@ -348,6 +354,7 @@ function ponychanx() {
 			}
 		},
 		clear: function(fid) {
+			$jq("#qr > input[type='button']").die("click").live("click", function() { QR.send(); });
 			$jq("#postform :input[name='quickreply']").val("");
 			QR.settitle("");
 			$jq(".listthumb[name='"+fid+"']").remove();
