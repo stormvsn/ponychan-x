@@ -137,6 +137,7 @@ function ponychanx() {
 						case 404:
 							document.title = "(404) " + Html.title;
 							QR.settitle("(404)");
+							$jq("#qr > input[type='button']").attr("disabled", "disabled");
 						break;
 						case 503:
 							QR.settitle("(503) <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
@@ -261,14 +262,10 @@ function ponychanx() {
 			Settings.set("x.show", "false");
 			$jq("#qr").css("display", "none");
 		},
-		abort: function() {
-			QR.ajax.abort();
-			$jq("#qr > input[type='button']").die("click").live("click", function() { QR.send(); });
-		},
 		send: function() {
 			if (!$jq("#qr").length) return;
+			if (QR.ajax != null) { QR.ajax.abort(); QR.ajax = null; return; }
 			var sb = $jq("#qr > input[type='button']");
-			sb.die("click").val("...").live("click", function() { QR.abort(); });
 			var n = $jq("#qr :input[name='name']").val();
 			var e = $jq("#qr :input[name='em']").val();
 			var s = $jq("#qr :input[name='subject']").val();
@@ -325,7 +322,7 @@ function ponychanx() {
 						Notifier._me = true;
 						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
 							QR.settitle(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
-							sb.die("click").val("Retry").live("click", function() { QR.send(); });
+							sb.val("Retry");
 						} else {
 							if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 								location.reload(true);
@@ -336,6 +333,7 @@ function ponychanx() {
 						sb.val("Retry");
 					}
 					QR.storefields();
+					QR.ajax = null;
 				}
 			}
 		},
@@ -354,7 +352,6 @@ function ponychanx() {
 			}
 		},
 		clear: function(fid) {
-			$jq("#qr > input[type='button']").die("click").live("click", function() { QR.send(); });
 			$jq("#postform :input[name='quickreply']").val("");
 			QR.settitle("");
 			$jq(".listthumb[name='"+fid+"']").remove();
