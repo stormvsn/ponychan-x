@@ -814,7 +814,7 @@ function ponychanx() {
 			.postarea a h2 { padding-bottom: 4px; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
-			#pxoptions { box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; top: 32px; right: 185px; border: 1px solid black; }\
+			#pxoptions { z-index: 3200; width: 471px; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
 			#qr * { margin: 0; padding: 0; }\
 			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
 			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
@@ -834,6 +834,7 @@ function ponychanx() {
 			#modpanel label input { position: relative; top: 2px; }";
 			if (Settings.gets("Enable hide post buttons") == "true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			if (Settings.gets("Hide namefields") == "true") s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
+			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: auto; right: auto; left: 0; bottom: 28px; }";
 			document.body.appendChild(s);
 		}
 	};
