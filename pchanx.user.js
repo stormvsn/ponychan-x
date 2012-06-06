@@ -283,10 +283,10 @@ function ponychanx() {
 			if ($jq("#qr .postopts :input[name='spoiler']").is(":checked")) d.append("spoiler", "true");
 			if (QR.checkmod()) {
 				d.append("modpassword", $jq("#qr #modpanel :input[name='modpassword']").val());
-				d.append("lockonpost", $jq("#qr #modpanel :input[name='lockonpost']").is(":checked"));
-				d.append("stickyonpost", $jq("#qr #modpanel :input[name='stickyonpost']").is(":checked"));
-				d.append("rawhtml", $jq("#qr #modpanel :input[name='rawhtml']").is(":checked"));
-				d.append("usestaffname", $jq("#qr #modpanel :input[name='usestaffname']").is(":checked"));
+				if ($jq("#qr #modpanel :input[name='lockonpost']").is(":checked")) d.append("lockonpost", "true");
+				if ($jq("#qr #modpanel :input[name='stickyonpost']").is(":checked")) d.append("stickyonpost", "true");
+				if ($jq("#qr #modpanel :input[name='rawhtml']").is(":checked")) d.append("rawhtml", "true");
+				if ($jq("#qr #modpanel :input[name='usestaffname']").is(":checked")) d.append("usestaffname", "true");
 			}
 			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
 				d.append("embed", $jq("#qr :input[name='embed']").val());
@@ -344,7 +344,10 @@ function ponychanx() {
 			var ts = $jq("#thumbselected");
 			var tsp = ts.length > 0 ? ts.attr("data-post") : "";
 			$jq("#qr textarea").val(tsp);
-			$jq("#qr :input[name='subject']").val("");
+			$jq("#qr input[name='subject']").val("");
+			$jq("#qr #modpanel :input[name='lockonpost']").attr("checked", false);
+			$jq("#qr #modpanel :input[name='stickyonpost']").attr("checked", false);
+			$jq("#qr #modpanel :input[name='rawhtml']").attr("checked", false);
 			$jq("#qr .embedwrap :input[name='embed']").val("");
 			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
 			if (Settings.gets("Hide quick reply after posting")=="true" && $jq("#qr .postopts :input[name='auto']")[0].checked == false)
