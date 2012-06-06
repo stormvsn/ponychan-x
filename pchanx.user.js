@@ -13,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.21
+// @version       0.22
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -27,7 +27,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 21,
+		version: 22,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -42,7 +42,8 @@ function ponychanx() {
 			Css.init();
 			if (Main.tid != "0" && $jq("#postform").length > 0) {
 				if (Settings.gets("Enable autoupdate")=="true") Updater.init();	
-				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true") Dialog.init();
+				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true")
+					Dialog.init();
 			}
 			if (Settings.gets("Enable quick reply")=="true") QR.init();
 			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
