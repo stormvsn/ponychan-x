@@ -734,11 +734,17 @@ function ponychanx() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			}));
 			var ow = $jq("<div id='pxoptions'></div>");
-			var ol = $jq("<div style='float: left;'><strong>Settings</strong><br /></div>");
+			var ol = $jq("<div style='float: left;'></div>");
 			var or = $jq("<div style='float: right;'></div>");
 			ow.append(ol);
 			ow.append(or);
+			var lc = "";
 			for (s in Settings.settings) {
+				var c = Settings.settings[s].cat;
+				if (c != lc) {
+					lc = c;
+					ol.append("<strong>"+c+"</strong><br />");
+				}
 				ol.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
 			}
 			var s = Settings.get("x.updatetimer");
@@ -749,10 +755,10 @@ function ponychanx() {
 				or.append("<strong>Filter</strong><br />Insert ; after each item<br />\
 				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
 				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
-				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br />")
+				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br /><br />")
 				.on("keyup change", function() { Filter.save(); });
 			}
-			or.append($jq("<br /><a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
+			or.append($jq("<a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
 				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
 			}));
 			or.append("<br /><a href='javascript:;' onclick='location.reload(true);' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
@@ -814,7 +820,7 @@ function ponychanx() {
 			.postarea a h2 { padding-bottom: 4px; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
-			#pxoptions { z-index: 3200; width: 471px; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
+			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
 			#qr * { margin: 0; padding: 0; }\
 			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
 			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
@@ -840,9 +846,6 @@ function ponychanx() {
 	};
 	
 	var Settings = {
-		init: function() {
-		
-		},
 		set: function(n, v) {
 			localStorage.setItem(n, v);
 		},
@@ -858,29 +861,29 @@ function ponychanx() {
 			return Settings.settings[n].def;
 		},
 		settings: {
-			"Enable quick reply": {def: "true" },
-			"Enable backlinks": {def: "true" },
-			"Enable autoupdate": { def: "true" },
-			"Show new post count in title": { def: "true" },
-			"Enable filter": { def: "false" },
-			"Enable inline replies": { def: "true" },
-			"Quick reply key shortcuts": { def: "false" },
-			"Hide quick reply after posting": { def: "true" },
-			"Enable hide post buttons": { def: "true" },
-			"Enable cross-thread inline replies": { def: "true" },
-			"Animate gif thumbnails": { def: "true" },
-			"Add google image shortcut to posts": { def: "true" },
-			"Add download image shortcut to posts": { def: "true" },
-			"Quote selected text on quick reply": { def: "false" },
-			"Hide original post form": { def: "true" },
-			"Show autoupdate countdown dialog": { def: "true" },
-			"Sync original post form and quick reply": { def: "false" },
-			"Hide quick reply when top button clicked": { def: "false" },
-			"Scroll on new post": { def: "false" },
-			"Unique post content per image": { def: "false" },
-			"Autoupdate watched threads list": { def: "false" },
-			"Expand images on hover": { def: "false" },
-			"Hide namefields": { def: "false" }
+			"Enable quick reply": { def: "true", cat: "Quick reply" },
+			"Quick reply key shortcuts": { def: "false", cat: "Quick reply" },
+			"Hide quick reply after posting": { def: "true", cat: "Quick reply" },
+			"Quote selected text on quick reply": { def: "false", cat: "Quick reply" },
+			"Hide quick reply when top button clicked": { def: "false", cat: "Quick reply" },
+			"Unique post content per image": { def: "false", cat: "Quick reply" },
+			"Show autoupdate countdown dialog": { def: "true", cat: "Autoupdate" },
+			"Enable autoupdate": { def: "true", cat: "Autoupdate" },
+			"Show new post count in title": { def: "true", cat: "Autoupdate" },
+			"Autoupdate watched threads list": { def: "false", cat: "Autoupdate" },
+			"Expand images on hover": { def: "false", cat: "Posts" },
+			"Enable inline replies": { def: "true", cat: "Posts" },
+			"Enable backlinks": {def: "true", cat: "Posts" },
+			"Enable hide post buttons": { def: "true", cat: "Posts" },
+			"Enable cross-thread inline replies": { def: "true", cat: "Posts" },
+			"Animate gif thumbnails": { def: "true", cat: "Posts" },
+			"Add google image shortcut to posts": { def: "true", cat: "Posts" },
+			"Add download image shortcut to posts": { def: "true", cat: "Posts" },
+			"Enable filter": { def: "false", cat: "Other" },
+			"Hide original post form": { def: "true", cat: "Other" },
+			"Sync original post form and quick reply": { def: "false", cat: "Other" },
+			"Scroll on new post": { def: "false", cat: "Other" },
+			"Hide namefields": { def: "false", cat: "Other" }
 		}
 	};
 	
