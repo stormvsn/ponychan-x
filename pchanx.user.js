@@ -265,7 +265,7 @@ function ponychanx() {
 		},
 		send: function() {
 			if (!$jq("#qr").length) return;
-			if (QR.ajax != null) { QR.ajax.abort(); QR.ajax = null; return; }
+			if (QR.ajax != null) { QR.ajax.abort(); return; }
 			var sb = $jq("#qr > input[type='button']");
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var i = document.getElementById("imgfile").files[fid];
@@ -315,12 +315,15 @@ function ponychanx() {
 							QR.clear(fid);
 						}
 					} else {
-						QR.settitle(xhr.status == 0 ? "Post aborted" : "An error occured while posting");
+						QR.settitle("(" + xhr.status + ") An error occured while posting");
 						sb.val("Retry");
 					}
 					QR.storefields();
 					QR.ajax = null;
 				}
+			}
+			xhr.onabort = function() {
+				QR.settitle("Posting aborted");
 			}
 		},
 		cooldowntimer: function() {
@@ -377,8 +380,7 @@ function ponychanx() {
 			}
 			$jq("#imagelist").html("");
 			var url = window.URL || window.webkitURL;
-			for (var i = 0, len = f.length; i < len; i++)
-			{
+			for (var i = 0, len = f.length; i < len; i++) {
 				var fU = url.createObjectURL(f[i]);
 				var thumb = document.createElement("div");
 				$jq("#imagelist").append(thumb);
@@ -453,18 +455,19 @@ function ponychanx() {
 	var Dialog = {
 		left: 0,
 		init: function() {
+			$jq("body").append($jq("<div id='dialog'><span id='d-countdown'></span><br /><span id='d-update-now'></span></div>"));
+			//$jq("#dialog #d-update-now").append($jq("<a href='javascript:;'>Update now</a>").on("click", function() { }));
 			Dialog.left = Updater.tmr/1000;
-			$jq("body").append($jq("<div id='dialog'></div>"));
 			Dialog.countdown();
 		},
 		countdown: function() {
 			if (Dialog.left > -1) {
-				$jq("#dialog").html("Autoupdate: " + Dialog.left);
+				$jq("#dialog #d-countdown").html("Autoupdate: " + Dialog.left);
 				Dialog.left--;
 				setTimeout(function() {	Dialog.countdown(); }, 1000);
 			} else {
 				Dialog.left = Updater.tmr/1000;
-				$jq("#dialog").html("Autoupdate: ..");
+				$jq("#dialog #d-countdown").html("Autoupdate: ..");
 			}
 		}
 	};
@@ -816,7 +819,7 @@ function ponychanx() {
 	var Css = {
 		init: function() {
 			var s = document.createElement('style');
-			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; }\
+			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; text-align: right; }\
 			#embed { width: 314px !important; }\
 			#qr .embedwrap select { padding: 3px 0 2px 0; }\
 			#qr .embedwrap { display: none; }\
@@ -866,7 +869,7 @@ function ponychanx() {
 		},
 		settings: {
 			"Enable quick reply": { def: "true", cat: "Quick reply" },
-			"Quick reply key shortcuts": { def: "false", cat: "Quick reply" },
+			"Quick reply key shortcuts": { def: "true", cat: "Quick reply" },
 			"Hide quick reply after posting": { def: "true", cat: "Quick reply" },
 			"Quote selected text on quick reply": { def: "false", cat: "Quick reply" },
 			"Hide quick reply when top button clicked": { def: "false", cat: "Quick reply" },
