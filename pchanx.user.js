@@ -225,10 +225,10 @@ function ponychanx() {
 				$jq("#qr .postopts label").css("display", "none");
 			}
 			if (Settings.gets("Sync original post form and quick reply") == "true") {
-				$jq("#qr > input[name], #qr textarea").on("keyup change", function() {
+				$jq("#qr > input[name], #qr textarea").on("input", function() {
 					$jq("#postform").find("[name='"+this.name+"']").val(this.value);
 				});
-				$jq("#postform input[name], #postform textarea").on("keyup change", function() {
+				$jq("#postform input[name], #postform textarea").on("input", function() {
 					$jq("#qr").find("[name='"+this.name+"']").val(this.value);
 				});
 			}
@@ -763,7 +763,7 @@ function ponychanx() {
 				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
 				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
 				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br /><br />")
-				.on("keyup change", function() { Filter.save(); });
+				.on("input", function() { Filter.save(); });
 			}
 			or.append($jq("<a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
 				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
