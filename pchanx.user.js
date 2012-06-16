@@ -39,7 +39,6 @@ function ponychanx() {
 			Main.tid = $jq("#postform :input[name='replythread']").val();
 			Main.bid = $jq("#postform :input[name='board']").val();
 			Html.init();
-			Css.init();
 			if (Main.tid != "0" && $jq("#postform").length > 0) {
 				if (Settings.gets("Enable autoupdate")=="true") Updater.init();	
 				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true")
@@ -121,10 +120,7 @@ function ponychanx() {
 									f = true;
 								if (f) {
 									var tal = $jq("#delform div[id]:first table:last");
-									if (tal.length > 0)
-										tal.after(this);
-									else
-										$jq(".thread .op").after(this);
+									tal.length > 0 ? tal.after(this) : $jq(".thread .op").after(this);
 									Posts.newhandle(this);
 									Posts.addhover(this);
 									Posts.newpostupdate(this);
@@ -194,7 +190,7 @@ function ponychanx() {
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
 			<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" accesskey="e">\
-			<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option></select></div>\
+			<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option><option value="vimeo">Vimeo</option><option value="blimp">Blimp</option></select></div>\
 			<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
 			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accept="image/*" accesskey="f">\
 			<input type="button" value="Reply" accesskey="z">\
@@ -202,10 +198,11 @@ function ponychanx() {
 			<div id="imagelist"></div>';
 			if (QR.checkmod()) {
 				qr.innerHTML += '<div id="modpanel">\
-				<input name="modpassword" placeholder="Mod Password" value="'+getCookie("modpassword")+'" size="28" maxlength="75" type="text" /> \
-				<label title="Lock"><input name="lockonpost" type="checkbox" /> Lock Thread</label> \
-				<label title="Sticky"><input name="stickyonpost" type="checkbox" /> Sticky</label> \
-				<label title="Raw HTML"><input name="rawhtml" type="checkbox" /> Raw HTML</label> \
+				<input name="modpassword" placeholder="Mod Password" size="28" maxlength="75" type="text" /> \
+				<label title="Display staff status (Mod/Admin)"><input name="displaystaffstatus" type="checkbox" checked /> Display Status</label> \
+				<label title="Lock this thread"><input name="lockonpost" type="checkbox" /> Lock</label> \
+				<label title="Sticky this thread"><input name="stickyonpost" type="checkbox" /> Sticky</label> \
+				<label title="Post with raw HTML"><input name="rawhtml" type="checkbox" /> Raw HTML</label> \
 				<label title="Name"><input name="usestaffname" type="checkbox" /> Name</label> \
 				</div>';
 			}
@@ -277,6 +274,7 @@ function ponychanx() {
 			d.append("em", $jq("#qr :input[name='em']").val());
 			d.append("subject", $jq("#qr :input[name='subject']").val());
 			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
+			d.append("ponychanx", Main.version);
 			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
 			d.append("stats_referrer", "");
 			d.append("message", $jq("#qr :input[name='message']").val());
@@ -284,6 +282,7 @@ function ponychanx() {
 			if ($jq("#qr .postopts :input[name='spoiler']").is(":checked")) d.append("spoiler", "true");
 			if (QR.checkmod()) {
 				d.append("modpassword", $jq("#qr #modpanel :input[name='modpassword']").val());
+				if ($jq("#qr #modpanel :input[name='displaystaffstatus']").is(":checked")) d.append("displaystaffstatus", "true");
 				if ($jq("#qr #modpanel :input[name='lockonpost']").is(":checked")) d.append("lockonpost", "true");
 				if ($jq("#qr #modpanel :input[name='stickyonpost']").is(":checked")) d.append("stickyonpost", "true");
 				if ($jq("#qr #modpanel :input[name='rawhtml']").is(":checked")) d.append("rawhtml", "true");
@@ -507,13 +506,10 @@ function ponychanx() {
 		hide: function(hp) {
 			hp = $jq(hp);
 			var c = hp.closest("table");
-			if (hp.html() == "[ - ]") {
-				hp.html("[ + ]");
-				$jq(".reply", c).addClass("hidden");
-			} else {
-				hp.html("[ - ]");
-				$jq(".reply", c).removeClass("hidden");
-			}
+			var t = $jq(".postertrip", c).html();
+			hp.html() == "[ - ]" ? hp.html("[ + ] " + $jq(".postername", c).html() + (t == null ? "" : t)) : hp.html("[ - ]");
+			$jq("a[href]", hp).removeAttr("href");
+			$jq(".reply", c).toggle();
 		},
 		getcrossthread: function(anc, pid) {
 			var xhr = new XMLHttpRequest();
@@ -716,6 +712,7 @@ function ponychanx() {
 		title: document.title,
 		init: function() {
 			Html.addoptions();
+			Html.css();
 			Html.catalog();
 		},
 		hidepostform: function() {
@@ -788,6 +785,39 @@ function ponychanx() {
 				var at = $jq("<a href='"+h+"' style='margin-left: 6px;'>[+50]</a>");
 				$jq(this).after(at);
 			});
+		},
+		css: function() {
+			var s = document.createElement('style');
+			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; text-align: right; }\
+			#embed { width: 314px !important; }\
+			#qr .embedwrap select { padding: 3px 0 2px 0; }\
+			#qr .embedwrap { display: none; }\
+			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
+			.postarea a h2 { padding-bottom: 4px; }\
+			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
+			#updatetimer { width: 30px; }\
+			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
+			#qr * { margin: 0; padding: 0; }\
+			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
+			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
+			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
+			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
+			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
+			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
+			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
+			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
+			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; background: #e2e2e2; border-radius: 4px; border: 1px solid #000; }\
+			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
+			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
+			.extrabtns { vertical-align: top; }\
+			#pxbtn { margin-right: -4px; }\
+			.postarea a h5 { margin: 0 0 12px 0; }\
+			#modpanel { clear: both; font-size: small; }\
+			#modpanel label input { position: relative; top: 2px; }";
+			if (Settings.gets("Enable hide post buttons") == "true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
+			if (Settings.gets("Hide namefields") == "true") s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
+			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: 28px; right: auto; left: 0; } #pxbtn { height: 9px; } ";
+			document.body.appendChild(s);
 		}
 	};
 	
@@ -814,42 +844,6 @@ function ponychanx() {
 			++Notifier._new;
 			document.title = "("+Notifier._new+") "+ Html.title;
 		},
-	}
-	
-	var Css = {
-		init: function() {
-			var s = document.createElement('style');
-			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; text-align: right; }\
-			#embed { width: 314px !important; }\
-			#qr .embedwrap select { padding: 3px 0 2px 0; }\
-			#qr .embedwrap { display: none; }\
-			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
-			.postarea a h2 { padding-bottom: 4px; }\
-			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
-			.hidden { height: 10px; opacity: 0.1; } #updatetimer { width: 30px; }\
-			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
-			#qr * { margin: 0; padding: 0; }\
-			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
-			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
-			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
-			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
-			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
-			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
-			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
-			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
-			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; background: #e2e2e2; border-radius: 4px; border: 1px solid #000; }\
-			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
-			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
-			.extrabtns { vertical-align: top; }\
-			#pxbtn { margin-right: -4px; }\
-			.postarea a h5 { margin: 0 0 12px 0; }\
-			#modpanel { clear: both; font-size: small; }\
-			#modpanel label input { position: relative; top: 2px; }";
-			if (Settings.gets("Enable hide post buttons") == "true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
-			if (Settings.gets("Hide namefields") == "true") s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
-			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: auto; right: auto; left: 0; bottom: 28px; } #pxbtn { height: 9px; } ";
-			document.body.appendChild(s);
-		}
 	};
 	
 	var Settings = {
