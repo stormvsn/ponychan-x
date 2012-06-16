@@ -105,6 +105,7 @@ function ponychanx() {
 					switch (xhr.status) {
 						case 200:
 							Updater.last = xhr.getResponseHeader("Last-Modified");
+							$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", xhr.responseText).val());
 							var f, l;
 							if ($jq("#delform div[id]:first table").length == 0) {
 								l = -1;
