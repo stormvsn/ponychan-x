@@ -1,0 +1,6 @@
+0.23
+- Changed hidden posts to show names beside the hide post button
+- Updated Settings panel CSS to match updated Left Bar
+- Updated quick reply mod panel
+- Added new quick reply embed options
+- Fixed Retry error after having a thread open for a long time
