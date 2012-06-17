@@ -189,10 +189,12 @@ function ponychanx() {
 			qr.innerHTML = '<div class="qrtop"><span></span></div><div class="top"><a href="#" title="Top">\u25b2</a><a href="javascript:;" onclick="javascript:window.scrollTo(0, document.body.scrollHeight);" title="Bottom">&#9660;</a></div><div class="close"><a href="javascript:;" title="Close">X</a></div>\
 			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" accesskey="n">\
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
-			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">\
-			<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" accesskey="e">\
-			<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option><option value="vimeo">Vimeo</option><option value="blimp">Blimp</option></select></div>\
-			<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
+			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">';
+			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
+				qr.innerHTML += '<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" accesskey="e">\
+				<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option><option value="vimeo">Vimeo</option><option value="blimp">Blimp</option></select></div>';
+			}
+			qr.innerHTML +=	'<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
 			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accept="image/*" accesskey="f">\
 			<input type="button" value="Reply" accesskey="z">\
 			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
@@ -231,14 +233,12 @@ function ponychanx() {
 				});
 			}
 			btn.live("click", function() { QR.send(); } );
-			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl")
-				$jq("#qr .embedwrap").css("display", "block");
 			QR.loadfields();
 			document.getElementById("imgfile").onchange = function() { QR.thumb(); };
 			var x = Settings.get("x.qrpos_x");
 			var y = Settings.get("x.qrpos_y");
-			if (x!=null) $jq("#qr").css("left", x);
-			if (y!=null) $jq("#qr").css("top", y);
+			if (x != null) $jq("#qr").css("left", x);
+			if (y != null) $jq("#qr").css("top", y);
 			$jq("#qr .qrtop").mousedown(function(e) {
 				e.originalEvent.preventDefault();
 				$jq("#qr").css("opacity", "0.8");
@@ -266,39 +266,23 @@ function ponychanx() {
 			if (QR.ajax != null) { QR.ajax.abort(); return; }
 			var sb = $jq("#qr > input[type='button']");
 			var fid = parseInt($jq("#thumbselected").attr("name"));
-			var i = document.getElementById("imgfile").files[fid];
 			var d = new FormData();
 			d.append("board", Main.bid);
 			d.append("replythread", Main.tid);
-			d.append("quickreply", $jq("#postform :input[name='quickreply']").val());
-			d.append("name", $jq("#qr :input[name='name']").val());
-			d.append("em", $jq("#qr :input[name='em']").val());
-			d.append("subject", $jq("#qr :input[name='subject']").val());
-			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
 			d.append("ponychanx", Main.version);
-			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
 			d.append("stats_referrer", "");
-			d.append("message", $jq("#qr :input[name='message']").val());
-			d.append("imagefile", i);
-			if ($jq("#qr .postopts :input[name='spoiler']").is(":checked")) d.append("spoiler", "true");
-			if (QR.checkmod()) {
-				d.append("modpassword", $jq("#qr #modpanel :input[name='modpassword']").val());
-				if ($jq("#qr #modpanel :input[name='displaystaffstatus']").is(":checked")) d.append("displaystaffstatus", "true");
-				if ($jq("#qr #modpanel :input[name='lockonpost']").is(":checked")) d.append("lockonpost", "true");
-				if ($jq("#qr #modpanel :input[name='stickyonpost']").is(":checked")) d.append("stickyonpost", "true");
-				if ($jq("#qr #modpanel :input[name='rawhtml']").is(":checked")) d.append("rawhtml", "true");
-				if ($jq("#qr #modpanel :input[name='usestaffname']").is(":checked")) d.append("usestaffname", "true");
-			}
-			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
-				d.append("embed", $jq("#qr :input[name='embed']").val());
-				d.append("embedtype", $jq("#qr select").val());
-			}
+			d.append("imagefile", document.getElementById("imgfile").files[fid]);
+			d.append("quickreply", $jq("#postform :input[name='quickreply']").val());
+			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
+			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
+			$jq(":input:not([type='file'],[type='button'])", "#qr").each(function() {
+				var v = this.getAttribute("type") == "checkbox" ? this.checked == true ? "true" : null : this.value;
+				if (v != null) d.append(this.name, v);
+			});
 			var xhr = QR.ajax = new XMLHttpRequest();
 			xhr.upload.addEventListener("progress", function(evt) {
-				if (evt.lengthComputable) {
-					var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-					sb.val(percentComplete.toString() + '%');
-				}
+				if (evt.lengthComputable)
+					sb.val(Math.round(evt.loaded * 100 / evt.total).toString() + '%');
 			}, false);
 			xhr.open("POST", "http://" + purl + "/board.php");  
 			xhr.send(d);
@@ -712,7 +696,7 @@ function ponychanx() {
 	var Html = {
 		title: document.title,
 		init: function() {
-			Html.addoptions();
+			Html.options();
 			Html.css();
 			Html.catalog();
 		},
@@ -734,7 +718,7 @@ function ponychanx() {
 				$jq(".postarea").prepend(a);
 			}
 		},
-		addoptions: function() {
+		options: function() {
 			$jq(".adminbar").prepend($jq('<a class="adminbaritem" id="pxbtn" href="javascript:;">Ponychan X</a>').bind("click", function() {
 				$jq("#pxoptions").css("display") == "block" ? $jq("#pxoptions").css("display", "none") : $jq("#pxoptions").css("display", "block");
 			}));
@@ -792,7 +776,6 @@ function ponychanx() {
 			s.innerHTML = "#dialog { position: fixed; bottom: 10px; right: 10px; text-align: right; }\
 			#embed { width: 314px !important; }\
 			#qr .embedwrap select { padding: 3px 0 2px 0; }\
-			#qr .embedwrap { display: none; }\
 			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
 			.postarea a h2 { padding-bottom: 4px; }\
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
