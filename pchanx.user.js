@@ -197,8 +197,8 @@ function ponychanx() {
 			qr.innerHTML +=	'<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" ></textarea>\
 			<input type="file" id="imgfile" name="imagefile" size="25" multiple="" accept="image/*" >';
 			if ($jq("#nofile").length > 0) qr.innerHTML += '<label><input type="checkbox" name="nofile" /> No File</label>';
-			qr.innerHTML += '<input type="button" value="Reply">';
-			qr.innerHTML += '<div class="postopts"><label><input type="checkbox" name="spoiler" /> Spoiler</label> \
+			qr.innerHTML += '<input type="button" value="Reply">\
+			<div class="postopts"><label><input type="checkbox" name="spoiler" /> Spoiler</label> \
 			' + ($jq("#nsfw").length > 0 ? '<label><input type="checkbox" name="nsfw" /> NSFW</label> ' : '') + '\
 			' + (Main.tid != "0" ? '<label class="auto">Auto <input type="checkbox" name="auto" /></label>' : '') + '\
 			</div><div id="imagelist"></div>';
@@ -342,7 +342,7 @@ function ponychanx() {
 			$jq("#qr .embedwrap :input[name='embed']").val("");
 			$jq("#qr .postopts :input[name='spoiler']").attr("checked", false);
 			$jq("#qr .postopts :input[name='nsfw']").attr("checked", false);
-			if (Settings.gets("Hide quick reply after posting") && $jq("#qr .postopts :input[name='auto']").attr("checked") == false)
+			if (Settings.gets("Hide quick reply after posting") && !$jq("#qr .postopts :input[name='auto']").is(":checked"))
 				QR.hide();
 			QR.cooldowntimer();
 		},
@@ -355,7 +355,7 @@ function ponychanx() {
 				} else {
 					$jq("#imagelist, .postopts").css("display", "none");
 					$jq("#qr input[type='file']").val("");
-					$jq("#qr .postopts :input[name='auto']")[0].checked = false
+					$jq("#qr .postopts :input[name='auto']").attr("checked", false);
 				}
 			}
 		},
