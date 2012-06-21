@@ -380,7 +380,7 @@ function ponychanx() {
 						$jq("#thumbselected").removeAttr("id");
 						this.id = "thumbselected";
 						if (upc)
-							$jq("#qr textarea").val(this.getAttribute("data-post"));;
+							$jq("#qr textarea").val(this.getAttribute("data-post"));
 					} else if (e.which == 2) {
 						$jq(this).remove();
 						QR.thumbreset();
@@ -751,10 +751,10 @@ function ponychanx() {
 				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br /><br />")
 				.on("input", function() { Filter.save(); });
 			}
-			or.append($jq("<a href='javascript:;' style='text-decoration: underline;'>View quick reply key shortcuts</a>").on("click", function() {
-				alert("Ctrl+Q - Show quick reply\nCtrl+S - [?][/?] - Spoiler tags\nCtrl+U - [u][/u] - Underline tags\nCtrl+B - [b][/b] - Bold tags\nCtrl+R - [s][/s] - Strikethrough tags\nCtrl+I - [i][/i] - Italic tags");
-			}));
-			or.append("<br /><a href='javascript:;' onclick='location.reload(true);' style='text-decoration: underline;'>Apply changes</a> (refreshes the page)");
+			or.append("<a href='javascript:;' onclick='location.reload(true);'>Apply changes</a> (refreshes the page)\
+			<br /><br /><strong>More</strong><br />\
+			<a target='_blank' href='http://www.ponychan.net/chan/meta/res/115168+50.html'>View support thread</a><br />\
+			<a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View quick reply key shortcuts</a>");
 			ow.insertAfter(".adminbar");
 		},
 		catalog: function() {
@@ -785,6 +785,7 @@ function ponychanx() {
 			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			#updatetimer { width: 30px; }\
 			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
+			#pxoptions a { text-decoration: underline; }\
 			#qr * { margin: 0; padding: 0; }\
 			#imgfile { margin-right: 3px; }\
 			.postopts { clear: both; display: none; margin-left: 2px !important; }\
