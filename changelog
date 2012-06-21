@@ -1,3 +1,8 @@
+0.25
+- Added support thread link to options panel
+- Fixed board expanded threads not parsing
+- Added individual options for each keybind
+
 0.24
 - Fixed quick reply showing on read-only pages
 - Added NSFW and No File checkboxes to quick reply

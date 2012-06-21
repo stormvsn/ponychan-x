@@ -13,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.24
+// @version       0.25
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -27,7 +27,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 24,
+		version: 25,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -159,7 +159,7 @@ function ponychanx() {
 			Html.hidepostform();
 			if (Settings.get("x.show")) QR.show();
 			if (rto != null) QR.quote(rto);
-			if (Settings.gets("Quick reply key shortcuts")) QR.keys();
+			if (Settings.gets("Enable keybinds")) QR.keys();
 		},
 		quote: function(h) {
 			QR.show();
@@ -412,12 +412,12 @@ function ponychanx() {
 				if (e.ctrlKey) {
 					var t = null;
 					switch (e.which) {
-						case 83: t = "?"; break;
-						case 66: t = "b"; break;
-						case 73: t = "i"; break;
-						case 85: t = "u"; break;
-						case 82: t = "s"; break;
-						case 81: $jq("#qr").css("display") == "block" ? QR.hide() : QR.show(); return false; break;
+						case 83: if (Settings.gets("Spoiler tags")) t = "?"; break;
+						case 66: if (Settings.gets("Bold tags")) t = "b"; break;
+						case 73: if (Settings.gets("Italic tags")) t = "i"; break;
+						case 85: if (Settings.gets("Underline tags")) t = "u"; break;
+						case 82: if (Settings.gets("Strikethrough tags")) t = "s"; break;
+						case 81: if (Settings.gets("Show/hide quick reply")) $jq("#qr").css("display") == "block" ? QR.hide() : QR.show(); return false; break;
 					}
 					if (t != null) {
 						var ins = "["+t+"][/"+t+"]";
@@ -474,17 +474,26 @@ function ponychanx() {
 				$jq(".reflink:first").after(bs);
 				Posts.newhandle(".op");
 			}
-			if (Main.tid == "0" && Settings.gets("Enable quick reply")) {
-				$jq(".postfooter > a[title='Quick Reply']").each(function() {
-					var to = $jq(this).attr("onclick");
-					to = to.replace("javascript:quickreply('", "");
-					to = to.replace("');", "");
-					$jq(this).attr("href", "javascript:;").removeAttr("onclick");
-					$jq(this).on("click", function() {
-						QR.show();
-						$jq("#qr > input[type='button']").val("Reply");
-						QR.settitle("Quick replying to >>"+to)
-						$jq("#postform :input[name='quickreply']").val(to);
+			if (Main.tid == "0") {
+				if (Settings.gets("Enable quick reply")) {
+					$jq(".postfooter > a[title='Quick Reply']").each(function() {
+						var to = $jq(this).attr("onclick");
+						to = to.replace("javascript:quickreply('", "");
+						to = to.replace("');", "");
+						$jq(this).attr("href", "javascript:;").removeAttr("onclick");
+						$jq(this).on("click", function() {
+							QR.show();
+							$jq("#qr > input[type='button']").val("Reply");
+							QR.settitle("Quick replying to >>"+to)
+							$jq("#postform :input[name='quickreply']").val(to);
+						});
+					});
+				}
+				$jq(".omittedposts a[title='Expand Thread']").click(function() {
+					$jq(document).bind("DOMNodeInserted", function(p) {
+						var pt = p.target;
+						if (pt.nodeName == "TABLE")
+							Posts.newhandle(pt);
 					});
 				});
 			}
@@ -732,6 +741,7 @@ function ponychanx() {
 			ow.append(ol);
 			ow.append(or);
 			var lc = "";
+			var ke = Settings.gets("Enable keybinds");
 			for (s in Settings.settings) {
 				var c = Settings.settings[s].cat;
 				if (c != lc) {
@@ -739,6 +749,7 @@ function ponychanx() {
 					ol.append("<strong>"+c+"</strong><br />");
 				}
 				ol.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) ? "checked" : "")+" /> "+s+"<br />");
+				if (c == "Keybinds" && !ke) break;
 			}
 			var s = Settings.get("x.updatetimer");
 			ol.append("Update every <input type='text' id='updatetimer' value='"+(s == null ? "10" : s)+"'> seconds<br />");
@@ -753,8 +764,10 @@ function ponychanx() {
 			}
 			or.append("<a href='javascript:;' onclick='location.reload(true);'>Apply changes</a> (refreshes the page)\
 			<br /><br /><strong>More</strong><br />\
-			<a target='_blank' href='http://www.ponychan.net/chan/meta/res/115168+50.html'>View support thread</a><br />\
-			<a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View quick reply key shortcuts</a>");
+			<a target='_blank' href='http://www.ponychan.net/chan/meta/res/115168+50.html'>View support thread</a>");
+			if (ke)
+				or.append("<br />\
+				<a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show/hide quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View keybinds</a>");
 			ow.insertAfter(".adminbar");
 		},
 		catalog: function() {
@@ -854,13 +867,12 @@ function ponychanx() {
 		},
 		settings: {
 			"Enable quick reply": { def: "true", cat: "Quick reply" },
-			"Quick reply key shortcuts": { def: "true", cat: "Quick reply" },
 			"Hide quick reply after posting": { def: "true", cat: "Quick reply" },
 			"Quote selected text on quick reply": { def: "false", cat: "Quick reply" },
 			"Hide quick reply when top button clicked": { def: "false", cat: "Quick reply" },
 			"Unique post content per image": { def: "false", cat: "Quick reply" },
-			"Show autoupdate countdown dialog": { def: "true", cat: "Autoupdate" },
 			"Enable autoupdate": { def: "true", cat: "Autoupdate" },
+			"Show autoupdate countdown dialog": { def: "true", cat: "Autoupdate" },
 			"Show new post count in title": { def: "true", cat: "Autoupdate" },
 			"Autoupdate watched threads list": { def: "false", cat: "Autoupdate" },
 			"Expand images on hover": { def: "false", cat: "Posts" },
@@ -875,7 +887,14 @@ function ponychanx() {
 			"Hide original post form": { def: "true", cat: "Other" },
 			"Sync original post form and quick reply": { def: "false", cat: "Other" },
 			"Scroll on new post": { def: "false", cat: "Other" },
-			"Hide namefields": { def: "false", cat: "Other" }
+			"Hide namefields": { def: "false", cat: "Other" },
+			"Enable keybinds": { def: "true", cat: "Keybinds" },
+			"Show/hide quick reply": { def: "true", cat: "Keybinds" },
+			"Spoiler tags": { def: "true", cat: "Keybinds" },
+			"Underline tags": { def: "true", cat: "Keybinds" },
+			"Bold tags": { def: "true", cat: "Keybinds" },
+			"Strikethrough tags": { def: "true", cat: "Keybinds" },
+			"Italic tags": { def: "true", cat: "Keybinds" }
 		}
 	};
 	
