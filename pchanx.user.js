@@ -40,15 +40,15 @@ function ponychanx() {
 			Main.bid = $jq("#postform :input[name='board']").val();
 			Html.init();
 			if (Main.tid != "0" && $jq("#postform").length > 0) {
-				if (Settings.gets("Enable autoupdate")=="true") Updater.init();	
-				if (Settings.gets("Show autoupdate countdown dialog")=="true" && Settings.gets("Enable autoupdate")=="true")
+				if (Settings.gets("Enable autoupdate")) Updater.init();	
+				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate"))
 					Dialog.init();
 			}
-			if (Settings.gets("Enable quick reply")=="true") QR.init();
-			if (Settings.gets("Show new post count in title")=="true") Notifier.init();
+			if (Settings.gets("Enable quick reply")) QR.init();
+			if (Settings.gets("Show new post count in title")) Notifier.init();
 			Posts.init();
-			if (Settings.gets("Enable filter")=="true") Filter.init();
-			if (Settings.gets("Autoupdate watched threads list")=="true")
+			if (Settings.gets("Enable filter")) Filter.init();
+			if (Settings.gets("Autoupdate watched threads list"))
 				setTimeout(function() { Updater.getwatched(); }, 10000);
 			Main.update();
 		},
@@ -101,7 +101,7 @@ function ponychanx() {
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
 					setTimeout(function() { Updater.get(); }, Updater.tmr);
-					if (Settings.gets("Show autoupdate countdown dialog") == "true") { Dialog.countdown(); }
+					if (Settings.gets("Show autoupdate countdown dialog")) { Dialog.countdown(); }
 					switch (xhr.status) {
 						case 200:
 							Updater.last = xhr.getResponseHeader("Last-Modified");
@@ -127,7 +127,7 @@ function ponychanx() {
 									Posts.newpostupdate(this);
 									Notifier.newhandle(this);
 									Filter.newhandle(this);
-									if (sat && Settings.gets("Scroll on new post") == "true")
+									if (sat && Settings.gets("Scroll on new post"))
 										window.scrollTo(0, document.body.scrollHeight);
 								}
 							});
@@ -157,14 +157,14 @@ function ponychanx() {
 		ajax: null,
 		init: function() {
 			Html.hidepostform();
-			if (Settings.get("x.show")=="true") QR.show();
+			if (Settings.get("x.show")) QR.show();
 			if (rto != null) QR.quote(rto);
-			if (Settings.gets("Quick reply key shortcuts")=="true") QR.keys();
+			if (Settings.gets("Quick reply key shortcuts")) QR.keys();
 		},
 		quote: function(h) {
 			QR.show();
 			var qs = "";
-			if (Settings.gets("Quote selected text on quick reply") == "true") {
+			if (Settings.gets("Quote selected text on quick reply")) {
 				var s = $jq.trim(window.getSelection().toString());
 				if (s.trim() != "")
 					qs = ">"+s+"\n";
@@ -217,14 +217,14 @@ function ponychanx() {
 					Settings.set("x.qrpos_x", $jq("#qr").css("left"));
 				}
 			});
-			if (Settings.gets("Hide quick reply when top button clicked") == "true")
+			if (Settings.gets("Hide quick reply when top button clicked"))
 				$jq("#qr .top a:first").on("click", function() { QR.hide(); });
 			var btn = $jq("#qr > input[type='button']");
 			if (Main.tid == "0") {
 				btn.val("Thread"); 
 				$jq("#qr .postopts label").css("display", "none");
 			}
-			if (Settings.gets("Sync original post form and quick reply") == "true") {
+			if (Settings.gets("Sync original post form and quick reply")) {
 				$jq("#qr > input[name], #qr textarea").on("input", function() {
 					$jq("#postform").find("[name='"+this.name+"']").val(this.value);
 				});
@@ -275,7 +275,7 @@ function ponychanx() {
 			d.append("quickreply", $jq("#postform :input[name='quickreply']").val());
 			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
 			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
-			$jq(":input:not([type='file'],[type='button'])", "#qr").each(function() {
+			$jq(":input:not([type='file'],[type='button'],[name='auto'])", "#qr").each(function() {
 				var v = this.getAttribute("type") == "checkbox" ? this.checked == true ? "true" : null : this.value;
 				if (v != null) d.append(this.name, v);
 			});
@@ -338,7 +338,7 @@ function ponychanx() {
 			$jq("#qr #modpanel :input[name='rawhtml']").attr("checked", false);
 			$jq("#qr .embedwrap :input[name='embed']").val("");
 			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
-			if (Settings.gets("Hide quick reply after posting")=="true" && $jq("#qr .postopts :input[name='auto']")[0].checked == false)
+			if (Settings.gets("Hide quick reply after posting") && $jq("#qr .postopts :input[name='auto']")[0].checked == false)
 				QR.hide();
 			QR.cooldowntimer();
 		},
@@ -370,7 +370,7 @@ function ponychanx() {
 				$jq("#imagelist").append(thumb);
 				$jq(thumb).on("mousedown", function(e) {
 					if (e.which == 1) {
-						var upc = (Settings.gets("Unique post content per image")=="true");
+						var upc = (Settings.gets("Unique post content per image"));
 						if (upc)
 							$jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
 						$jq("#thumbselected").removeAttr("id");
@@ -470,7 +470,7 @@ function ponychanx() {
 				$jq(".reflink:first").after(bs);
 				Posts.newhandle(".op");
 			}
-			if (Main.tid == "0" && Settings.gets("Enable quick reply")=="true") {
+			if (Main.tid == "0" && Settings.gets("Enable quick reply")) {
 				$jq(".postfooter > a[title='Quick Reply']").each(function() {
 					var to = $jq(this).attr("onclick");
 					to = to.replace("javascript:quickreply('", "");
@@ -527,11 +527,11 @@ function ponychanx() {
 			}
 		},
 		newhandle: function(p) {
-			var eq = (Settings.gets("Enable quick reply") == "true");
-			var eb = (Settings.gets("Enable backlinks") == "true");
-			var ei = (Settings.gets("Enable inline replies") == "true");
-			var eh = (Settings.gets("Enable hide post buttons") == "true");
-			var bp = (Main.tid == "0");
+			var eq = Settings.gets("Enable quick reply");
+			var eb = Settings.gets("Enable backlinks");
+			var ei = Settings.gets("Enable inline replies");
+			var eh = Settings.gets("Enable hide post buttons");
+			var bp = Main.tid == "0";
 			if (eh) {
 				var dd = $jq(".doubledash", p);
 				if (durl.indexOf("lunachan") > -1 && dd.length == 0) {
@@ -577,7 +577,7 @@ function ponychanx() {
 								n.remove();
 							else {
 								var ca = this.className.split("|");
-								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies") == "true") {
+								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")) {
 									Posts.getcrossthread(this, ca[3]);
 								} else {
 									var pc = tto.parent();
@@ -602,9 +602,9 @@ function ponychanx() {
 				.on("click", function() { QR.quote(from); return false; });
 			}
 			if (im != null) {
-				if (Settings.gets("Add google image shortcut to posts") == "true")
+				if (Settings.gets("Add google image shortcut to posts"))
 					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
-				if (Settings.gets("Add download image shortcut to posts") == "true")
+				if (Settings.gets("Add download image shortcut to posts"))
 					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+im.src+"' target='_blank'>Download</a>"));
 			}
 		},
@@ -651,7 +651,7 @@ function ponychanx() {
 				ns = ns.replace("/thumb/", "/src/");
 				ns = ns.replace("s.", ".");
 				var fs = $jq(this).closest("td").find(".filesize");
-				if (Settings.gets("Animate gif thumbnails") == "true" && fs.text().indexOf(", spoiler.gif") == -1 && this.src.indexOf("s.gif") > 0) {
+				if (Settings.gets("Animate gif thumbnails") && fs.text().indexOf(", spoiler.gif") == -1 && this.src.indexOf("s.gif") > 0) {
 					this.src = ns;
 					this.removeAttribute("height");
 					this.removeAttribute("width");
@@ -663,7 +663,7 @@ function ponychanx() {
 				fsa.attr("href", "javascript:;");
 				fsa.removeAttr("onclick").unbind("click");
 				fsa.on("click", function() { Posts.expandimg(imp, ns, os); });
-				if (Settings.gets("Expand images on hover") == "true") {
+				if (Settings.gets("Expand images on hover")) {
 					var img = $jq(this).unbind("mouseover").on("mouseover", function(e) {
 						var hi = document.createElement("img");
 						hi.id = "hoverimg";
@@ -702,7 +702,7 @@ function ponychanx() {
 		},
 		hidepostform: function() {
 			var pf = $jq("#postform");
-			if (Settings.gets("Hide original post form") == "true" && pf.length > 0) {
+			if (Settings.gets("Hide original post form") && pf.length > 0) {
 				pf.css({"visibility":"hidden", "height":"0"});
 				var a = document.createElement("a");
 				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
@@ -734,13 +734,13 @@ function ponychanx() {
 					lc = c;
 					ol.append("<strong>"+c+"</strong><br />");
 				}
-				ol.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) == "true" ? "checked" : "")+" /> "+s+"<br />");
+				ol.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) ? "checked" : "")+" /> "+s+"<br />");
 			}
 			var s = Settings.get("x.updatetimer");
 			ol.append("Update every <input type='text' id='updatetimer' value='"+(s == null ? "10" : s)+"'> seconds<br />");
 			$jq("#updatetimer").live("change", function() { if (isNaN(parseInt($jq(this).val()))) return; Settings.set("x.updatetimer", $jq(this).val()); });
 			$jq('#pxoptions input[type="checkbox"]').live("click", function() { Settings.sets($jq(this).attr("name"), String($jq(this).is(":checked"))); });
-			if (Settings.gets("Enable filter") == "true") {
+			if (Settings.gets("Enable filter")) {
 				or.append("<strong>Filter</strong><br />Insert ; after each item<br />\
 				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
 				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
@@ -798,8 +798,8 @@ function ponychanx() {
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
 			#modpanel label input { position: relative; top: 2px; }";
-			if (Settings.gets("Enable hide post buttons") == "true") s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
-			if (Settings.gets("Hide namefields") == "true") s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
+			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
+			if (Settings.gets("Hide namefields")) s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
 			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: 28px; right: auto; left: 0; } #pxbtn { height: 9px; } ";
 			document.body.appendChild(s);
 		}
@@ -842,8 +842,8 @@ function ponychanx() {
 		},
 		gets: function(n) {
 			var v = Settings.get("x.opt."+n);
-			if (v != null) return v;
-			return Settings.settings[n].def;
+			if (v != null) return v == "true";
+			return Settings.settings[n].def == "true";
 		},
 		settings: {
 			"Enable quick reply": { def: "true", cat: "Quick reply" },
@@ -914,7 +914,7 @@ function ponychanx() {
 			$jq(p).css("display", "none");
 		},
 		newhandle: function(p) {
-			if (Settings.gets("Enable filter") != "true" || $jq("span.mod, span.admin", p).length > 0) return;
+			if (!Settings.gets("Enable filter") || $jq("span.mod, span.admin", p).length > 0) return;
 			if (Filter.filtered(0, $jq.trim($jq("span.postername", p).text()))) {
 				Filter.filter(p);
 				return;
