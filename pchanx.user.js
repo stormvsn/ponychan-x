@@ -317,7 +317,7 @@ function ponychanx() {
 			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.cooldown);
 			if (QR.cooldown > 0) {
 				setTimeout(function() { QR.cooldowntimer(); }, 1000);
-				var a = $jq("#qr .postopts :input[name='auto']")[0].checked ? "Auto " : "";
+				var a = $jq("#qr .postopts :input[name='auto']").is(":checked") ? "Auto " : "";
 				$jq("#qr > input[type='button']").val(a+QR.cooldown);
 				QR.cooldown--;
 			} else {
@@ -340,8 +340,9 @@ function ponychanx() {
 			$jq("#qr #modpanel :input[name='stickyonpost']").attr("checked", false);
 			$jq("#qr #modpanel :input[name='rawhtml']").attr("checked", false);
 			$jq("#qr .embedwrap :input[name='embed']").val("");
-			$jq("#qr .postopts :input[name='spoiler']")[0].checked = false;
-			if (Settings.gets("Hide quick reply after posting") && $jq("#qr .postopts :input[name='auto']")[0].checked == false)
+			$jq("#qr .postopts :input[name='spoiler']").attr("checked", false);
+			$jq("#qr .postopts :input[name='nsfw']").attr("checked", false);
+			if (Settings.gets("Hide quick reply after posting") && $jq("#qr .postopts :input[name='auto']").attr("checked") == false)
 				QR.hide();
 			QR.cooldowntimer();
 		},
