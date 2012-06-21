@@ -1,3 +1,7 @@
+0.24
+- Fixed quick reply showing on read-only pages
+- Added NSFW and No File checkboxes to quick reply
+
 0.23
 - Changed hidden posts to show names beside the hide post button
 - Updated Settings panel CSS to match updated Left Bar

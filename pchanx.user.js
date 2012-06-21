@@ -13,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.23
+// @version       0.24
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -27,7 +27,7 @@ function ponychanx() {
 	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
-		version: 23,
+		version: 24,
 		bid: null,
 		tid: null,
 		init: function() {
@@ -44,7 +44,7 @@ function ponychanx() {
 				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate"))
 					Dialog.init();
 			}
-			if (Settings.gets("Enable quick reply")) QR.init();
+			if (Settings.gets("Enable quick reply") && $jq("#postform").length > 0) QR.init();
 			if (Settings.gets("Show new post count in title")) Notifier.init();
 			Posts.init();
 			if (Settings.gets("Enable filter")) Filter.init();
@@ -187,18 +187,21 @@ function ponychanx() {
 			var qr = document.createElement("div");
 			qr.setAttribute("id", "qr");
 			qr.innerHTML = '<div class="qrtop"><span></span></div><div class="top"><a href="#" title="Top">\u25b2</a><a href="javascript:;" onclick="javascript:window.scrollTo(0, document.body.scrollHeight);" title="Bottom">&#9660;</a></div><div class="close"><a href="javascript:;" title="Close">X</a></div>\
-			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" accesskey="n">\
-			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" accesskey="e">\
-			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" accesskey="s">';
-			if (Main.bid == "test" || Main.bid == "show" || Main.bid == "media" || Main.bid == "collab" || Main.bid == "phoenix" || Main.bid == "vinyl") {
-				qr.innerHTML += '<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" accesskey="e">\
+			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" />\
+			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" />\
+			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" />';
+			if ($jq("input[name='embed']", "#postform").length > 0) {
+				qr.innerHTML += '<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" />\
 				<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option><option value="vimeo">Vimeo</option><option value="blimp">Blimp</option></select></div>';
 			}
-			qr.innerHTML +=	'<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" accesskey="m"></textarea>\
-			<input type="file" id="imgfile" name="imagefile" size="35" multiple="" accept="image/*" accesskey="f">\
-			<input type="button" value="Reply" accesskey="z">\
-			<div class="postopts"><input type="checkbox" name="spoiler" /> Spoiler <label>Auto <input type="checkbox" name="auto" /></label></div>\
-			<div id="imagelist"></div>';
+			qr.innerHTML +=	'<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" ></textarea>\
+			<input type="file" id="imgfile" name="imagefile" size="25" multiple="" accept="image/*" >';
+			if ($jq("#nofile").length > 0) qr.innerHTML += '<label><input type="checkbox" name="nofile" /> No File</label>';
+			qr.innerHTML += '<input type="button" value="Reply">';
+			qr.innerHTML += '<div class="postopts"><label><input type="checkbox" name="spoiler" /> Spoiler</label> \
+			' + ($jq("#nsfw").length > 0 ? '<label><input type="checkbox" name="nsfw" /> NSFW</label> ' : '') + '\
+			' + (Main.tid != "0" ? '<label class="auto">Auto <input type="checkbox" name="auto" /></label>' : '') + '\
+			</div><div id="imagelist"></div>';
 			if (QR.checkmod()) {
 				qr.innerHTML += '<div id="modpanel">\
 				<input name="modpassword" placeholder="Mod Password" size="28" maxlength="75" type="text" /> \
@@ -222,7 +225,6 @@ function ponychanx() {
 			var btn = $jq("#qr > input[type='button']");
 			if (Main.tid == "0") {
 				btn.val("Thread"); 
-				$jq("#qr .postopts label").css("display", "none");
 			}
 			if (Settings.gets("Sync original post form and quick reply")) {
 				$jq("#qr > input[name], #qr textarea").on("input", function() {
@@ -271,7 +273,8 @@ function ponychanx() {
 			d.append("replythread", Main.tid);
 			d.append("ponychanx", Main.version);
 			d.append("stats_referrer", "");
-			d.append("imagefile", document.getElementById("imgfile").files[fid]);
+			if (!$jq("input[name='nofile']", "#qr").is(":checked"))
+				d.append("imagefile", document.getElementById("imgfile").files[fid]);
 			d.append("quickreply", $jq("#postform :input[name='quickreply']").val());
 			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
 			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
@@ -389,7 +392,7 @@ function ponychanx() {
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
-			$jq("#imagelist, .postopts").fadeIn("fast");
+			$jq("#imagelist, .postopts").css("display", "block");
 		},
 		loadfields: function() {
 			var ln = getCookie("name");
@@ -782,8 +785,10 @@ function ponychanx() {
 			#updatetimer { width: 30px; }\
 			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
 			#qr * { margin: 0; padding: 0; }\
-			.postopts { clear: both; display: none; font-size: small; margin-left: 2px !important; }\
-			.postopts label { float: right; margin: 1px 2px 0 0 !important; }\
+			#imgfile { margin-right: 3px; }\
+			.postopts { clear: both; display: none; margin-left: 2px !important; }\
+			#qr label, .postopts label { font-size: small; }\
+			.postopts .auto { float: right; margin: 1px 2px 0 0 !important; }\
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
 			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
 			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
@@ -797,7 +802,7 @@ function ponychanx() {
 			#pxbtn { margin-right: -4px; }\
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
-			#modpanel label input { position: relative; top: 2px; }";
+			#modpanel label input, #qr label input, .postopts label input { position: relative; top: 2px; }";
 			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			if (Settings.gets("Hide namefields")) s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
 			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: 28px; right: auto; left: 0; } #pxbtn { height: 9px; } ";
