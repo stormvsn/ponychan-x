@@ -550,7 +550,7 @@ function ponychanx() {
 			var bp = Main.tid == "0";
 			if (eh) {
 				var dd = $jq(".doubledash", p);
-				if (dd.length == 0) {
+				if (!Main.isponychan && dd.length == 0) {
 					dd = $jq("<td class='doubledash'></td>");
 					$jq("tbody > tr:first", p).prepend(dd);
 				}
