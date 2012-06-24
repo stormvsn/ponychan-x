@@ -21,19 +21,19 @@
 
 function ponychanx() {
 	$jq = jQuery.noConflict();
-	var durl = document.URL.split("#")[0];
-	var us = durl.split("/");
-	var purl = us[2].indexOf("ponychan") > 1 ? us[2]+"/chan" : us[2];
-	var rto = document.URL.split("#i")[1];
 	
 	var Main = {
 		version: 25,
 		bid: null,
 		tid: null,
+		durl: "",
+		isponychan: true,
 		init: function() {
+			Main.durl = document.URL.split("#")[0];
+			Main.isponychan = Main.durl.indexOf("ponychan") > -1;
 			if ($jq("h1").length > 0 && $jq("h1").html() == "404 Not Found") {
-				if (durl.indexOf("+50") > -1)
-					return window.location = durl.replace("+50", "");
+				if (Main.durl.indexOf("+50") > -1)
+					return window.location = Main.durl.replace("+50", "");
 				return;
 			}
 			Main.tid = $jq("#postform :input[name='replythread']").val();
@@ -53,7 +53,7 @@ function ponychanx() {
 			Main.update();
 		},
 		update: function() {
-			var d = new Date().getTime();
+			var d = Date.now();
 			var lu = Settings.get("x.update.lastcheck");
 			var lv = Settings.get("x.update.latestversion");
 			if (lu == null) {
@@ -94,7 +94,7 @@ function ponychanx() {
 		},
 		get: function() {
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", durl+(durl.indexOf("lunachan") > -1 ? "" : "?"+new Date().getTime()));
+			xhr.open("GET", Main.durl+(Main.isponychan ? "?"+Date.now() : ""));
 			xhr.setRequestHeader("If-Modified-Since", Updater.last);
 			xhr.setRequestHeader("Accept", "*/*");
 			xhr.send();
@@ -155,9 +155,12 @@ function ponychanx() {
 	var QR = {
 		cooldown: 15,
 		ajax: null,
+		action: "",
 		init: function() {
 			Html.hidepostform();
 			if (Settings.get("x.show")) QR.show();
+			QR.action = $jq("#postform").attr("action");
+			var rto = document.URL.split("#i")[1];
 			if (rto != null) QR.quote(rto);
 			if (Settings.gets("Enable keybinds")) QR.keys();
 		},
@@ -287,7 +290,7 @@ function ponychanx() {
 				if (evt.lengthComputable)
 					sb.val(Math.round(evt.loaded * 100 / evt.total).toString() + '%');
 			}, false);
-			xhr.open("POST", "http://" + purl + "/board.php");  
+			xhr.open("POST", QR.action);  
 			xhr.send(d);
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
@@ -433,7 +436,7 @@ function ponychanx() {
 			});
 		},
 		checkmod: function() {
-			if (durl.indexOf("ponychan") > -1)
+			if (Main.isponychan)
 				return checkMod();
 			else
 				return false;
@@ -547,7 +550,7 @@ function ponychanx() {
 			var bp = Main.tid == "0";
 			if (eh) {
 				var dd = $jq(".doubledash", p);
-				if (durl.indexOf("lunachan") > -1 && dd.length == 0) {
+				if (dd.length == 0) {
 					dd = $jq("<td class='doubledash'></td>");
 					$jq("tbody > tr:first", p).prepend(dd);
 				}
@@ -630,6 +633,7 @@ function ponychanx() {
 			});
 		},
 		newpostupdate: function(p) {
+			if (!Main.isponychan) return;
 			var timezone = getCookie('timezone');
 			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
 			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
