@@ -158,7 +158,7 @@ function ponychanx() {
 		action: "",
 		init: function() {
 			Html.hidepostform();
-			if (Settings.get("x.show")) QR.show();
+			if (Settings.get("x.show") == "true") QR.show();
 			QR.action = $jq("#postform").attr("action");
 			var rto = document.URL.split("#i")[1];
 			if (rto != null) QR.quote(rto);
