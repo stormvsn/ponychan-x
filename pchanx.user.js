@@ -203,7 +203,7 @@ function ponychanx() {
 			qr.innerHTML += '<input type="button" value="Reply">\
 			<div class="postopts"><label><input type="checkbox" name="spoiler" /> Spoiler</label> \
 			' + ($jq("#nsfw").length > 0 ? '<label><input type="checkbox" name="nsfw" /> NSFW</label> ' : '') + '\
-			' + (Main.tid != "0" ? '<label class="auto">Auto <input type="checkbox" name="auto" /></label>' : '') + '\
+			' + (Main.tid != "0" ? '<label class="auto"><span id="imgnum">(0)</span> Auto <input type="checkbox" name="auto" /></label>' : '') + '\
 			</div><div id="imagelist"></div>';
 			if (QR.checkmod()) {
 				qr.innerHTML += '<div id="modpanel">\
@@ -361,6 +361,7 @@ function ponychanx() {
 					$jq("#qr .postopts :input[name='auto']").attr("checked", false);
 				}
 			}
+			$jq("#imgnum").text("(" + $jq(".listthumb").length + ")");
 		},
 		thumb: function() {
 			var f = document.getElementById("imgfile").files;
@@ -397,6 +398,7 @@ function ponychanx() {
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
 			$jq("#imagelist, .postopts").css("display", "block");
+			$jq("#imgnum").text("(" + $jq(".listthumb").length + ")");
 		},
 		loadfields: function() {
 			var ln = getCookie("name");
@@ -447,7 +449,6 @@ function ponychanx() {
 		left: 0,
 		init: function() {
 			$jq("body").append($jq("<div id='dialog'><span id='d-countdown'></span><br /><span id='d-update-now'></span></div>"));
-			//$jq("#dialog #d-update-now").append($jq("<a href='javascript:;'>Update now</a>").on("click", function() { }));
 			Dialog.left = Updater.tmr/1000;
 			Dialog.countdown();
 		},
