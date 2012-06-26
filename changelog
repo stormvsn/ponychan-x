@@ -1,3 +1,7 @@
+0.26
+- Fixed quick reply always reappearing on refresh
+- Added queued images counter to quick reply
+
 0.25
 - Added support thread link to options panel
 - Fixed board expanded threads not parsing
