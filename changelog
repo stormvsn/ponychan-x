@@ -1,3 +1,7 @@
+0.27
+- Fixed inline posts and hide post buttons on /all/
+- Added border to inline OP posts
+
 0.26
 - Fixed quick reply always reappearing on refresh
 - Added queued images counter to quick reply

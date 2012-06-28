@@ -13,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.26
+// @version       0.27
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -23,7 +23,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		version: 26,
+		version: 27,
 		bid: null,
 		tid: null,
 		durl: "",
@@ -501,7 +501,9 @@ function ponychanx() {
 					});
 				});
 			}
-			$jq("#delform table:not(.postform):not(.userdelete)").each(function() {
+			var ts = $jq("#delform");
+			ts = ts.length == 0 ? $jq(".thread") : ts;
+			$jq("table:not(.postform):not(.userdelete)", ts).each(function() {
 				Posts.newhandle(this);
 			});			
 		},
@@ -548,6 +550,7 @@ function ponychanx() {
 			var eb = Settings.gets("Enable backlinks");
 			var ei = Settings.gets("Enable inline replies");
 			var eh = Settings.gets("Enable hide post buttons");
+			var df = $jq("#delform").length > 0;
 			var bp = Main.tid == "0";
 			if (eh) {
 				var dd = $jq(".doubledash", p);
@@ -560,7 +563,7 @@ function ponychanx() {
 				}));
 			}
 			var ql = $jq($jq(".reflink a", p)[1]);
-			if (eq && !bp) {
+			if (eq && !bp && df) {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
@@ -614,7 +617,7 @@ function ponychanx() {
 				});
 			}
 			var rb = $jq(".postfooter", p);
-			if (eq && !bp) {
+			if (eq && !bp && df) {
 				$jq("a:first", rb).removeAttr("onclick").attr("href", "javascript:;")
 				.on("click", function() { QR.quote(from); return false; });
 			}
@@ -800,7 +803,7 @@ function ponychanx() {
 			#qr .embedwrap select { padding: 3px 0 2px 0; }\
 			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
 			.postarea a h2 { padding-bottom: 4px; }\
-			.reply.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
+			.reply.inline, .op.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			#updatetimer { width: 30px; }\
 			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
 			#pxoptions a { text-decoration: underline; }\
