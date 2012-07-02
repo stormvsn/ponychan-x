@@ -726,7 +726,7 @@ function ponychanx() {
 					lc = c;
 					ol.append("<strong>"+c+"</strong><br />");
 				}
-				ol.append("<input name='"+s+"' type='checkbox' "+(Settings.gets(s) ? "checked" : "")+" /> "+s+"<br />");
+				ol.append("<label><input name='"+s+"' type='checkbox' "+(Settings.gets(s) ? "checked" : "")+" /> "+s+"</label><br />");
 				if (c == "Keybinds" && !ke) break;
 			}
 			var s = Settings.get("x.updatetimer");
