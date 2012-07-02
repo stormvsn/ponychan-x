@@ -7,9 +7,7 @@
 // @contributor   onekopaka
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
-// @exclude       http://www.ponychan.net/chan/
 // @exclude       http://www.ponychan.net/chan/board.php
-// @exclude       http://www.ponychan.net/chan/?p=*
 // @version       0.28
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
@@ -23,30 +21,25 @@ function ponychanx() {
 		version: 28,
 		bid: null,
 		tid: null,
-		durl: "",
-		isponychan: true,
+		durl: document.URL.split("#")[0],
 		init: function() {
-			Main.durl = document.URL.split("#")[0];
-			Main.isponychan = Main.durl.indexOf("ponychan") > -1;
-			if ($jq("h1").length > 0 && $jq("h1").html() == "404 Not Found") {
-				if (Main.durl.indexOf("+50") > -1)
-					return window.location = Main.durl.replace("+50", "");
+			if ($jq("h1").length && $jq("h1").html() == "404 Not Found") {
+				if (/\+50/.test(Main.durl)) return window.location = Main.durl.replace("+50", "");
 				return;
 			}
-			Main.tid = $jq("#postform :input[name='replythread']").val();
-			Main.bid = $jq("#postform :input[name='board']").val();
-			Html.init();
-			if (Main.tid != "0" && $jq("#postform").length > 0) {
-				if (Settings.gets("Enable autoupdate")) Updater.init();	
-				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate"))
-					Dialog.init();
-			}
-			if (Settings.gets("Enable quick reply") && $jq("#postform").length > 0) QR.init();
+			var pf = $jq("#postform");
+			Main.tid = $jq(":input[name='replythread']", pf).val();
+			Main.bid = $jq(":input[name='board']", pf).val();
+			if (Settings.gets("Enable quick reply") && pf.length) QR.init();
 			if (Settings.gets("Show new post count in title")) Notifier.init();
-			Posts.init();
 			if (Settings.gets("Enable filter")) Filter.init();
-			if (Settings.gets("Autoupdate watched threads list"))
-				setTimeout(function() { Updater.getwatched(); }, 10000);
+			if (Settings.gets("Autoupdate watched threads list")) setTimeout(function() { Updater.getwatched(); }, 10000);
+			if (Main.tid != "0" && pf.length) {
+				if (Settings.gets("Enable autoupdate")) Updater.init();	
+				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate")) Dialog.init();
+			}
+			Html.init();
+			Posts.init();
 			Main.update();
 		},
 		update: function() {
@@ -91,7 +84,7 @@ function ponychanx() {
 		},
 		get: function() {
 			var xhr = new XMLHttpRequest();
-			xhr.open("GET", Main.durl+(Main.isponychan ? "?"+Date.now() : ""));
+			xhr.open("GET", Main.durl+"?"+Date.now());
 			xhr.setRequestHeader("If-Modified-Since", Updater.last);
 			xhr.setRequestHeader("Accept", "*/*");
 			xhr.send();
@@ -202,7 +195,7 @@ function ponychanx() {
 			' + ($jq("#nsfw").length > 0 ? '<label><input type="checkbox" name="nsfw" /> NSFW</label> ' : '') + '\
 			' + (Main.tid != "0" ? '<label class="auto"><span id="imgnum">(0)</span> Auto <input type="checkbox" name="auto" /></label>' : '') + '\
 			</div><div id="imagelist"></div>';
-			if (QR.checkmod()) {
+			if (checkMod()) {
 				qr.innerHTML += '<div id="modpanel">\
 				<input name="modpassword" placeholder="Mod Password" size="28" maxlength="75" type="text" /> \
 				<label title="Display staff status (Mod/Admin)"><input name="displaystaffstatus" type="checkbox" checked /> Display Status</label> \
@@ -434,12 +427,6 @@ function ponychanx() {
 				}
 			});
 		},
-		checkmod: function() {
-			if (Main.isponychan)
-				return checkMod();
-			else
-				return false;
-		},
 		resetpos: function() {
 			$jq("#qr").css("top", "46px").css("left", "83px");
 			Settings.set("x.qrpos_x", $jq("#qr").css("left"));
@@ -555,12 +542,7 @@ function ponychanx() {
 			var df = $jq("#delform").length > 0;
 			var bp = Main.tid == "0";
 			if (eh) {
-				var dd = $jq(".doubledash", p);
-				if (!Main.isponychan && dd.length == 0) {
-					dd = $jq("<td class='doubledash'></td>");
-					$jq("tbody > tr:first", p).prepend(dd);
-				}
-				dd.html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
+				$jq(".doubledash", p).html("").append($jq("<a>[ - ]</a>").attr("href","javascript:;").on("click", function() {
 					Posts.hide(this);
 				}));
 			}
@@ -639,7 +621,6 @@ function ponychanx() {
 			});
 		},
 		newpostupdate: function(p) {
-			if (!Main.isponychan) return;
 			var timezone = getCookie('timezone');
 			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
 			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
