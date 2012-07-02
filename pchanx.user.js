@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          Ponychan X
 // @namespace     milky
-// @description   Adds various bloat.
+// @description   Adds new features to ponychan
 // @author        milky
 // @contributor   Storm Vision
 // @contributor   onekopaka
