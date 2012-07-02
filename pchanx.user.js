@@ -77,56 +77,49 @@ function ponychanx() {
 			setTimeout(function() { Updater.get(); }, Updater.tmr);
 		},
 		get: function() {
-			var xhr = new XMLHttpRequest();
-			xhr.open("GET", Main.durl+"?"+Date.now());
-			xhr.setRequestHeader("If-Modified-Since", Updater.last);
-			xhr.setRequestHeader("Accept", "*/*");
-			xhr.send();
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState == 4) {
-					setTimeout(function() { Updater.get(); }, Updater.tmr);
-					if (Settings.gets("Show autoupdate countdown dialog")) { Dialog.countdown(); }
-					switch (xhr.status) {
-						case 200:
-							Updater.last = xhr.getResponseHeader("Last-Modified");
-							$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", xhr.responseText).val());
-							var f, l;
-							if ($jq("#delform div[id]:first table").length == 0) {
-								l = -1;
+			$jq.ajax({
+				headers: {"If-Modified-Since": Updater.last},
+				url: Main.durl+"?"+Date.now(),
+			}).done(function(r, s, xhr) {
+				setTimeout(function() { Updater.get(); }, Updater.tmr);
+				if (Settings.gets("Show autoupdate countdown dialog")) { Dialog.countdown(); }
+				switch (xhr.status) {
+					case 200:
+						Updater.last = xhr.getResponseHeader("Last-Modified");
+						$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", xhr.responseText).val());
+						var f, l;
+						if ($jq("#delform div[id]:first table").length == 0) {
+							l = -1;
+							f = true;
+						} else {
+							l = parseInt($jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name);
+							f = false;
+						}
+						var sat = (parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100);
+						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
+							var fne = $jq("tbody tr td[id] a[name]", this)[0];
+							if (!f && fne != null && parseInt(fne.name) > l)
 								f = true;
-							} else {
-								l = parseInt($jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name);
-								f = false;
+							if (f) {
+								var tal = $jq("#delform div[id]:first table:last");
+								tal.length > 0 ? tal.after(this) : $jq(".thread .op").after(this);
+								Posts.newhandle(this);
+								Posts.addhover(this);
+								Posts.newpostupdate(this);
+								Notifier.newhandle(this);
+								Filter.newhandle(this);
+								if (sat && Settings.gets("Scroll on new post"))
+									window.scrollTo(0, document.body.scrollHeight);
 							}
-							var sat = (parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100);
-							$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
-								var fne = $jq("tbody tr td[id] a[name]", this)[0];
-								if (!f && fne != null && parseInt(fne.name) > l)
-									f = true;
-								if (f) {
-									var tal = $jq("#delform div[id]:first table:last");
-									tal.length > 0 ? tal.after(this) : $jq(".thread .op").after(this);
-									Posts.newhandle(this);
-									Posts.addhover(this);
-									Posts.newpostupdate(this);
-									Notifier.newhandle(this);
-									Filter.newhandle(this);
-									if (sat && Settings.gets("Scroll on new post"))
-										window.scrollTo(0, document.body.scrollHeight);
-								}
-							});
-						break;
-						case 404:
-							document.title = "(404) " + Html.title;
-							QR.settitle("(404)");
-							$jq("#qr > input[type='button']").attr("disabled", "disabled");
-						break;
-						case 503:
-							QR.settitle("(503) <a href='javascript:;' onclick='javascript:location.reload(true);'>Refresh manually?</a>");
-						break;
-					}
+						});
+					break;
+					case 404:
+						document.title = "(404) " + Html.title;
+						QR.settitle("(404)");
+						$jq("#qr > input[type='button']").attr("disabled", "disabled");
+					break;
 				}
-			}
+			});
 		},
 		getwatched: function() {
 			if (getCookie("showwatchedthreads") == "1") {
