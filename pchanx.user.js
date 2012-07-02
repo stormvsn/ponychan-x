@@ -82,34 +82,27 @@ function ponychanx() {
 				url: Main.durl+"?"+Date.now(),
 			}).done(function(rt, s, xhr) {
 				setTimeout(function() { Updater.get(); }, Updater.tmr);
-				if (Settings.gets("Show autoupdate countdown dialog")) { Dialog.countdown(); }
+				if (Settings.gets("Show autoupdate countdown dialog")) Dialog.countdown();
 				switch (xhr.status) {
 					case 200:
 						Updater.last = xhr.getResponseHeader("Last-Modified");
 						$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", rt).val());
-						var f, l;
-						if ($jq("#delform div[id]:first table").length == 0) {
-							l = -1;
-							f = true;
-						} else {
-							l = parseInt($jq($jq("table:not(.postform):not(.userdelete) > tbody > tr > td[id] > a[name]").get().reverse())[0].name);
-							f = false;
-						}
-						var sat = (parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100);
-						$jq("table:not(.postform):not(.userdelete)", rt).each(function() {
-							var fne = $jq("tbody tr td[id] a[name]", this)[0];
-							if (!f && fne != null && parseInt(fne.name) > l)
-								f = true;
+						var tl = $jq(".thread table:last");
+						var f = !tl.length;
+						var l = f ? -1 : parseInt($jq("a[name]", tl).attr("name"));
+						var sat = parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100;
+						$jq(".thread table", rt).each(function() {
+							var fne = $jq("a[name]", this);
+							if (!f && fne != null && parseInt(fne.attr("name")) > l) f = true;
 							if (f) {
-								var tal = $jq("#delform div[id]:first table:last");
-								tal.length > 0 ? tal.after(this) : $jq(".thread .op").after(this);
+								var ntl = $jq(".thread table:last");
+								ntl.length ? ntl.after(this) : $jq(".thread .op").after(this);
 								Posts.newhandle(this);
 								Posts.addhover(this);
 								Posts.newpostupdate(this);
 								Notifier.newhandle(this);
 								Filter.newhandle(this);
-								if (sat && Settings.gets("Scroll on new post"))
-									window.scrollTo(0, document.body.scrollHeight);
+								if (sat && Settings.gets("Scroll on new post"))	window.scrollTo(0, document.body.scrollHeight);
 							}
 						});
 					break;
