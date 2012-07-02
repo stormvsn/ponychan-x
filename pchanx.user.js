@@ -163,16 +163,16 @@ function ponychanx() {
 			<input type="text" name="name" placeholder="Name" size="28" maxlength="75" />\
 			<input type="text" name="em" placeholder="Email" size="28" maxlength="75" />\
 			<input type="text" name="subject" placeholder="Subject" size="35" maxlength="75" />';
-			if ($jq("input[name='embed']", "#postform").length > 0) {
+			if ($jq("input[name='embed']", "#postform").length) {
 				qr.innerHTML += '<div class="embedwrap"><input type="text" name="embed" id="embed" placeholder="Embed" size="28" maxlength="75" />\
 				<select name="embedtype"><option value="youtube">Youtube</option><option value="google">Google</option><option value="vimeo">Vimeo</option><option value="blimp">Blimp</option></select></div>';
 			}
 			qr.innerHTML +=	'<textarea name="message" id="msg" placeholder="Message" cols="48" rows="6" ></textarea>\
 			<input type="file" id="imgfile" name="imagefile" size="25" multiple="" accept="image/*" >';
-			if ($jq("#nofile").length > 0) qr.innerHTML += '<label><input type="checkbox" name="nofile" /> No File</label>';
+			if ($jq("#nofile").length) qr.innerHTML += '<label><input type="checkbox" name="nofile" /> No File</label>';
 			qr.innerHTML += '<input type="button" value="Reply">\
 			<div class="postopts"><label><input type="checkbox" name="spoiler" /> Spoiler</label> \
-			' + ($jq("#nsfw").length > 0 ? '<label><input type="checkbox" name="nsfw" /> NSFW</label> ' : '') + '\
+			' + ($jq("#nsfw").length ? '<label><input type="checkbox" name="nsfw" /> NSFW</label> ' : '') + '\
 			' + (Main.tid != "0" ? '<label class="auto"><span id="imgnum">(0)</span> Auto <input type="checkbox" name="auto" /></label>' : '') + '\
 			</div><div id="imagelist"></div>';
 			if (checkMod()) {
@@ -185,20 +185,18 @@ function ponychanx() {
 				<label title="Name"><input name="usestaffname" type="checkbox" /> Name</label> \
 				</div>';
 			}
-			$jq("#qr .close a").live("click", function() { QR.hide(); });
 			$jq("body").append(qr);
+			$jq("#qr .close a").on("click", function() { QR.hide(); });
 			$jq(window).resize(function() {
 				if ($jq("#qr").position().left+410 > document.documentElement.clientWidth) {
 					$jq("#qr").css("left", document.documentElement.clientWidth-410);
 					Settings.set("x.qrpos_x", $jq("#qr").css("left"));
 				}
 			});
-			if (Settings.gets("Hide quick reply when top button clicked"))
-				$jq("#qr .top a:first").on("click", function() { QR.hide(); });
+			if (Settings.gets("Hide quick reply when top button clicked")) $jq("#qr .top a:first").on("click", function() { QR.hide(); });
 			var btn = $jq("#qr > input[type='button']");
-			if (Main.tid == "0") {
-				btn.val("Thread"); 
-			}
+			if (Main.tid == "0") btn.val("Thread"); 
+			btn.on("click", function() { QR.send(); });
 			if (Settings.gets("Sync original post form and quick reply")) {
 				$jq("#qr > input[name], #qr textarea").on("input", function() {
 					$jq("#postform").find("[name='"+this.name+"']").val(this.value);
@@ -207,7 +205,7 @@ function ponychanx() {
 					$jq("#qr").find("[name='"+this.name+"']").val(this.value);
 				});
 			}
-			btn.live("click", function() { QR.send(); } );
+			
 			QR.loadfields();
 			document.getElementById("imgfile").onchange = function() { QR.thumb(); };
 			var x = Settings.get("x.qrpos_x");
@@ -343,6 +341,14 @@ function ponychanx() {
 			$jq("#imagelist").html("");
 			var url = window.URL || window.webkitURL;
 			for (var i = 0, len = f.length; i < len; i++) {
+				if (f[i].size > $jq("#postform input[name='MAX_FILE_SIZE']").val()) {
+					QR.settitle(f[i].name + " is too large");
+					continue;
+				}
+				if (!/^image/.test(f[i].type)) {
+					QR.settitle(f[i].name + " is not an image");
+					continue;
+				}
 				var fU = url.createObjectURL(f[i]);
 				var thumb = document.createElement("div");
 				$jq("#imagelist").append(thumb);
@@ -367,7 +373,7 @@ function ponychanx() {
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
-			$jq("#imagelist, .postopts").css("display", "block");
+			if ($jq(".listthumb").length) $jq("#imagelist, .postopts").css("display", "block");
 			$jq("#imgnum").text("(" + $jq(".listthumb").length + ")");
 		},
 		loadfields: function() {

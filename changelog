@@ -1,3 +1,10 @@
+improvements branch
+- Added quick reply file size warning
+- Added quick reply file type warning
+- Remove lunachan support
+- Changed icon
+- Changed description
+
 0.28
 - Added Reset quick reply option
 
