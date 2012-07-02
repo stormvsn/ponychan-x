@@ -13,7 +13,7 @@
 // @exclude       http://www.ponychan.net/chan/?p=*
 // @exclude       *lunachan.net/
 // @exclude       *lunachan.net/board.php
-// @version       0.27
+// @version       0.28
 // @icon          http://i.imgur.com/12a0D.jpg
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -23,7 +23,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		version: 27,
+		version: 28,
 		bid: null,
 		tid: null,
 		durl: "",
@@ -442,6 +442,11 @@ function ponychanx() {
 				return checkMod();
 			else
 				return false;
+		},
+		resetpos: function() {
+			$jq("#qr").css("top", "46px").css("left", "83px");
+			Settings.set("x.qrpos_x", $jq("#qr").css("left"));
+			Settings.set("x.qrpos_y", $jq("#qr").css("top"));
 		}
 	};
 	
@@ -774,8 +779,8 @@ function ponychanx() {
 			<br /><br /><strong>More</strong><br />\
 			<a target='_blank' href='http://www.ponychan.net/chan/meta/res/115168+50.html'>View support thread</a>");
 			if (ke)
-				or.append("<br />\
-				<a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show/hide quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View keybinds</a>");
+				or.append("<br /><a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show/hide quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View keybinds</a>");
+			or.append($jq("<br /><a href='javascript:;'>Reset quick reply</a>").on("click", function() { QR.resetpos(); }));
 			ow.insertAfter(".adminbar");
 		},
 		catalog: function() {
@@ -818,7 +823,7 @@ function ponychanx() {
 			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
 			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
-			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; right: 10px; width: 400px; background: #e2e2e2; border-radius: 4px; border: 1px solid #000; }\
+			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; left: 83px; width: 400px; background: #e2e2e2; border-radius: 4px; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
 			#qr textarea { width: 394px; padding: 2px 0 2px 4px; font-family: sans-serif; height: 98px; font-size: small; }\
 			.extrabtns { vertical-align: top; }\
