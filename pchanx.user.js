@@ -333,7 +333,7 @@ function ponychanx() {
 					document.getElementById("imagelist").scrollTop = 0;
 					$jq("#qr textarea").val($jq("#thumbselected").attr("data-post"));
 				} else {
-					$jq("#imagelist, .postopts").css("display", "none");
+					$jq("#imagelist, .postopts").hide();
 					$jq("#qr input[type='file']").val("");
 					$jq("#qr .postopts :input[name='auto']").attr("checked", false);
 				}
@@ -342,8 +342,10 @@ function ponychanx() {
 		},
 		thumb: function() {
 			var f = document.getElementById("imgfile").files;
+			QR.settitle("");
+			var po = $jq("#imagelist, .postopts");
 			if (f[0] == null) {
-				$jq("#imagelist, .postopts").css("display", "none");
+				po.hide();
 				$jq("#imagelist").html("");
 				return;
 			}
@@ -382,7 +384,7 @@ function ponychanx() {
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
-			if ($jq(".listthumb").length) $jq("#imagelist, .postopts").css("display", "block");
+			$jq(".listthumb").length ? po.show() : po.hide();
 			$jq("#imgnum").text("(" + $jq(".listthumb").length + ")");
 		},
 		loadfields: function() {
