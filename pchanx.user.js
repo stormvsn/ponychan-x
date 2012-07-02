@@ -7,14 +7,11 @@
 // @contributor   onekopaka
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
-// @include       *lunachan.net/*
 // @exclude       http://www.ponychan.net/chan/
 // @exclude       http://www.ponychan.net/chan/board.php
 // @exclude       http://www.ponychan.net/chan/?p=*
-// @exclude       *lunachan.net/
-// @exclude       *lunachan.net/board.php
 // @version       0.28
-// @icon          http://i.imgur.com/12a0D.jpg
+// @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
 // ==/UserScript==
