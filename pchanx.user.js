@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.28
+// @version       0.29
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -18,7 +18,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 28,
+		ver: 29,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -962,8 +962,7 @@ function ponychanx() {
 	Main.init();
 }
 
-function loadjQ(s)
-{
+function loadjQ(s) {
 	var script = document.createElement("script");
 	script.setAttribute("src", "http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js");
 	script.addEventListener('load', function() {
