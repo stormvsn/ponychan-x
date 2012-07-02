@@ -30,6 +30,9 @@ function ponychanx() {
 			var pf = $jq("#postform");
 			Main.tid = $jq(":input[name='replythread']", pf).val();
 			Main.bid = $jq(":input[name='board']", pf).val();
+			Html.init();
+			Posts.init();
+			Main.update();
 			if (Settings.gets("Enable quick reply") && pf.length) QR.init();
 			if (Settings.gets("Show new post count in title")) Notifier.init();
 			if (Settings.gets("Enable filter")) Filter.init();
@@ -38,9 +41,6 @@ function ponychanx() {
 				if (Settings.gets("Enable autoupdate")) Updater.init();	
 				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate")) Dialog.init();
 			}
-			Html.init();
-			Posts.init();
-			Main.update();
 		},
 		update: function() {
 			var d = Date.now();
@@ -264,7 +264,7 @@ function ponychanx() {
 				if (xhr.readyState == 4) {
 					if (xhr.status == 200) {
 						Notifier._me = true;
-						if (xhr.responseText.indexOf("<title>Ponychan</title>") > -1) {
+						if (/<title>Ponychan<\/title>/.test(xhr.responseText)) {
 							QR.settitle(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 							sb.val("Retry");
 						} else {
@@ -444,7 +444,7 @@ function ponychanx() {
 			Posts.addhandles();
 		},
 		addhandles: function() {
-			if (Main.tid != "0" && $jq("#postform").length > 0) {
+			if (Main.tid != "0" && $jq("#postform").length) {
 				var oe = $jq(".thread").contents(":not(table,span:last)");
 				var op = $jq("<div class='op'></div>");
 				$jq(".thread").prepend(op);
@@ -476,11 +476,9 @@ function ponychanx() {
 					});
 				});
 			}
-			var ts = $jq("#delform");
-			ts = ts.length == 0 ? $jq(".thread") : ts;
-			$jq("table:not(.postform):not(.userdelete)", ts).each(function() {
+			$jq(".thread table").each(function() {
 				Posts.newhandle(this);
-			});			
+			});
 		},
 		hide: function(hp) {
 			hp = $jq(hp);
@@ -491,34 +489,28 @@ function ponychanx() {
 			$jq(".reply", c).toggle();
 		},
 		getcrossthread: function(anc, pid) {
-			var xhr = new XMLHttpRequest();
-			xhr.open("GET", anc.href);
-			xhr.setRequestHeader("Accept", "*/*");
-			xhr.send();
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState == 4) {
-					if (xhr.status == 200) {
-						var f = false;
-						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
-							if (!f && $jq("tbody tr td.reply[id] a[name]", this)[0].name == pid)
-								f = true;
-							if (f) {
-								var c = $jq("td.reply[id]", this).addClass("inline").insertAfter(anc);
-								Posts.newhandle(c);
-								Posts.newpostupdate(c);
-								c.find("a[name], .postfooter").remove();
-								c.find(".reflink a").removeAttr("onclick").unbind("click");
-								c.find(".reflink a:not(:first)").removeAttr("href").css("cursor","not-allowed");
-								return false;
-							}
-						});
-						if (!f)
-							$jq("<td class='reply inline'>Reply not found<br /><a target='_blank' style='font-family: \"Trebuchet MS\";' href='"+anc.href+"'>Open thread in new tab</a></td>").insertAfter(anc);
-					} else {
-						$jq("<td class='reply inline'>Reply not found ("+xhr.status+")</td>").insertAfter(anc);
-					}
+			$jq.ajax({
+				url: anc.href
+			}).done(function(rt, s, xhr) {
+				if (xhr.status == 200) {
+					var f = false;
+					$jq(".thread table", rt).each(function() {
+						if (!f && $jq("a[name]", this).attr("name") == pid) f = true;
+						if (f) {
+							var c = $jq("td.reply[id]", this).addClass("inline").insertAfter(anc);
+							Posts.newhandle(c);
+							Posts.newpostupdate(c);
+							c.find("a[name], .postfooter").remove();
+							c.find(".reflink a").removeAttr("onclick").unbind("click");
+							c.find(".reflink a:not(:first)").removeAttr("href").css("cursor","not-allowed");
+							return false;
+						}
+					});
+					if (!f)	$jq("<td class='reply inline'>Reply not found<br /><a target='_blank' style='font-family: \"Trebuchet MS\";' href='"+anc.href+"'>Open thread in new tab</a></td>").insertAfter(anc);
+				} else {
+					$jq("<td class='reply inline'>Reply not found ("+xhr.status+")</td>").insertAfter(anc);
 				}
-			}
+			});
 		},
 		newhandle: function(p) {
 			var eq = Settings.gets("Enable quick reply");
@@ -641,7 +633,7 @@ function ponychanx() {
 				ns = ns.replace("/thumb/", "/src/");
 				ns = ns.replace("s.", ".");
 				var fs = $jq(this).closest("td").find(".filesize");
-				if (Settings.gets("Animate gif thumbnails") && fs.text().indexOf(", spoiler.gif") == -1 && this.src.indexOf("s.gif") > 0) {
+				if (Settings.gets("Animate gif thumbnails") && !/, spoiler\.gif/.test(fs.text()) && /s\.gif/.test(this.src)) {
 					this.src = ns;
 					this.removeAttribute("height");
 					this.removeAttribute("width");
@@ -734,9 +726,9 @@ function ponychanx() {
 			$jq('#pxoptions input[type="checkbox"]').live("click", function() { Settings.sets($jq(this).attr("name"), String($jq(this).is(":checked"))); });
 			if (Settings.gets("Enable filter")) {
 				or.append("<strong>Filter</strong><br />Insert ; after each item<br />\
-				Names<br /><input id='n' name='nlist' type='text' value='' style='width: 99%' />\
-				Tripcodes<br /><input id='t' name='tlist' type='text' value='' style='width: 99%' />\
-				Posts<br /><input id='p' name='plist' type='text' value='' style='width: 99%' /><br /><br />")
+				Names<br /><input id='nf' name='nlist' type='text' value='' style='width: 99%' />\
+				Tripcodes<br /><input id='tf' name='tlist' type='text' value='' style='width: 99%' />\
+				Posts<br /><input id='pf' name='plist' type='text' value='' style='width: 99%' /><br /><br />")
 				.on("input", function() { Filter.save(); });
 			}
 			or.append("<a href='javascript:;' onclick='location.reload(true);'>Apply changes</a> (refreshes the page)\
@@ -748,7 +740,7 @@ function ponychanx() {
 			ow.insertAfter(".adminbar");
 		},
 		catalog: function() {
-			if ($jq(".catalogtable").length > 0) {
+			if ($jq(".catalogtable").length) {
 				$jq("#SearchText").on("keyup", function(e) {
 					if (e.keyCode == 13) Html.cataloglasts();
 				});
@@ -884,7 +876,7 @@ function ponychanx() {
 			Filter.addhandles();
 		},
 		addhandles: function() {
-			$jq("table:not(.postform):not(.userdelete)").each(function() {
+			$jq(".thread table").each(function() {
 				Filter.newhandle($jq(this));
 			});
 		},
@@ -892,25 +884,25 @@ function ponychanx() {
 			var n = Settings.get("x.filter.nlist");
 			if (n != null && n != "undefined") {
 				Filter.nlist = n;
-				$jq('#pxoptions > div input[name="nlist"]').val(n);
+				$jq('#nf').val(n);
 			}
 			var t = Settings.get("x.filter.tlist");
 			if (t != null && t != "undefined") {
 				Filter.tlist = t;
-				$jq('#pxoptions > div input[name="tlist"]').val(t);
+				$jq('#tf').val(t);
 			}
 			var p = Settings.get("x.filter.plist");
 			if (p != null && p != "undefined") {
 				Filter.plist = p;
-				$jq('#pxoptions > div input[name="plist"]').val(p);
+				$jq('#pf').val(p);
 			}
 		},
 		save: function() {
-			Filter.nlist = $jq('#pxoptions > div input[name="nlist"]').val();
+			Filter.nlist = $jq('#nf').val();
 			Settings.set("x.filter.nlist", Filter.nlist);
-			Filter.tlist = $jq('#pxoptions > div input[name="tlist"]').val();
+			Filter.tlist = $jq('#tf').val();
 			Settings.set("x.filter.tlist", Filter.tlist);
-			Filter.plist = $jq('#pxoptions > div input[name="plist"]').val();
+			Filter.plist = $jq('#pf').val();
 			Settings.set("x.filter.plist", Filter.plist);
 		},
 		filter: function(p) {
@@ -936,13 +928,13 @@ function ponychanx() {
 			}
 		},
 		filtered: function(t, s) {
-			if (s == "") return false;
+			if ($jq.trim(s) == "") return false;
 			switch (t) {
 				case 0:
-					if (Filter.nlist.indexOf(s+";") > -1) return true;
+					return (Filter.nlist.indexOf(s+";") > -1);
 				break;
 				case 1:
-					if (Filter.tlist.indexOf(s+";") > -1) return true;
+					return (Filter.tlist.indexOf(s+";") > -1);
 				break;
 				case 2:
 					if (Filter.plist.length <= 1) return false;

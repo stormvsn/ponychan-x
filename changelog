@@ -1,7 +1,6 @@
 improvements branch
-- Added quick reply file size warning
-- Added quick reply file type warning
-- Remove lunachan support
+- Added file size and type warnings to quick reply
+- Removed lunachan support
 - Changed icon
 - Changed description
 
