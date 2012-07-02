@@ -18,7 +18,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		version: 28,
+		ver: 28,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -50,22 +50,16 @@ function ponychanx() {
 				lu = d;
 				Settings.set("x.update.lastcheck", lu);
 			}
-			if (lv == null) lv = Main.version;
-			if (d > parseInt(lu)+86400000 && lv <= Main.version) {
-				var xhr = new XMLHttpRequest();
-				xhr.open("GET", "http://nassign.heliohost.org/s/latest.php");
-				xhr.send();
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4) {
-						if (xhr.status == 200) {
-							lv = parseInt(xhr.responseText);
-							Settings.set("x.update.latestversion", lv);
-						}
-					}
-				}
-				Settings.set("x.update.lastcheck", d);
+			if (lv == null) lv = Main.ver;
+			if (d > parseInt(lu)+86400000 && lv <= Main.ver) {
+				$jq.ajax({
+					url: "http://nassign.heliohost.org/s/latest.php"
+				}).done(function(lv) {
+					Settings.set("x.update.latestversion", lv);
+					Settings.set("x.update.lastcheck", d);
+				});
 			}
-			if (lv > Main.version) {
+			if (lv > Main.ver) {
 				$jq("#pxbtn").append(" (Update)");
 				$jq("#pxoptions").prepend("<strong>Update</strong><br />A new update for Ponychan X is available.<br />\
 				Update applies on your next refresh.<br />\
@@ -264,7 +258,7 @@ function ponychanx() {
 			var d = new FormData();
 			d.append("board", Main.bid);
 			d.append("replythread", Main.tid);
-			d.append("ponychanx", Main.version);
+			d.append("ponychanx", Main.ver);
 			d.append("stats_referrer", "");
 			if (!$jq("input[name='nofile']", "#qr").is(":checked"))
 				d.append("imagefile", document.getElementById("imgfile").files[fid]);
