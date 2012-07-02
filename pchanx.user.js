@@ -80,13 +80,13 @@ function ponychanx() {
 			$jq.ajax({
 				headers: {"If-Modified-Since": Updater.last},
 				url: Main.durl+"?"+Date.now(),
-			}).done(function(r, s, xhr) {
+			}).done(function(rt, s, xhr) {
 				setTimeout(function() { Updater.get(); }, Updater.tmr);
 				if (Settings.gets("Show autoupdate countdown dialog")) { Dialog.countdown(); }
 				switch (xhr.status) {
 					case 200:
 						Updater.last = xhr.getResponseHeader("Last-Modified");
-						$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", xhr.responseText).val());
+						$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", rt).val());
 						var f, l;
 						if ($jq("#delform div[id]:first table").length == 0) {
 							l = -1;
@@ -96,7 +96,7 @@ function ponychanx() {
 							f = false;
 						}
 						var sat = (parseInt($jq(window).scrollTop()) + parseInt($jq(window).height()) > parseInt($jq(document).height()) - 100);
-						$jq("table:not(.postform):not(.userdelete)", xhr.responseText).each(function() {
+						$jq("table:not(.postform):not(.userdelete)", rt).each(function() {
 							var fne = $jq("tbody tr td[id] a[name]", this)[0];
 							if (!f && fne != null && parseInt(fne.name) > l)
 								f = true;
