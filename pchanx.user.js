@@ -79,7 +79,8 @@ function ponychanx() {
 		get: function() {
 			$jq.ajax({
 				headers: {"If-Modified-Since": Updater.last},
-				url: Main.durl+"?"+Date.now(),
+				url: Main.durl,
+				cache: false
 			}).done(function(rt, s, xhr) {
 				setTimeout(function() { Updater.get(); }, Updater.tmr);
 				if (Settings.gets("Show autoupdate countdown dialog")) Dialog.countdown();
@@ -253,36 +254,44 @@ function ponychanx() {
 				var v = this.getAttribute("type") == "checkbox" ? this.checked == true ? "true" : null : this.value;
 				if (v != null) d.append(this.name, v);
 			});
-			var xhr = QR.ajax = new XMLHttpRequest();
-			xhr.upload.addEventListener("progress", function(evt) {
-				if (evt.lengthComputable)
-					sb.val(Math.round(evt.loaded * 100 / evt.total).toString() + '%');
-			}, false);
-			xhr.open("POST", QR.action);  
-			xhr.send(d);
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState == 4) {
-					if (xhr.status == 200) {
-						Notifier._me = true;
-						if (/<title>Ponychan<\/title>/.test(xhr.responseText)) {
-							QR.settitle(xhr.responseText.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
-							sb.val("Retry");
-						} else {
-							if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
-								location.reload(true);
-							QR.clear(fid);
-						}
-					} else {
-						QR.settitle("(" + xhr.status + ") An error occured while posting");
+			QR.ajax = $jq.ajax({
+				processData: false,
+				contentType: false,
+				type: "POST",
+				url: QR.action,
+				data: d,
+				xhr: function() {
+					var xhr = new window.XMLHttpRequest();
+					xhr.upload.addEventListener("progress", function(e) {
+						if (e.lengthComputable)
+							sb.val(Math.round(e.loaded * 100 / e.total).toString() + '%');
+					}, false);
+					xhr.onabort = function() {
+						QR.settitle("Posting aborted");
 						sb.val("Retry");
+						QR.ajax = null;
 					}
-					QR.storefields();
-					QR.ajax = null;
+					return xhr;
+				},
+			}).done(function(rt, s, xhr) {
+				if (xhr.status == 200) {
+					Notifier._me = true;
+					if (/<title>Ponychan<\/title>/.test(rt)) {
+						QR.settitle(rt.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
+						sb.val("Retry");
+					} else {
+						if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
+							location.reload(true);
+						QR.clear(fid);
+					}
+				} else {
+					QR.settitle("(" + xhr.status + ") An error occured while posting");
+					sb.val("Retry");
 				}
-			}
-			xhr.onabort = function() {
-				QR.settitle("Posting aborted");
-			}
+				QR.storefields();
+				QR.ajax = null;
+			});
+			
 		},
 		cooldowntimer: function() {
 			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.cooldown);
@@ -684,7 +693,7 @@ function ponychanx() {
 		},
 		hidepostform: function() {
 			var pf = $jq("#postform");
-			if (Settings.gets("Hide original post form") && pf.length > 0) {
+			if (Settings.gets("Hide original post form") && pf.length) {
 				pf.css({"visibility":"hidden", "height":"0"});
 				var a = document.createElement("a");
 				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
