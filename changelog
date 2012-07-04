@@ -1,3 +1,9 @@
+0.30
+- Improved start up time
+- Increased space between backlinks
+- Fixed 404 errors not being shown
+- New post counter shows 0 when no new posts
+
 0.29
 - Added file size and type warnings to quick reply
 - Removed lunachan support
