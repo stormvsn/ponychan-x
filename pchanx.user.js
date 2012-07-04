@@ -555,7 +555,7 @@ function ponychanx() {
 						var blcl = "ref|"+Main.bid+"|"+Main.tid+"|"+from;
 						var blat = tto.parent().find(".extrabtns")[0];
 						if ($jq("a[class='"+blcl+"']", blat).length == 0) {
-							var bl = $jq("<a href='#"+from+"' onclick='return highlight("+from+", true);' class='"+blcl+" backlink'>>>"+from+"</a>")
+							var bl = $jq("<a href='#"+from+"' onclick='return highlight("+from+", true);' class='"+blcl+"'>>>"+from+"</a>")
 							.on("mouseover", addreflinkpreview)
 							.on("mouseout", delreflinkpreview);
 							$jq(blat).append(bl);
@@ -807,7 +807,7 @@ function ponychanx() {
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
 			#modpanel label input, #qr label input, .postopts label input { position: relative; top: 2px; }\
-			.backlink { margin-right: 4px; }";
+			.extrabtns a { margin-right: 4px; }";
 			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
 			if (Settings.gets("Hide namefields")) s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
 			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: 28px; right: auto; left: 0; } #pxbtn { height: 9px; } ";
