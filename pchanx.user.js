@@ -268,11 +268,6 @@ function ponychanx() {
 						if (e.lengthComputable)
 							sb.val(Math.round(e.loaded * 100 / e.total).toString() + '%');
 					}, false);
-					xhr.onabort = function() {
-						QR.settitle("Posting aborted");
-						sb.val("Retry");
-						QR.ajax = null;
-					}
 					return xhr;
 				},
 			}).done(function(rt, s, xhr) {
@@ -289,8 +284,8 @@ function ponychanx() {
 				}
 				QR.storefields();
 				QR.ajax = null;
-			}).fail(function(xhr) {
-					QR.settitle("(" + xhr.status + ") An error occured while posting");
+			}).fail(function(xhr, s) {
+					s == "abort" ? QR.settitle("Posting aborted") : QR.settitle("(" + xhr.status + ") An error occured while posting");
 					sb.val("Retry");
 					QR.ajax = null;
 			});
