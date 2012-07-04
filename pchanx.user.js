@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.31
+// @version       0.32
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 31,
+		ver: 32,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -33,8 +33,8 @@ function ponychanx() {
 			var pf = $jq("#postform");
 			Main.tid = $jq(":input[name='replythread']", pf).val();
 			Main.bid = $jq(":input[name='board']", pf).val();
-			Html.init();
 			Posts.init();
+			Html.init();
 			Main.update();
 			if (Settings.gets("Enable quick reply") && pf.length) QR.init();
 			if (Settings.gets("Enable filter")) Filter.init();
@@ -367,12 +367,10 @@ function ponychanx() {
 				$jq(thumb).on("mousedown", function(e) {
 					if (e.which == 1) {
 						var upc = (Settings.gets("Unique post content per image"));
-						if (upc)
-							$jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
+						if (upc) $jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
 						$jq("#thumbselected").removeAttr("id");
 						this.id = "thumbselected";
-						if (upc)
-							$jq("#qr textarea").val(this.getAttribute("data-post"));
+						if (upc) $jq("#qr textarea").val(this.getAttribute("data-post"));
 					} else if (e.which == 2) {
 						$jq(this).remove();
 						QR.thumbreset();
@@ -693,6 +691,16 @@ function ponychanx() {
 			Html.options();
 			Html.css();
 			Html.catalog();
+			if (Main.tid != "0") {
+				var ft = $jq(".thread .op label .filetitle");
+				if (ft.length && ft.text() != "") {
+					Html.title = ft.text();
+				} else {
+					var ot = $jq(".thread .op blockquote");
+					if (ot.text() != "") Html.title = ot.text();
+				}
+				if (Html.title.length > 50) Html.title = Html.title.substr(0, 47) + "...";
+			}
 		},
 		hidepostform: function() {
 			var pf = $jq("#postform");
