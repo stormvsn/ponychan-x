@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.30
+// @version       0.31
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 30,
+		ver: 31,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -114,6 +114,9 @@ function ponychanx() {
 					Notifier.settitle("(404) " + Html.title);
 					QR.settitle("404");
 					$jq("#qr > input[type='button']").attr("disabled", "disabled").val("404");
+				} else {
+					setTimeout(function() { Updater.get(); }, Updater.tmr);
+					if (Settings.gets("Show autoupdate countdown dialog")) Dialog.countdown();
 				}
 			});
 		},

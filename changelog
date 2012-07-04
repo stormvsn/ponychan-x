@@ -1,3 +1,7 @@
+0.31
+- Fixed posting aborted message
+- Fixed autoupdating stopping after an error
+
 0.30
 - Improved start up time
 - Increased space between backlinks
