@@ -574,9 +574,11 @@ function ponychanx() {
 						$jq(this).removeAttr("onclick");
 						$jq(this).on("click", function() {
 							var n = $jq(this).next();
-							if (n.hasClass("inline"))
+							if (n.hasClass("inline")) {
+								$jq(this).css('display', 'block');
 								n.remove();
-							else {
+							} else {
+								$jq(this).css('display', 'inline-block')
 								var ca = this.className.split("|");
 								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")) {
 									Posts.getcrossthread(this, ca[3]);
@@ -822,9 +824,10 @@ function ponychanx() {
 			#modpanel { clear: both; font-size: small; }\
 			td.reply { white-space: nowrap; }\
 			td.reply > blockquote { white-space: normal; }\
+			td.reply > blockquote > a { display: inline-block; }\
 			#modpanel label input, #qr label input, .postopts label input { position: relative; top: 2px; }\
 			.extrabtns a { margin-right: 4px; }";
-			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
+			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " .doubledash { white-space: nowrap; display: block !important; }";
 			if (Settings.gets("Hide namefields")) s.innerHTML += " input[name='name'] { background-color: black; } input[name='name']:hover { background-color: white; }";
 			if (getCookie("vertnavbar") == "1") s.innerHTML += " #pxoptions { top: 28px; right: auto; left: 0; } #pxbtn { height: 9px; } ";
 			document.body.appendChild(s);
