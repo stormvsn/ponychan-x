@@ -806,6 +806,8 @@ function ponychanx() {
 			#pxbtn { margin-right: -4px; }\
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
+			td.reply { white-space: nowrap; }\
+			td.reply > blockquote { white-space: normal; }\
 			#modpanel label input, #qr label input, .postopts label input { position: relative; top: 2px; }\
 			.extrabtns a { margin-right: 4px; }";
 			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " td.reply { margin-left: 25px; } .doubledash { white-space: nowrap; display: block !important; }";
