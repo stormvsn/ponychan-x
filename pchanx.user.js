@@ -575,10 +575,8 @@ function ponychanx() {
 						$jq(this).on("click", function() {
 							var n = $jq(this).next();
 							if (n.hasClass("inline")) {
-								$jq(this).css("display", "inline-block");
 								n.remove();
 							} else {
-								$jq(this).css("display", "block");
 								var ca = this.className.split("|");
 								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")) {
 									Posts.getcrossthread(this, ca[3]);
@@ -800,7 +798,7 @@ function ponychanx() {
 			#qr .embedwrap select { padding: 3px 0 2px 0; }\
 			#qr .top a { height: 19px; float: left; color: white; background-color: black; padding: 0 0 1px 1px; }\
 			.postarea a h2 { padding-bottom: 4px; }\
-			.reply.inline, .op.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; display: inline-block; }\
+			.reply.inline, .op.inline { border: 1px solid rgba(0, 0, 0, 0.3) !important; }\
 			#updatetimer { width: 30px; }\
 			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
 			#pxoptions a { text-decoration: underline; }\
@@ -822,7 +820,6 @@ function ponychanx() {
 			#pxbtn { margin-right: -4px; }\
 			.postarea a h5 { margin: 0 0 12px 0; }\
 			#modpanel { clear: both; font-size: small; }\
-			td.reply > blockquote > a { display: inline-block; }\
 			#modpanel label input, #qr label input, .postopts label input { position: relative; top: 2px; }\
 			.extrabtns a { margin-right: 4px; }";
 			if (Settings.gets("Enable hide post buttons")) s.innerHTML += " .doubledash { display: block !important; white-space: nowrap; }";

@@ -1,7 +1,6 @@
 0.33
 - Renamed "Download" image link to "Save" image link
 - Save image link now starts a download
-- (Guardian) Fix width of inline posts
 - Added Check for update link in options
 - Added Automatically check for updates option
 
