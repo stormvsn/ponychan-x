@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.32
+// @version       0.33
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 32,
+		ver: 33,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -35,10 +35,10 @@ function ponychanx() {
 			Main.bid = $jq(":input[name='board']", pf).val();
 			Posts.init();
 			Html.init();
-			Main.update();
 			if (Settings.gets("Enable quick reply") && pf.length) QR.init();
 			if (Settings.gets("Enable filter")) Filter.init();
 			if (Settings.gets("Autoupdate watched threads list")) setTimeout(function() { Updater.getwatched(); }, 10000);
+			if (Settings.gets("Automatically check for updates")) Main.autoupdate();
 			if (Main.tid != "0" && pf.length) {
 				if (Settings.gets("Enable autoupdate")) Updater.init();	
 				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate")) Dialog.init();
@@ -46,6 +46,22 @@ function ponychanx() {
 			}
 		},
 		update: function() {
+			$jq("#checkupdate").text("Checking...");
+			$jq.ajax({
+					url: "http://nassign.heliohost.org/s/latest.php"
+				}).done(function(lv) {
+					Settings.set("x.update.latestversion", lv);
+					Settings.set("x.update.lastcheck", Date.now());
+				if (parseInt(lv) > Main.ver) {
+					if (confirm("A new update for Ponychan X is available. Install now?"))
+						window.location = "https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js";
+				} else
+					$jq("#checkupdate").text("No update available");
+			}).fail(function() {
+				$jq("#checkupdate").text("Error checking for update");
+			});
+		},
+		autoupdate: function() {
 			var d = Date.now();
 			var lu = Settings.get("x.update.lastcheck");
 			var lv = Settings.get("x.update.latestversion");
@@ -54,14 +70,7 @@ function ponychanx() {
 				Settings.set("x.update.lastcheck", lu);
 			}
 			if (lv == null) lv = Main.ver;
-			if (d > parseInt(lu)+86400000 && lv <= Main.ver) {
-				$jq.ajax({
-					url: "http://nassign.heliohost.org/s/latest.php"
-				}).done(function(lv) {
-					Settings.set("x.update.latestversion", lv);
-					Settings.set("x.update.lastcheck", d);
-				});
-			}
+			if (d > parseInt(lu)+86400000 && lv <= Main.ver) Main.update();
 			if (lv > Main.ver) {
 				$jq("#pxbtn").append(" (Update)");
 				$jq("#pxoptions").prepend("<strong>Update</strong><br />A new update for Ponychan X is available.<br />\
@@ -761,6 +770,7 @@ function ponychanx() {
 			if (ke)
 				or.append("<br /><a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show/hide quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View keybinds</a>");
 			or.append($jq("<br /><a href='javascript:;'>Reset quick reply</a>").on("click", function() { QR.resetpos(); }));
+			or.append($jq("<br /><a id='checkupdate' href='javascript:;'>Check for update</a>").on("click", function() { Main.update(); }));
 			ow.insertAfter(".adminbar");
 		},
 		catalog: function() {
@@ -884,6 +894,7 @@ function ponychanx() {
 			"Add google image shortcut to posts": { def: "true", cat: "Posts" },
 			"Add save image shortcut to posts": { def: "true", cat: "Posts" },
 			"Enable filter": { def: "false", cat: "Other" },
+			"Automatically check for updates": { def: "true", cat: "Other" },
 			"Hide original post form": { def: "true", cat: "Other" },
 			"Sync original post form and quick reply": { def: "false", cat: "Other" },
 			"Scroll on new post": { def: "false", cat: "Other" },
