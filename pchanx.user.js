@@ -596,8 +596,12 @@ function ponychanx() {
 			if (im != null) {
 				if (Settings.gets("Add google image shortcut to posts"))
 					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
-				if (Settings.gets("Add download image shortcut to posts"))
-					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+im.src+"' target='_blank'>Download</a>"));
+				if (Settings.gets("Add save image shortcut to posts")) {
+					var du = im.src;
+					du = du.replace("/thumb/", "/src/");
+					du = du.replace("s.", ".");
+					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+du+"' download='"+du.split("/").pop()+"' target='_blank'>Save</a>"));
+				}
 			}
 		},
 		addhover: function(p) {
@@ -878,7 +882,7 @@ function ponychanx() {
 			"Enable cross-thread inline replies": { def: "true", cat: "Posts" },
 			"Animate gif thumbnails": { def: "true", cat: "Posts" },
 			"Add google image shortcut to posts": { def: "true", cat: "Posts" },
-			"Add download image shortcut to posts": { def: "true", cat: "Posts" },
+			"Add save image shortcut to posts": { def: "true", cat: "Posts" },
 			"Enable filter": { def: "false", cat: "Other" },
 			"Hide original post form": { def: "true", cat: "Other" },
 			"Sync original post form and quick reply": { def: "false", cat: "Other" },
