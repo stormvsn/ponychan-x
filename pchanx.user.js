@@ -575,10 +575,10 @@ function ponychanx() {
 						$jq(this).on("click", function() {
 							var n = $jq(this).next();
 							if (n.hasClass("inline")) {
-								$jq(this).css('display', 'block');
+								$jq(this).css("display", "inline-block");
 								n.remove();
 							} else {
-								$jq(this).css('display', 'inline-block')
+								$jq(this).css("display", "block");
 								var ca = this.className.split("|");
 								if (($jq("a[name='"+ca[3]+"']").length < 1) && Settings.gets("Enable cross-thread inline replies")) {
 									Posts.getcrossthread(this, ca[3]);
