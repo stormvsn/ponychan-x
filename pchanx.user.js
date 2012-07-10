@@ -253,6 +253,8 @@ function ponychanx() {
 			if (!$jq("#qr").length) return;
 			if (QR.ajax != null) { QR.ajax.abort(); return; }
 			var sb = $jq("#qr > input[type='button']");
+			sb.val("...");
+			QR.settitle("");
 			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var d = new FormData();
 			d.append("board", Main.bid);
@@ -297,7 +299,7 @@ function ponychanx() {
 				QR.storefields();
 				QR.ajax = null;
 			}).fail(function(xhr, s) {
-					s == "abort" ? QR.settitle("Posting aborted") : QR.settitle("(" + xhr.status + ") An error occured while posting");
+					QR.settitle(xhr.status == 0 ? s == "abort" ? "Posting aborted" : "Connection error with ponychan" : "(" + xhr.status + ") An error occured while posting");
 					sb.val("Retry");
 					QR.ajax = null;
 			});
