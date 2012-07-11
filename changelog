@@ -1,3 +1,8 @@
+0.34
+- Minor fixes
+- Reverted new post counter showing 0
+- Save image link now saves as original filename
+
 0.33
 - Renamed "Download" image link to "Save" image link
 - Save image link now starts a download

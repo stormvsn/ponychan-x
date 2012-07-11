@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.33
+// @version       0.34
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 33,
+		ver: 34,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -48,7 +48,7 @@ function ponychanx() {
 		update: function() {
 			$jq("#checkupdate").text("Checking...");
 			$jq.ajax({
-					url: "http://nassign.heliohost.org/s/latest.php"
+					url: "http://www.milkyis.me/ponychanx/latest.php"
 				}).done(function(lv) {
 					Settings.set("x.update.latestversion", lv);
 					Settings.set("x.update.lastcheck", Date.now());
@@ -286,11 +286,14 @@ function ponychanx() {
 				},
 			}).done(function(rt, s, xhr) {
 				if (xhr.status == 200) {
-					Notifier._me = true;
 					if (/<title>Ponychan<\/title>/.test(rt)) {
 						QR.settitle(rt.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 						sb.val("Retry");
+					} else if (/Error connecting to database/.test(rt)) {
+						QR.settitle("Error connecting to database");
+						sb.val("Retry");
 					} else {
+						Notifier._me = true;
 						if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 							location.reload(true);
 						QR.clear(fid);
@@ -550,7 +553,6 @@ function ponychanx() {
 				ql.attr("href", "javascript:;").removeAttr("onclick").on("click", function() { QR.quote(this.innerHTML); return false; } );
 			}
 			var from = ql.html();
-			var im = $jq("a[href] span[id] img", p)[0];
 			Posts.addexpandimg(p);
 			if (eb || ei || eq) {
 				$jq("blockquote a[class]", p).each(function() {
@@ -608,10 +610,14 @@ function ponychanx() {
 				if (Settings.gets("Add google image shortcut to posts"))
 					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
 				if (Settings.gets("Add save image shortcut to posts")) {
+					var im = $jq("a[href] span[id] img", p)[0];
+					var fst = $jq(im).closest("td").find(".filesize");
+					var fnm = fst.text().match(/.*.(gif|png|jpg|mp3)/g);
+					var fn = fnm[1].replace(/^, /, "");
 					var du = im.src;
 					du = du.replace("/thumb/", "/src/");
 					du = du.replace("s.", ".");
-					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+du+"' download='"+du.split("/").pop()+"' target='_blank'>Save</a>"));
+					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+du+"' download='"+fn+"' target='_blank'>Save</a>"));
 				}
 			}
 		},
@@ -715,6 +721,7 @@ function ponychanx() {
 					if (ot.text() != "") Html.title = ot.text();
 				}
 				if (Html.title.length > 50) Html.title = Html.title.substr(0, 47) + "...";
+				Notifier.settitle(Html.title);
 			}
 		},
 		hidepostform: function() {
@@ -836,11 +843,10 @@ function ponychanx() {
 		_focus: true,
 		_me: false,
 		init: function() {
-			Notifier.settitle("(0) " + Html.title);
 			$jq(window).bind("focus", function() {
 				Notifier._new = 0;
 				Notifier._focus = true;
-				Notifier.settitle("(0) " + Html.title);
+				Notifier.settitle(Html.title);
 			});
 			$jq(window).bind("blur", function() {
 				Notifier._focus = false;
