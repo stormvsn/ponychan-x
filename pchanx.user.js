@@ -611,7 +611,7 @@ function ponychanx() {
 				if (Settings.gets("Add google image shortcut to posts"))
 					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
 				if (Settings.gets("Add save image shortcut to posts")) {
-					var fst = $jq(im).closest("td").find(".filesize");
+					var fst = $jq(im).closest("td, .op").find(".filesize");
 					var fnm = fst.text().match(/.*.(gif|png|jpg|mp3)/g);
 					var fn = fnm.length == 1 ? fnm[0] : fnm[1].replace(/^, /, "");
 					var du = im.src;
