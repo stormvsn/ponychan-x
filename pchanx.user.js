@@ -614,6 +614,7 @@ function ponychanx() {
 					var fst = $jq(im).closest("td, .op").find(".filesize");
 					var fnm = fst.text().match(/.*.(gif|png|jpg|mp3)/g);
 					var fn = fnm.length == 1 ? fnm[0] : fnm[1].replace(/^, /, "");
+					fn = fn.replace("'", "_");
 					var du = im.src;
 					du = du.replace("/thumb/", "/src/");
 					du = du.replace("s.", ".");
