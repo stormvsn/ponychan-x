@@ -606,14 +606,14 @@ function ponychanx() {
 				$jq("a:first", rb).removeAttr("onclick").attr("href", "javascript:;")
 				.on("click", function() { QR.quote(from); return false; });
 			}
+			var im = $jq("a[href] span[id] img", p)[0];
 			if (im != null) {
 				if (Settings.gets("Add google image shortcut to posts"))
 					rb.append(unescape("&nbsp;%u2022&nbsp; <a target='_blank' href='http://www.google.com/searchbyimage?image_url="+im.src+"'>Google</a> "));
 				if (Settings.gets("Add save image shortcut to posts")) {
-					var im = $jq("a[href] span[id] img", p)[0];
 					var fst = $jq(im).closest("td").find(".filesize");
 					var fnm = fst.text().match(/.*.(gif|png|jpg|mp3)/g);
-					var fn = fnm[1].replace(/^, /, "");
+					var fn = fnm.length == 1 ? fnm[0] : fnm[1].replace(/^, /, "");
 					var du = im.src;
 					du = du.replace("/thumb/", "/src/");
 					du = du.replace("s.", ".");
