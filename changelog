@@ -1,3 +1,6 @@
+0.35
+- Changed thumbnail remove method from middle click to shift+click
+
 0.34
 - Minor fixes
 - Reverted new post counter showing 0

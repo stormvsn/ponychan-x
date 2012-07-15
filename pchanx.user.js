@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.34
+// @version       0.35
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 34,
+		ver: 35,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -378,22 +378,22 @@ function ponychanx() {
 				var fU = url.createObjectURL(f[i]);
 				var thumb = document.createElement("div");
 				$jq("#imagelist").append(thumb);
-				$jq(thumb).on("mousedown", function(e) {
-					if (e.which == 1) {
+				$jq(thumb).on("click", function(e) {
+					if (e.shiftKey) {
+						$jq(this).remove();
+						QR.thumbreset();
+						url.revokeObjectURL(fU);
+					} else {
 						var upc = (Settings.gets("Unique post content per image"));
 						if (upc) $jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
 						$jq("#thumbselected").removeAttr("id");
 						this.id = "thumbselected";
 						if (upc) $jq("#qr textarea").val(this.getAttribute("data-post"));
-					} else if (e.which == 2) {
-						$jq(this).remove();
-						QR.thumbreset();
-						url.revokeObjectURL(fU);
 					}
 				});
 				$jq(thumb).attr("class", "listthumb");
 				$jq(thumb).attr("name", i);
-				$jq(thumb).attr("title", f[i].name + " (middle click to remove)");
+				$jq(thumb).attr("title", f[i].name + " (Shift+Click to remove)");
 				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
 				$jq(thumb).css("background-image", "url(" + fU + ")");
 			}
