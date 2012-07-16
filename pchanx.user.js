@@ -120,7 +120,7 @@ function ponychanx() {
 				}
 			}).fail(function(xhr) {
 				if (xhr.status == 404) {
-					Notifier.settitle("(404) " + Html.title);
+					Html.settitle("(404) " + Html.title);
 					QR.settitle("404");
 					$jq("#qr > input[type='button']").attr("disabled", "disabled").val("404");
 				} else {
@@ -286,14 +286,11 @@ function ponychanx() {
 				},
 			}).done(function(rt, s, xhr) {
 				if (xhr.status == 200) {
-					if (/<title>Ponychan<\/title>/.test(rt)) {
-						QR.settitle(rt.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
-						sb.val("Retry");
-					} else if (/Error connecting to database/.test(rt)) {
-						QR.settitle("Error connecting to database");
+					if (/<title>Ponychan<\/title>/.test(rt) || /Error connecting to database/.test(rt)) {
+						QR.settitle(rt.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1] || "An error occured trying to post");
 						sb.val("Retry");
 					} else {
-						Notifier._me = true;
+						Notifier.self = true;
 						if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 							location.reload(true);
 						QR.clear(fid);
@@ -423,6 +420,7 @@ function ponychanx() {
 						case 85: if (Settings.gets("Underline tags")) t = "u"; break;
 						case 82: if (Settings.gets("Strikethrough tags")) t = "s"; break;
 						case 81: if (Settings.gets("Show/hide quick reply")) $jq("#qr").css("display") == "block" ? QR.hide() : QR.show(); return false; break;
+						case 76: if (Settings.gets("Clear quick reply")) QR.clear(); return false; break;
 					}
 					if (t != null) {
 						var ins = "["+t+"][/"+t+"]";
@@ -724,8 +722,11 @@ function ponychanx() {
 					if (ot.text() != "") Html.title = ot.text();
 				}
 				if (Html.title.length > 50) Html.title = Html.title.substr(0, 47) + "...";
-				Notifier.settitle(Html.title);
+				Html.settitle(Html.title);
 			}
+		},
+		settitle: function(t) {
+			document.title = t;
 		},
 		hidepostform: function() {
 			var pf = $jq("#postform");
@@ -780,7 +781,7 @@ function ponychanx() {
 			<br /><br /><strong>More</strong><br />\
 			<a target='_blank' href='http://www.ponychan.net/chan/meta/res/115168+50.html'>View support thread</a>");
 			if (ke)
-				or.append("<br /><a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show/hide quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View keybinds</a>");
+				or.append("<br /><a href='javascript:;' onclick=\"javascript:alert('Ctrl+Q - Show/hide quick reply\\nCtrl+L - Clear quick reply\\nCtrl+S - [?][/?] - Spoiler tags\\nCtrl+U - [u][/u] - Underline tags\\nCtrl+B - [b][/b] - Bold tags\\nCtrl+R - [s][/s] - Strikethrough tags\\nCtrl+I - [i][/i] - Italic tags');\">View keybinds</a>");
 			or.append($jq("<br /><a href='javascript:;'>Reset quick reply</a>").on("click", function() { QR.resetpos(); }));
 			or.append($jq("<br /><a id='checkupdate' href='javascript:;'>Check for update</a>").on("click", function() { Main.update(); }));
 			ow.insertAfter(".adminbar");
@@ -842,31 +843,23 @@ function ponychanx() {
 	};
 	
 	var Notifier = {
-		_new: 0,
-		_focus: true,
-		_me: false,
+		unread: 0,
+		self: false,
 		init: function() {
-			$jq(window).bind("focus", function() {
-				Notifier._new = 0;
-				Notifier._focus = true;
-				Notifier.settitle(Html.title);
-			});
-			$jq(window).bind("blur", function() {
-				Notifier._focus = false;
+			$jq(window).on("scroll", function() {
+				Notifier.unread = 0;
+				Html.settitle(Html.title);
 			});
 		},
 		newhandle: function(e) {
-			if (Notifier._me) { Notifier._me = false; return; }
-			if (Notifier._focus) return;
-			++Notifier._new;
-			Notifier.settitle("("+Notifier._new+") "+ Html.title);
+			var d = document;
+			if (Notifier.self) {
+				Notifier.self = false;
+				return;
+			}
+			if (d.hidden || d.oHidden || d.mozHidden || d.webkitHidden)
+				Html.settitle("("+ ++Notifier.unread +") "+ Html.title);
 		},
-		settitle: function(t) {
-			setTimeout(function() {
-				document.title = ".";
-				document.title = t;
-			}, 1000);
-		}
 	};
 	
 	var Settings = {
@@ -910,6 +903,7 @@ function ponychanx() {
 			"Hide namefields": { def: "false", cat: "Other" },
 			"Enable keybinds": { def: "true", cat: "Keybinds" },
 			"Show/hide quick reply": { def: "true", cat: "Keybinds" },
+			"Clear quick reply": { def: "true", cat: "Keybinds" },
 			"Spoiler tags": { def: "true", cat: "Keybinds" },
 			"Underline tags": { def: "true", cat: "Keybinds" },
 			"Bold tags": { def: "true", cat: "Keybinds" },
