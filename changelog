@@ -1,5 +1,5 @@
 0.36
-- Fixed script not starting in mod OP threads
+- Fixed script not starting in some threads
 
 0.35
 - Changed thumbnail remove method from middle click to shift+click
