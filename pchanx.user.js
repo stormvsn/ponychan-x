@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.35
+// @version       0.36
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 35,
+		ver: 36,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -613,12 +613,14 @@ function ponychanx() {
 				if (Settings.gets("Add save image shortcut to posts")) {
 					var fst = $jq(im).closest("td, .op").find(".filesize");
 					var fnm = fst.text().match(/.*.(gif|png|jpg|mp3)/g);
-					var fn = fnm.length == 1 ? fnm[0] : fnm[1].replace(/^, /, "");
-					fn = fn.replace("'", "_");
-					var du = im.src;
-					du = du.replace("/thumb/", "/src/");
-					du = du.replace("s.", ".");
-					rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+du+"' download='"+fn+"' target='_blank'>Save</a>"));
+					if (fnm != null) {
+						var fn = fnm.length == 1 ? fnm[0] : fnm[1].replace(/^, /, "");
+						fn = fn.replace("'", "_");
+						var du = im.src;
+						du = du.replace("/thumb/", "/src/");
+						du = du.replace("s.", ".");
+						rb.append(unescape(" &nbsp;%u2022&nbsp; <a href='"+du+"' download='"+fn+"' target='_blank'>Save</a>"));
+					}
 				}
 			}
 		},
