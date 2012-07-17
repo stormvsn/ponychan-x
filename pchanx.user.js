@@ -632,7 +632,7 @@ function ponychanx() {
 		},
 		newpostupdate: function(p) {
 			var timezone = getCookie('timezone');
-			timezone = timezone === '' ? -8 : parseInt(timezone, 10);
+			timezone = timezone === '' ? -8 : parseFloat(timezone);
 			var timeFormat = 'ddd, MMM d, yyyy ' + (getCookie('twelvehour') !== '0' ? 'h:mm tt' : 'H:mm');
 			$jq(".posttime",p).html(Date.parse($jq(".posttime",p).text()).addHours(8 + timezone).toString(timeFormat)
 				.replace(/([AP]M)$/, '<span style="font-size:0.75em">$1</span>'));
