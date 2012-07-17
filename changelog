@@ -1,3 +1,7 @@
+0.37
+- Added Clear quick reply keybind (Ctrl+L)
+- Updated timezone setting on new posts
+
 0.36
 - Fixed script not starting in some threads
 
