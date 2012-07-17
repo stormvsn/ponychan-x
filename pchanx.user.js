@@ -843,23 +843,31 @@ function ponychanx() {
 	};
 	
 	var Notifier = {
-		unread: 0,
+		unread: [],
 		self: false,
 		init: function() {
-			$jq(window).on("scroll", function() {
-				Notifier.unread = 0;
-				Html.settitle(Html.title);
-			});
+			$jq(window).on("scroll", Notifier.scroll);
 		},
-		newhandle: function(e) {
-			var d = document;
+		newhandle: function(p) {
+			if (!Settings.gets("Show new post count in title")) return;
 			if (Notifier.self) {
 				Notifier.self = false;
 				return;
 			}
-			if (d.hidden || d.oHidden || d.mozHidden || d.webkitHidden)
-				Html.settitle("("+ ++Notifier.unread +") "+ Html.title);
+			if (p.getBoundingClientRect().bottom > document.documentElement.clientHeight) {
+				Notifier.unread.push(p);
+				Html.settitle("(" + Notifier.unread.length+") " + Html.title);
+			}
 		},
+		scroll: function() {
+			var r = 0;
+			for (var i = 0, l = Notifier.unread.length; i < l; i++) {
+				if (Notifier.unread[i].getBoundingClientRect().bottom < document.documentElement.clientHeight)
+					r++;
+			}
+			Notifier.unread = Notifier.unread.slice(r);
+			Html.settitle(Notifier.unread.length > 0 ? "(" + Notifier.unread.length+") " + Html.title : Html.title);
+		}
 	};
 	
 	var Settings = {
