@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.36
+// @version       0.37
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 36,
+		ver: 37,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
@@ -294,6 +294,7 @@ function ponychanx() {
 						if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 							location.reload(true);
 						QR.clear(fid);
+						QR.cooldowntimer();
 					}
 				}
 				QR.storefields();
@@ -336,7 +337,6 @@ function ponychanx() {
 			$jq("#qr .postopts :input[name='nsfw']").attr("checked", false);
 			if (Settings.gets("Hide quick reply after posting") && !$jq("#qr .postopts :input[name='auto']").is(":checked"))
 				QR.hide();
-			QR.cooldowntimer();
 		},
 		thumbreset: function() {
 			if ($jq("#thumbselected").length < 1) {
