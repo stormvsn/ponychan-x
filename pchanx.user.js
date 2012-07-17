@@ -849,12 +849,13 @@ function ponychanx() {
 			$jq(window).on("scroll", Notifier.scroll);
 		},
 		newhandle: function(p) {
+			var d = document;
 			if (!Settings.gets("Show new post count in title")) return;
 			if (Notifier.self) {
 				Notifier.self = false;
 				return;
 			}
-			if (p.getBoundingClientRect().bottom > document.documentElement.clientHeight) {
+			if (p.getBoundingClientRect().bottom > d.documentElement.clientHeight || (d.hidden || d.oHidden || d.mozHidden || d.webkitHidden)) {
 				Notifier.unread.push(p);
 				Html.settitle("(" + Notifier.unread.length+") " + Html.title);
 			}
