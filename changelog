@@ -1,3 +1,7 @@
+0.38
+- New post counter now counts down read posts rather than resetting
+- Fixed empty OP threads having the wrong title
+
 0.37
 - Added Clear quick reply keybind (Ctrl+L)
 - Updated timezone setting on new posts
