@@ -719,7 +719,7 @@ function ponychanx() {
 					Html.title = ft.text();
 				} else {
 					var ot = $jq(".thread .op blockquote");
-					if (ot.text() != "") Html.title = ot.text();
+					if (ot.text().trim().length != 0) Html.title = ot.text();
 				}
 				if (Html.title.length > 50) Html.title = Html.title.substr(0, 47) + "...";
 				Html.settitle(Html.title);
