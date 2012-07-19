@@ -40,8 +40,7 @@ function ponychanx() {
 			if (Settings.gets("Autoupdate watched threads list")) setTimeout(function() { Updater.getwatched(); }, 10000);
 			if (Settings.gets("Automatically check for updates")) Main.autoupdate();
 			if (Main.tid != "0" && pf.length) {
-				if (Settings.gets("Enable autoupdate")) Updater.init();	
-				if (Settings.gets("Show autoupdate countdown dialog") && Settings.gets("Enable autoupdate")) Dialog.init();
+				if (Settings.gets("Enable autoupdate")) Updater.init();
 				if (Settings.gets("Show new post count in title")) Notifier.init();
 			}
 		},
@@ -81,21 +80,29 @@ function ponychanx() {
 	};
 	
 	Updater = {
-		tmr: 10000,
-		last: "",
+		timer: 10000,
+		last: null,
+		left: 0,
 		init: function() {
 			var stmr = Settings.get("x.updatetimer");
-			if (stmr != null) Updater.tmr = parseInt(stmr)*1000;
-			setTimeout(function() { Updater.get(); }, Updater.tmr);
+			if (stmr != null) Updater.timer = parseInt(stmr)*1000;
+			Updater.dialog();
+			Updater.countdown(true);
 		},
-		get: function() {
+		countdown: function(r) {
+			if (r) Updater.left = Updater.timer/1000;
+			$jq("#dialog #countdown").text(Updater.left--);
+			Updater.left == -1 ? Updater.update() : setTimeout(Updater.countdown, 1000);
+		},
+		dialog: function() {
+			$jq("body").append($jq("<div id='dialog'><span id='countdown'></span> </div>").append($jq("<a href='javascript:;'><img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAYAAACkTj4ZAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAx5JREFUeNo0U11oFFcYPd+98+PM7rg7u01s6xr8ibiJgfhgTf8oLTaltJUi9MUnS7FF8EEFEepDEfpSKBYfAyqUQtrmxf7lSWhpTWkRasAqaURLq2JMkN24JrszmZ25X79J6MCdC9/Md+75zjmXoADyAGSA2kBQPQBHvNUboYPuML1qPYUad02a/I1b8RV8r4oYb0+gBekhactfyiPZ/gcysgKCu4veLL2jPnUHMECaVusmM2DDMAmj8xNfap3DUW5ilnysPjmQzhHJEhYrgL2RRnpO2l96g3oLkUK2BCSzuGfaHOmiKpIGrH7e5mzRzyXX8LNpoUFO3p8DCSNVEGoOgsoH9pniS/bufMx4hu+0xrPT6UNzdvk7/ia5iTlrE223fDsoP+8/7W7XI+1f0ymzhIby8yHlFJKRvBfVC5t/9Bs7/gp48yW/ZW3Cvpy23S+n1eTHAlD9yLlYv1HinbMhDz0IuXbev6KqVKeikLF6CMGooBnqd3t1RXsK7an0l9J+54fSARvd2yz6QFXet09V97t79TqC6Ypei4zyPmfPxrPeV7qqhrU/qk8Eo/bp4rP2a27N2pDrj4wsVcZeqxfvxjPmrpQqwSvWsXSBH6UtxM6TFDID7avp/bRpYsNcgNWnhmuf+9NDC2UenJF1PeSdt0Kuz5SiymHngiohFFdFSax6VDnijA38U+L6zfUcvGV9nAdA9PVU1jTX5o5HBxa/TX6nUm4hI1sxaExEfzTHkkOFt/Wi/4bKw9HRvdghMrxuVjJ0m1nanTd/Sl24IdJ6vczc5Eb7t/Sy3YdnRNxa524sxnVd/QR5VEDHqlCgQnq5csj+zBtSg5C4LF9Op1sT6SeSkuXVCOmqAHVE0EgMrFJ/+QSNO7vNHsWiVqrQncO/itSyqLfN7pHo2Yx0AdH8h8l7yQ18nTvGMUPnGeBEEG0x7jGa8VWe0lXUrT5sVS7BCqmsQ+rVBdgsSq3c5ubiWHoqucNfIBUdaO16rQF116KeZwoRGsk0JtN5PGTNRThsy/c4uc/3liazyUfnspNybS6CyfDj/H6sAf0nwADKKTlgROF51gAAAABJRU5ErkJggg==' width='18' height='13' alt='Autoupdate' title='Update now' /></a>").on("click", function() { Updater.left = 0; })));
+		},
+		update: function() {
 			$jq.ajax({
 				headers: {"If-Modified-Since": Updater.last},
 				url: Main.durl,
 				cache: false
 			}).done(function(rt, s, xhr) {
-				setTimeout(function() { Updater.get(); }, Updater.tmr);
-				if (Settings.gets("Show autoupdate countdown dialog")) Dialog.countdown();
 				if (xhr.status == 200) {
 					Updater.last = xhr.getResponseHeader("Last-Modified");
 					$jq("#postform :input[name='how_much_pony_can_you_handle']").val($jq("#postform :input[name='how_much_pony_can_you_handle']", rt).val());
@@ -118,14 +125,14 @@ function ponychanx() {
 						}
 					});
 				}
+				Updater.countdown(true);
 			}).fail(function(xhr) {
 				if (xhr.status == 404) {
 					Html.settitle("(404) " + Html.title);
 					QR.settitle("404");
 					$jq("#qr > input[type='button']").attr("disabled", "disabled").val("404");
 				} else {
-					setTimeout(function() { Updater.get(); }, Updater.tmr);
-					if (Settings.gets("Show autoupdate countdown dialog")) Dialog.countdown();
+					Updater.countdown(true);
 				}
 			});
 		},
@@ -442,25 +449,6 @@ function ponychanx() {
 		}
 	};
 	
-	var Dialog = {
-		left: 0,
-		init: function() {
-			$jq("body").append($jq("<div id='dialog'><span id='d-countdown'></span><br /><span id='d-update-now'></span></div>"));
-			Dialog.left = Updater.tmr/1000;
-			Dialog.countdown();
-		},
-		countdown: function() {
-			if (Dialog.left > -1) {
-				$jq("#dialog #d-countdown").html("Autoupdate: " + Dialog.left);
-				Dialog.left--;
-				setTimeout(function() {	Dialog.countdown(); }, 1000);
-			} else {
-				Dialog.left = Updater.tmr/1000;
-				$jq("#dialog #d-countdown").html("Autoupdate: ..");
-			}
-		}
-	};
-	
 	var Posts = {
 		init: function() {
 			Posts.addhandles();
@@ -710,6 +698,8 @@ function ponychanx() {
 	var Html = {
 		title: document.title,
 		init: function() {
+			$jq("link[rel$=icon]").replaceWith("");
+			$jq("<link rel='shortcut icon' type='image/x-icon' />").appendTo("head").attr("href", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAphJREFUeNpkU89LVFEUPvfHPGfMYKqpCUH8gSiOZERRGliSzNLIEDcVuIgiaBBy0yb69QcE1aJNtiiIwKAirDAowo2YC0GyTCKoibIoNObNzJv37u07NoMzeOHj3XvuPed83znnCft8hkqrIIgMrVtnqiwNT1QFI/eq/WzE0uRfQXIgp3P9riL9MBKQwittibo9RdV2XZCBQFDrDl8mo4ZGVyR111gKWgvyNV/qBxGfwnDKIbsF+rKK8qIiwCKuD0WsqFck6k9n1PftRiYbfFEXSLqrN+CWA/Dy19M/AISZ3btQ0LO3IE2npzpwbEaSU6sMyl/LtS1zuABchE26wiKAifZnQ0eR5AskncTd7YoA7OyuUY8AKTZz9rmQpZ2oz2ZDS8ichP1DyUeXp8wIWzq6wE3YejOCXlYRxVp8mfIEbYN9D7qyGmBZVkpogHsU3x7gFnAZuMpNafJlGzqT4vBwDs+FDM2B2rTjk0YGprkpIIpvDUQMb64Bn4FH7Bz6H3we+/NQ0gbnp9drCk6OyFMwysGs1tDWjkeOJ2xpBDrKpRVL8wSMO5elPe4RJdD0FoeoRg+46kpSybq0tLPPwkH7D2UNmNRjKjvhNAtki7GafAxUoqD2x0zwptmX8S5PJUTuxcwnTGIjV3tBGzPtGDnoah4qA9MUHI8AS8A+x9LER23cKcfcP5HRB0Etz504DP2jaM9bVFo2+pIWteHR5rsuoBY4B4xD38Z5beK9eTVsBK3AZ4gZlOSehdYbrBdZLqHyXxHhN1i8gikNltU/pTVpZeRuT31DS3cxs/I2RktTAH3j2E8Xz/yvjSDwll/STrb4agy1qC2ye1weYAw4Bqc/+L4vswc8F/yfsDy09Q6k9OG4wJf/BBgA+8b4itdkXQIAAAAASUVORK5CYII=");
 			Html.options();
 			Html.css();
 			Html.catalog();
@@ -733,7 +723,7 @@ function ponychanx() {
 			if (Settings.gets("Hide original post form") && pf.length) {
 				pf.css({"visibility":"hidden", "height":"0"});
 				var a = document.createElement("a");
-				Main.tid == "0" ? a.innerHTML = "<h2>New Thread</h2>" : a.innerHTML = "<h2>Quick Reply</h2>";
+				a.innerHTML = Main.tid == "0" ? "<h2>New Thread</h2>" : "<h2>Quick Reply</h2>";
 				a.href = "javascript:;";
 				a.onclick = function() { QR.show(); };
 				var topf = document.createElement("a");
@@ -893,7 +883,6 @@ function ponychanx() {
 			"Hide quick reply when top button clicked": { def: "false", cat: "Quick reply" },
 			"Unique post content per image": { def: "false", cat: "Quick reply" },
 			"Enable autoupdate": { def: "true", cat: "Autoupdate" },
-			"Show autoupdate countdown dialog": { def: "true", cat: "Autoupdate" },
 			"Show new post count in title": { def: "true", cat: "Autoupdate" },
 			"Autoupdate watched threads list": { def: "false", cat: "Autoupdate" },
 			"Expand images on hover": { def: "false", cat: "Posts" },
