@@ -145,9 +145,11 @@ function ponychanx() {
 	};
 	
 	var QR = {
-		cooldown: 15,
+		timer: 15,
 		ajax: null,
-		action: "",
+		action: null,
+		images: [],
+		selected: null,
 		init: function() {
 			Html.hidepostform();
 			if (Settings.get("x.show") == "true") QR.show();
@@ -177,7 +179,7 @@ function ponychanx() {
 		},
 		show: function() {
 			Settings.set("x.show", "true");
-			$jq("#qr").css("display", "block");
+			$jq("#qr").show();
 			if ($jq("#qr").length) return;
 			var qr = document.createElement("div");
 			qr.setAttribute("id", "qr");
@@ -208,17 +210,17 @@ function ponychanx() {
 				</div>';
 			}
 			$jq("body").append(qr);
-			$jq("#qr .close a").on("click", function() { QR.hide(); });
+			$jq("#qr .close a").on("click", QR.hide);
 			$jq(window).resize(function() {
 				if ($jq("#qr").position().left+410 > document.documentElement.clientWidth) {
 					$jq("#qr").css("left", document.documentElement.clientWidth-410);
 					Settings.set("x.qrpos_x", $jq("#qr").css("left"));
 				}
 			});
-			if (Settings.gets("Hide quick reply when top button clicked")) $jq("#qr .top a:first").on("click", function() { QR.hide(); });
+			if (Settings.gets("Hide quick reply when top button clicked")) $jq("#qr .top a:first").on("click", QR.hide);
 			var btn = $jq("#qr > input[type='button']");
 			if (Main.tid == "0") btn.val("Thread"); 
-			btn.on("click", function() { QR.send(); });
+			btn.on("click", QR.send);
 			if (Settings.gets("Sync original post form and quick reply")) {
 				$jq("#qr > input[name], #qr textarea").on("input", function() {
 					$jq("#postform").find("[name='"+this.name+"']").val(this.value);
@@ -227,9 +229,8 @@ function ponychanx() {
 					$jq("#qr").find("[name='"+this.name+"']").val(this.value);
 				});
 			}
-			
-			QR.loadfields();
-			document.getElementById("imgfile").onchange = function() { QR.thumb(); };
+			QR.load();
+			document.getElementById("imgfile").onchange = QR.add;
 			var x = Settings.get("x.qrpos_x");
 			var y = Settings.get("x.qrpos_y");
 			if (x != null) $jq("#qr").css("left", x);
@@ -258,18 +259,21 @@ function ponychanx() {
 		},
 		send: function() {
 			if (!$jq("#qr").length) return;
-			if (QR.ajax != null) { QR.ajax.abort(); return; }
+			if (QR.ajax != null) {
+				QR.ajax.abort();
+				return;
+			}
+			var sel = $jq("#thumbselected");
+			var si = QR.selected;
 			var sb = $jq("#qr > input[type='button']");
 			sb.val("...");
 			QR.settitle("");
-			var fid = parseInt($jq("#thumbselected").attr("name"));
 			var d = new FormData();
 			d.append("board", Main.bid);
 			d.append("replythread", Main.tid);
 			d.append("ponychanx", Main.ver);
 			d.append("stats_referrer", "");
-			if (!$jq("input[name='nofile']", "#qr").is(":checked"))
-				d.append("imagefile", document.getElementById("imgfile").files[fid]);
+			if (!$jq("input[name='nofile']", "#qr").is(":checked") && si != null) d.append("imagefile", si);
 			d.append("quickreply", $jq("#postform :input[name='quickreply']").val());
 			d.append("postpassword", $jq("#postform :input[name='postpassword']").val());
 			d.append("how_much_pony_can_you_handle", $jq("#postform :input[name='how_much_pony_can_you_handle']").val());
@@ -300,11 +304,11 @@ function ponychanx() {
 						Notifier.self = true;
 						if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
 							location.reload(true);
-						QR.clear(fid);
-						QR.cooldowntimer();
+						QR.clear(sel);
+						QR.cooldown();
 					}
 				}
-				QR.storefields();
+				QR.store();
 				QR.ajax = null;
 			}).fail(function(xhr, s) {
 					QR.settitle(xhr.status == 0 ? s == "abort" ? "Posting aborted" : "Connection error with ponychan" : "(" + xhr.status + ") An error occured while posting");
@@ -313,25 +317,23 @@ function ponychanx() {
 			});
 			
 		},
-		cooldowntimer: function() {
-			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.cooldown);
-			if (QR.cooldown > 0) {
-				setTimeout(function() { QR.cooldowntimer(); }, 1000);
-				var a = $jq("#qr .postopts :input[name='auto']").is(":checked") ? "Auto " : "";
-				$jq("#qr > input[type='button']").val(a+QR.cooldown);
-				QR.cooldown--;
+		cooldown: function() {
+			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.timer);
+			if (QR.timer > 0) {
+				setTimeout(QR.cooldown, 1000);
+				$jq("#qr > input[type='button']").val(($jq("#qr .postopts :input[name='auto']").is(":checked") ? "Auto " : "") + QR.timer);
+				QR.timer--;
 			} else {
 				$jq("#qr > input[type='button']").removeAttr("disabled").val(Main.tid == "0" ? "Thread" : "Reply");
-				QR.cooldown = 15;
-				if ($jq("#qr .postopts :input[name='auto']").is(":checked") && $jq(".listthumb").length > 0)
-					QR.send();
+				QR.timer = 15;
+				if ($jq("#qr .postopts :input[name='auto']").is(":checked") && $jq(".listthumb").length) QR.send();
 			}
 		},
-		clear: function(fid) {
+		clear: function(sel) {
 			$jq("#postform :input[name='quickreply']").val("");
 			QR.settitle("");
-			$jq(".listthumb[name='"+fid+"']").remove();
-			QR.thumbreset();
+			if (!sel) sel = $jq("#thumbselected");
+			sel.trigger("rm");
 			var ts = $jq("#thumbselected");
 			var tsp = ts.length > 0 ? ts.attr("data-post") : "";
 			$jq("#qr textarea").val(tsp);
@@ -345,72 +347,69 @@ function ponychanx() {
 			if (Settings.gets("Hide quick reply after posting") && !$jq("#qr .postopts :input[name='auto']").is(":checked"))
 				QR.hide();
 		},
-		thumbreset: function() {
-			if ($jq("#thumbselected").length < 1) {
-				if ($jq(".listthumb").length > 0) {
-					$jq($jq(".listthumb")[0]).attr("id", "thumbselected");
-					document.getElementById("imagelist").scrollTop = 0;
-					$jq("#qr textarea").val($jq("#thumbselected").attr("data-post"));
-				} else {
-					$jq("#imagelist, .postopts").hide();
-					$jq("#qr input[type='file']").val("");
-					$jq("#qr .postopts :input[name='auto']").attr("checked", false);
-				}
-			}
-			$jq("#imgnum").text("(" + $jq(".listthumb").length + ")");
-		},
-		thumb: function() {
-			var f = document.getElementById("imgfile").files;
+		add: function() {
 			QR.settitle("");
-			var po = $jq("#imagelist, .postopts");
-			if (f[0] == null) {
-				po.hide();
-				$jq("#imagelist").html("");
-				return;
-			}
-			$jq("#imagelist").html("");
+			var fl = document.getElementById("imgfile").files;
+			if (fl.length == 0) return;
 			var url = window.URL || window.webkitURL;
-			for (var i = 0, len = f.length; i < len; i++) {
-				if (f[i].size > $jq("#postform input[name='MAX_FILE_SIZE']").val()) {
-					QR.settitle(f[i].name + " is too large");
+			var max = $jq("#postform input[name='MAX_FILE_SIZE']").val();
+			for (var i = 0, len = fl.length; i < len; i++) {
+				var f = fl[i];
+				if (f.size > max) {
+					QR.settitle(f.name + " is too large");
 					continue;
 				}
-				if (!/^image/.test(f[i].type)) {
-					QR.settitle(f[i].name + " is not an image");
+				if (!/^image/.test(f.type)) {
+					QR.settitle(f.name + " is not an image");
 					continue;
 				}
-				var fU = url.createObjectURL(f[i]);
-				var thumb = document.createElement("div");
+				QR.images.push(f);
+				var sf = QR.images[QR.images.length-1];
+				var fu = url.createObjectURL(sf);
+				var thumb = $jq("<div />");
 				$jq("#imagelist").append(thumb);
-				$jq(thumb).on("click", function(e) {
-					if (e.shiftKey) {
-						$jq(this).remove();
-						QR.thumbreset();
-						url.revokeObjectURL(fU);
-					} else {
-						var upc = (Settings.gets("Unique post content per image"));
-						if (upc) $jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
-						$jq("#thumbselected").removeAttr("id");
-						this.id = "thumbselected";
-						if (upc) $jq("#qr textarea").val(this.getAttribute("data-post"));
-					}
-				});
-				$jq(thumb).attr("class", "listthumb");
-				$jq(thumb).attr("name", i);
-				$jq(thumb).attr("title", f[i].name + " (Shift+Click to remove)");
-				if ($jq("#thumbselected").length < 1) $jq(thumb).attr("id", "thumbselected");
-				$jq(thumb).css("background-image", "url(" + fU + ")");
+				thumb.attr("class", "listthumb").attr("title", sf.name + " (Shift+Click to remove)").css("background-image", "url(" + fu + ")");
+				(function(thumb, sf, fu) {
+					thumb.bind("click", function(e) {
+						if (e.shiftKey) {
+							thumb.trigger("rm");
+						} else {
+							QR.selected = sf;
+							var upc = Settings.gets("Unique post content per image");
+							if (upc) $jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
+							$jq("#thumbselected").removeAttr("id");
+							this.id = "thumbselected";
+							if (upc) $jq("#qr textarea").val(this.getAttribute("data-post"));
+						}
+					}).bind("rm", function() {
+						url.revokeObjectURL(fu);
+						thumb.remove();
+						QR.selected = null;
+						QR.images.splice(QR.images.indexOf(sf), 1);
+						delete sf;
+						$jq("#imgnum").text("(" + QR.images.length + ")");
+						if (!$jq("#thumbselected").length) {
+							if ($jq(".listthumb").length) {
+								$jq(".listthumb").first().click();
+							} else {
+								$jq(".postopts").hide();
+							}
+						}
+					});
+					if (!$jq("#thumbselected").length) thumb.click();
+				})(thumb, sf, fu);
 			}
-			$jq(".listthumb").length ? po.show() : po.hide();
-			$jq("#imgnum").text("(" + $jq(".listthumb").length + ")");
+			$jq("#imgfile").val("");
+			if (QR.images.length) $jq(".postopts").show();
+			$jq("#imgnum").text("(" + QR.images.length + ")");
 		},
-		loadfields: function() {
+		load: function() {
 			var ln = getCookie("name");
 			var le = getCookie("email");
 			$jq("#qr :input[name='name']").val(ln == null ? "" : ln);
 			$jq("#qr :input[name='em']").val(le == null ? "" : le);
 		},
-		storefields: function() {
+		store: function() {
 			set_cookie("name", $jq("#qr :input[name='name']").val(), -1);
 			var eu = $jq("#qr :input[name='em']").val();
 			if(eu != "sage" && eu != "\u4E0B\u3052")
@@ -442,7 +441,7 @@ function ponychanx() {
 				}
 			});
 		},
-		resetpos: function() {
+		reset: function() {
 			$jq("#qr").css("top", "46px").css("left", "83px");
 			Settings.set("x.qrpos_x", $jq("#qr").css("left"));
 			Settings.set("x.qrpos_y", $jq("#qr").css("top"));
@@ -821,7 +820,7 @@ function ponychanx() {
 			.postopts .auto { float: right; margin: 1px 2px 0 0 !important; }\
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
 			.listthumb { cursor: pointer; opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
-			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
+			#imagelist { overflow-y: scroll; max-height: 73px; margin: 2px; background-size: cover; }\
 			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
 			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
@@ -899,7 +898,7 @@ function ponychanx() {
 			"Expand images on hover": { def: "false", cat: "Posts" },
 			"Enable inline replies": { def: "true", cat: "Posts" },
 			"Enable backlinks": {def: "true", cat: "Posts" },
-			"Enable hide post buttons": { def: "true", cat: "Posts" },
+			"Enable hide post buttons": { def: "false", cat: "Posts" },
 			"Enable cross-thread inline replies": { def: "true", cat: "Posts" },
 			"Animate gif thumbnails": { def: "true", cat: "Posts" },
 			"Add google image shortcut to posts": { def: "true", cat: "Posts" },
