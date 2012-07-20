@@ -813,10 +813,11 @@ function ponychanx() {
 			#updatetimer { width: 30px; }\
 			#pxoptions { z-index: 3200; width: 503px; height: 490px; overflow-y: scroll; box-shadow: 3px 3px 8px #666; display: none; font-size: 13px; padding: 10px; position: absolute; background-color: gray; border: 1px solid black; top: 32px; right: 185px; }\
 			#pxoptions a { text-decoration: underline; }\
+			#pxoptions label { cursor: pointer; }\
 			#qr * { margin: 0; padding: 0; }\
 			#imgfile { margin-right: 3px; }\
 			.postopts { clear: both; display: none; margin-left: 2px !important; }\
-			#qr label, .postopts label { font-size: small; }\
+			#qr label, .postopts label { cursor: pointer; font-size: small; }\
 			.postopts .auto { float: right; margin: 1px 2px 0 0 !important; }\
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
 			.listthumb { cursor: pointer; opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
