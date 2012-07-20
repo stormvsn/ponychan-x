@@ -819,7 +819,7 @@ function ponychanx() {
 			#qr label, .postopts label { font-size: small; }\
 			.postopts .auto { float: right; margin: 1px 2px 0 0 !important; }\
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
-			.listthumb { opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
+			.listthumb { cursor: pointer; opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
 			#imagelist { height: 73px; overflow-y: scroll; margin: 2px; display: none; background-size: cover; }\
 			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
 			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
