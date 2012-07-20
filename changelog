@@ -1,3 +1,7 @@
+0.39
+- Added favicon to show thread has unread replies
+- Added button next to autoupdate countdown to update now
+
 0.38
 - New post counter now counts down read posts rather than resetting
 - Fixed empty OP threads having the wrong title
@@ -13,7 +17,6 @@
 - Changed thumbnail remove method from middle click to shift+click
 
 0.34
-- Minor fixes
 - Reverted new post counter showing 0
 - Save image link now saves as original filename
 

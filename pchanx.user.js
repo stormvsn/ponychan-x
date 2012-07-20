@@ -8,7 +8,7 @@
 // @contributor   Guardian
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
-// @version       0.38
+// @version       0.39
 // @icon          http://i.imgur.com/3MFtd.png
 // @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/pchanx.user.js
 // @homepage      http://www.ponychan.net/chan/meta/res/115168+50.html
@@ -21,7 +21,7 @@ function ponychanx() {
 	$jq = jQuery.noConflict();
 	
 	var Main = {
-		ver: 38,
+		ver: 39,
 		bid: null,
 		tid: null,
 		durl: document.URL.split("#")[0],
