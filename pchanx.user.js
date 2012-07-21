@@ -368,7 +368,7 @@ function ponychanx() {
 				var fu = url.createObjectURL(sf);
 				var thumb = $jq("<div />");
 				$jq("#imagelist").append(thumb);
-				thumb.attr("class", "listthumb").attr("title", sf.name + " (Shift+Click to remove)").css("background-image", "url(" + fu + ")");
+				thumb.attr("class", "listthumb").attr("title", sf.name + " (" + (sf.size/1024).toFixed(0) + " KB) (Shift+Click to remove)").css("background-image", "url(" + fu + ")");
 				(function(thumb, sf, fu) {
 					thumb.bind("click", function(e) {
 						if (e.shiftKey) {
@@ -384,15 +384,14 @@ function ponychanx() {
 					}).bind("rm", function() {
 						url.revokeObjectURL(fu);
 						thumb.remove();
-						QR.selected = null;
+						QR.selected = sf = null;
 						QR.images.splice(QR.images.indexOf(sf), 1);
-						delete sf;
 						$jq("#imgnum").text("(" + QR.images.length + ")");
 						if (!$jq("#thumbselected").length) {
 							if ($jq(".listthumb").length) {
 								$jq(".listthumb").first().click();
 							} else {
-								$jq(".postopts").hide();
+								$jq(".postopts, #imagelist").hide();
 							}
 						}
 					});
@@ -400,7 +399,7 @@ function ponychanx() {
 				})(thumb, sf, fu);
 			}
 			$jq("#imgfile").val("");
-			if (QR.images.length) $jq(".postopts").show();
+			if (QR.images.length) $jq(".postopts, #imagelist").show();
 			$jq("#imgnum").text("(" + QR.images.length + ")");
 		},
 		load: function() {
@@ -819,8 +818,9 @@ function ponychanx() {
 			#qr label, .postopts label { cursor: pointer; font-size: small; }\
 			.postopts .auto { float: right; margin: 1px 2px 0 0 !important; }\
 			#thumbselected { opacity: 1 !important; border: 1px solid black; }\
-			.listthumb { cursor: pointer; opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
-			#imagelist { overflow-y: scroll; max-height: 73px; margin: 2px; background-size: cover; }\
+			.listthumb { -webkit-transition: opacity .15s ease-in-out; -moz-transition: opacity .15s ease-in-out; transition: opacity .15s ease-in-out; -o-transition: opacity .15s ease-in-out; cursor: pointer; opacity: 0.6; display: inline-block; margin-right: 2px !important; border: 1px solid darkgray; width: 71px; height: 71px; background-size: cover; }\
+			.listthumb:hover { border: 1px solid darkgray; opacity: 1; }\
+			#imagelist { overflow-y: scroll; display:none; height: 73px; margin: 2px; background-size: cover; }\
 			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
 			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
