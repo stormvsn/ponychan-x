@@ -330,7 +330,6 @@ function ponychanx() {
 			}
 		},
 		clear: function(sel) {
-			$jq("#postform :input[name='quickreply']").val("");
 			QR.settitle("");
 			if (!sel) sel = $jq("#thumbselected");
 			sel.trigger("rm");
@@ -339,6 +338,7 @@ function ponychanx() {
 			var auto = $jq("#qr .postopts :input[name='auto']");
 			$jq("#qr textarea").val(tsp);
 			$jq("#qr input[name='subject']").val("");
+			$jq("#postform :input[name='quickreply']").val("");
 			$jq("#qr #modpanel :input[name='lockonpost']").attr("checked", false);
 			$jq("#qr #modpanel :input[name='stickyonpost']").attr("checked", false);
 			$jq("#qr #modpanel :input[name='rawhtml']").attr("checked", false);
