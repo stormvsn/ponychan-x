@@ -319,14 +319,14 @@ function ponychanx() {
 		},
 		cooldown: function() {
 			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.timer);
+			var auto = $jq("#qr .postopts :input[name='auto']").is(":checked");
 			if (QR.timer > 0) {
 				setTimeout(QR.cooldown, 1000);
-				$jq("#qr > input[type='button']").val(($jq("#qr .postopts :input[name='auto']").is(":checked") ? "Auto " : "") + QR.timer);
-				QR.timer--;
+				$jq("#qr > input[type='button']").val((auto ? "Auto " : "") + QR.timer--);
 			} else {
 				$jq("#qr > input[type='button']").removeAttr("disabled").val(Main.tid == "0" ? "Thread" : "Reply");
 				QR.timer = 15;
-				if ($jq("#qr .postopts :input[name='auto']").is(":checked") && $jq(".listthumb").length) QR.send();
+				if (auto) QR.send();
 			}
 		},
 		clear: function(sel) {
@@ -336,6 +336,7 @@ function ponychanx() {
 			sel.trigger("rm");
 			var ts = $jq("#thumbselected");
 			var tsp = ts.length > 0 ? ts.attr("data-post") : "";
+			var auto = $jq("#qr .postopts :input[name='auto']");
 			$jq("#qr textarea").val(tsp);
 			$jq("#qr input[name='subject']").val("");
 			$jq("#qr #modpanel :input[name='lockonpost']").attr("checked", false);
@@ -344,8 +345,8 @@ function ponychanx() {
 			$jq("#qr .embedwrap :input[name='embed']").val("");
 			$jq("#qr .postopts :input[name='spoiler']").attr("checked", false);
 			$jq("#qr .postopts :input[name='nsfw']").attr("checked", false);
-			if (Settings.gets("Hide quick reply after posting") && !$jq("#qr .postopts :input[name='auto']").is(":checked"))
-				QR.hide();
+			if (!ts.length) auto.attr("checked", false);
+			if (Settings.gets("Hide quick reply after posting") && !auto.is(":checked")) QR.hide();
 		},
 		add: function() {
 			QR.settitle("");
