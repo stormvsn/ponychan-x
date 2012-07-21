@@ -1,6 +1,7 @@
 files
 - Clear quick reply keybind now removes selected image
 - Adding more images will no longer clear existing queue
+- Added file size to quick thumbnail preview titles
 
 0.39
 - Added favicon to show thread has unread replies
