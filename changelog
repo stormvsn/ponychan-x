@@ -1,4 +1,4 @@
-files
+0.40
 - Clear quick reply keybind now removes selected image
 - Adding more images will no longer clear existing queue
 - Added file size to quick thumbnail preview titles
