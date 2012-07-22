@@ -300,6 +300,9 @@ function ponychanx() {
 					if (/<title>Ponychan<\/title>/.test(rt) || /Error connecting to database/.test(rt)) {
 						QR.settitle(rt.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1] || "An error occured trying to post");
 						sb.val("Retry");
+					} else if (/<title>YOU ARE BANNED!<\/title>/.test(rt)) {
+						QR.settitle("You are banned! <a href='http://www.ponychan.net/chan/banned.php'>Why?</a>");
+						sb.attr("disabled", "disabled").val("Banned");
 					} else {
 						Notifier.self = true;
 						if (Main.tid == "0" && $jq("#postform :input[name='quickreply']").val() == "")
@@ -824,6 +827,7 @@ function ponychanx() {
 			#imagelist { overflow-y: scroll; display:none; height: 73px; margin: 2px; background-size: cover; }\
 			#qr .close a { font-weight: bold; width: 16px; height: 19px; padding: 1px 0 0 5px; color: white; float: right; background-color: black; border-radius: 0 4px 0 0; }\
 			#qr .qrtop { float: left; width: 340px; font-size: small; color: white; padding-left: 5px; background-color: #000; height: 20px; cursor: move; border-radius: 4px 0 0 0; }\
+			#qr .qrtop a { color: #C51C71; }\
 			#qr input[type='button'] { width: 90px; height: 23px; float: right; }\
 			#qr { padding: 2px; padding-top: 2px; padding-left: 2px; display: block; position: fixed; top: 46px; left: 83px; width: 400px; background: #e2e2e2; border-radius: 4px; border: 1px solid #000; }\
 			#qr input[type='text'] { padding: 2px 0 2px 4px; height: 20px; width: 394px; border: 1px solid gray; margin: 1px 0; }\
