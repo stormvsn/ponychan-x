@@ -229,6 +229,12 @@ function ponychanx() {
 					$jq("#qr").find("[name='"+this.name+"']").val(this.value);
 				});
 			}
+			if (Settings.gets("Unique post content per image")) {
+				$jq("#qr textarea").on("input", function() {
+					var ts = $jq("#thumbselected");
+					if (ts.length) ts.attr("data-post", this.value);
+				});
+			}
 			QR.load();
 			document.getElementById("imgfile").onchange = QR.add;
 			var x = Settings.get("x.qrpos_x");
@@ -322,7 +328,7 @@ function ponychanx() {
 		},
 		cooldown: function() {
 			$jq("#qr > input[type='button']").attr("disabled", "disabled").val(QR.timer);
-			var auto = $jq("#qr .postopts :input[name='auto']").is(":checked");
+			var auto = $jq("#qr .postopts :input[name='auto']").is(":checked") && $jq(".listthumb").length;
 			if (QR.timer > 0) {
 				setTimeout(QR.cooldown, 1000);
 				$jq("#qr > input[type='button']").val((auto ? "Auto " : "") + QR.timer--);
@@ -379,18 +385,20 @@ function ponychanx() {
 							thumb.trigger("rm");
 						} else {
 							QR.selected = sf;
-							var upc = Settings.gets("Unique post content per image");
-							if (upc) $jq("#thumbselected").attr("data-post", $jq("#qr textarea").val());
-							$jq("#thumbselected").removeAttr("id");
+							var ts = $jq("#thumbselected");
+							ts.removeAttr("id");
 							this.id = "thumbselected";
-							if (upc) $jq("#qr textarea").val(this.getAttribute("data-post"));
+							if (Settings.gets("Unique post content per image")) {
+								$jq("#qr textarea").val(this.getAttribute("data-post"));
+							}
+							setTimeout(function() { $jq("#qr textarea").focus(); }, 100);
 						}
 					}).bind("rm", function() {
 						url.revokeObjectURL(fu);
-						thumb.remove();
 						QR.selected = sf = null;
 						QR.images.splice(QR.images.indexOf(sf), 1);
 						$jq("#imgnum").text("(" + QR.images.length + ")");
+						thumb.remove();
 						if (!$jq("#thumbselected").length) {
 							if ($jq(".listthumb").length) {
 								$jq(".listthumb").first().click();
@@ -398,8 +406,12 @@ function ponychanx() {
 								$jq(".postopts, #imagelist").hide();
 							}
 						}
+						
 					});
-					if (!$jq("#thumbselected").length) thumb.click();
+					if (!$jq("#thumbselected").length) {
+						if ($jq(".listthumb").length == 1 && Settings.gets("Unique post content per image")) thumb.attr("data-post", $jq("#qr textarea").val());
+						thumb.click();
+					}
 				})(thumb, sf, fu);
 			}
 			$jq("#imgfile").val("");
