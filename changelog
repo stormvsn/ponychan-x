@@ -1,3 +1,7 @@
+0.41
+- Fixed quick reply message clearing after selecting an image
+- Added ban notification
+
 0.40
 - Clear quick reply keybind now removes selected image
 - Adding more images will no longer clear existing queue
