@@ -12,7 +12,7 @@
 // Inspired by 4chan X
 // http://mayhemydg.github.com/4chan-x/
 
-var AutoUpdate, Favicon, Filter, Keybinds, Main, Ponychan, QR, Settings, Updater;
+var AutoUpdate, Favicon, Filter, Keybinds, Main, Ponychan, QR, Settings, ThreadUpdater, WatchedUpdater;
 var Set = {};
 
 AutoUpdate = {
@@ -42,12 +42,27 @@ Keybinds = {
 };
 
 Main = {
-	board: null,
 	namespace: "pX.",
 	version: 1.0,
+	board: null,
 	thread: null,
 	init: function() {
 		Settings.init();
+		Title.init();
+		if (Set["Enable thread autoupdate"])
+			ThreadUpdater.init();
+		if (Set["Enable watched threads autoupdate"])
+			WatchedUpdater.init();
+		if (Set["Enable quick reply"])
+			QR.init();
+		if (Set["Enable filter"])
+			Filter.init();
+		if (Set["Enable read and unread favicons"])
+			Favicon.init();
+		if (Set["Enable keybinds"])
+			Keybinds.init();
+		if (Set["Automatically check for updates"])
+			AutoUpdate.init();
 	}
 };
 
@@ -80,7 +95,7 @@ Settings = {
 	settings: {
 		Updating: {
 			"Enable thread autoupdate": true,
-			"Enabled watched threads autoupdate": true
+			"Enable watched threads autoupdate": true
 		},
 		Images: {
 			"Show image on hover": true,
@@ -120,9 +135,15 @@ Title = {
 	}
 };
 
-Updater = {
+ThreadUpdater = {
 	init: function() {
 		
+	}
+};
+
+WatchedUpdater = {
+	init: function() {
+	
 	}
 };
 
