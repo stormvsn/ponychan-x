@@ -43,7 +43,45 @@ Filter = {
 
 Keybinds = {
 	init: function() {
-		
+		$j(document).on("keydown", Keybinds.key);
+	},
+	key: function(e) {
+		if (e.target.nodeName != "TEXTAREA") return;
+		if (e.ctrlKey) {
+			var tag = null;
+			switch (e.which) {
+				case 83:
+					if (Set["Spoiler tags"])
+						tag = "?";
+				break;
+				case 66:
+					if (Set["Bold tags"])
+						tag = "b";
+				break;
+				case 73:
+					if (Set["Italic tags"])
+						tag = "?";
+				break;
+				case 85:
+					if (Set["Underline tags"])
+						tag = "u";
+				break;
+				case 82:
+					if (Set["Strikethrough tags"])
+						tag = "s";
+				break;
+			}
+			if (tag != null) {
+				e.originalEvent.preventDefault();
+				var ta = e.target;
+				var val = ta.value;
+				var ss = ta.selectionStart;
+				var se = ta.selectionEnd;
+				ta.value = val.slice(0, ss) + ("[" + tag + "]") + val.slice(ss, se) + ("[/" + tag + "]") + val.slice(se);
+				var r = se + 3;
+				ta.setSelectionRange(r, r);
+			}
+		}
 	}
 };
 
@@ -134,13 +172,17 @@ Settings = {
 		Filter: {
 			"Enable filter": false
 		},
-		Other: {
+		Keybinds: {
 			"Enable keybinds": true,
+			"Spoiler tags": true,
+			"Bold tags": true,
+			"Italic tags": true,
+			"Underline tags": true,
+			"Strikethrough tags": true
+		},
+		Other: {
 			"Automatically check for updates": true
 		}
-	},
-	keybinds: {
-		
 	}
 };
 
