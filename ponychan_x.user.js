@@ -57,7 +57,7 @@ Main = {
 		Main.board = $j("input[name='board']").val();
 		Main.thread = $j("input[name='replythread']").val();
 		Settings.init();
-		if (Set["Show thread subject in title"])
+		if (Set["Show thread information in title"])
 			Title.init();
 		if (Set["Show unread post count in title"])
 			Unread.init();
@@ -117,7 +117,7 @@ Settings = {
 		Monitoring: {
 			"Enable read and unread favicons": true,
 			"Show unread post count in title": true,
-			"Show thread subject in title": true
+			"Show thread information in title": true
 		},
 		Posting: {
 			"Enable quick reply": true,
@@ -138,6 +138,9 @@ Settings = {
 			"Enable keybinds": true,
 			"Automatically check for updates": true
 		}
+	},
+	keybinds: {
+		
 	}
 };
 
@@ -145,11 +148,13 @@ Title = {
 	title: document.title,
 	task: null,
 	init: function() {
+		if (Main.thread == "0")
+			return;
 		var subject = $j(".filetitle").text();
-		if (subject != "") {
+		if (subject != "")
 			Title.title = subject;
-			Title.set();
-		}
+		Title.title = "/" + Main.board + "/" + " - " + Title.title;
+		Title.set();
 	},
 	set: function() {
 		clearTimeout(Title.task);
