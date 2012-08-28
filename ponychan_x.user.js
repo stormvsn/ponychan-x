@@ -28,15 +28,22 @@ AutoUpdate = {
 };
 
 Favicon = {
+	el: null,
 	read: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAphJREFUeNpkU89LVFEUPvfHPGfMYKqpCUH8gSiOZERRGliSzNLIEDcVuIgiaBBy0yb69QcE1aJNtiiIwKAirDAowo2YC0GyTCKoibIoNObNzJv37u07NoMzeOHj3XvuPed83znnCft8hkqrIIgMrVtnqiwNT1QFI/eq/WzE0uRfQXIgp3P9riL9MBKQwittibo9RdV2XZCBQFDrDl8mo4ZGVyR111gKWgvyNV/qBxGfwnDKIbsF+rKK8qIiwCKuD0WsqFck6k9n1PftRiYbfFEXSLqrN+CWA/Dy19M/AISZ3btQ0LO3IE2npzpwbEaSU6sMyl/LtS1zuABchE26wiKAifZnQ0eR5AskncTd7YoA7OyuUY8AKTZz9rmQpZ2oz2ZDS8ichP1DyUeXp8wIWzq6wE3YejOCXlYRxVp8mfIEbYN9D7qyGmBZVkpogHsU3x7gFnAZuMpNafJlGzqT4vBwDs+FDM2B2rTjk0YGprkpIIpvDUQMb64Bn4FH7Bz6H3we+/NQ0gbnp9drCk6OyFMwysGs1tDWjkeOJ2xpBDrKpRVL8wSMO5elPe4RJdD0FoeoRg+46kpSybq0tLPPwkH7D2UNmNRjKjvhNAtki7GafAxUoqD2x0zwptmX8S5PJUTuxcwnTGIjV3tBGzPtGDnoah4qA9MUHI8AS8A+x9LER23cKcfcP5HRB0Etz504DP2jaM9bVFo2+pIWteHR5rsuoBY4B4xD38Z5beK9eTVsBK3AZ4gZlOSehdYbrBdZLqHyXxHhN1i8gikNltU/pTVpZeRuT31DS3cxs/I2RktTAH3j2E8Xz/yvjSDwll/STrb4agy1qC2ye1weYAw4Bqc/+L4vswc8F/yfsDy09Q6k9OG4wJf/BBgA+8b4itdkXQIAAAAASUVORK5CYII=",
 	unread: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA3ZJREFUeNpMU32IVFUUv19v5r03X29mZ32us+VOzjpu07bGkCu7TuCmwmpCiRZF/wZB9UdB9EdgiVAQEUGBEUZgEEaFkhaStn+ItmhYbEW06uyO627pfOx87cy8mbnv3s7VFTrw4xzuOb9zzz3nXCzPXEH3pIsREqu2dzRtgRricwdfY+Vtj+f6vzh9hRpzE9bJHyo8UovrfxfA32DfGi6iYDGJUKZDkQlaG01DKmQA+kVjKOPynnC4Mbg9ZX9Pp2u7nuu6ZhESnAH/IvvK4EgHkgMUCdg7soWAwwSsBWzE+oIrmxsR69j6Co8Mj7HsbV6dZKh2yEYb3vqI+YCsEijhd5W+Sh4W5e2TSHqIqu5XJ2k1Sk9IqxJPyI5t8N7TNxhClKH/CbmrDCTpALz9Jbe451GCMG5iif6gOnuquLWX0+U2in0+xe77+GuIrd9JcGTTmOLeaQUgILtR2y1PjCAgq9v/1CQagf5ESL0jN708g32zJyBuHlChv73/mSJ6ASFAjyof00ZQNhP9GEs/j/54G+s3G4l6Msill2J9cYEEZr6DuNl7FXjUrVOVfaO2yzakltNbZfzdc1rizU+Q1KCIbqxv5eEJnt8TU62iPOCAUlATx6wh/Hau9eCgQHiLLlgSlXYcEOY1l8aOHgfyVQj6i/h/r5K1x23q9Nnt3lNZ7gbDPloLgs+lB183M/PNR3YbrPxQCDvxUHGHLcych1gXrkHAP+qdAA2RboTk96dvEq9+gxCUdVJ+IT2SHt733qeRZnzcJ7B1uZW2wq31voBW6EraWIfoShNTpwMJoqI6lhGlySEP7lBuXdJN7veZ5fH7cfunqQrhoZDq9lXmyl88Ej/dZLBUUiIjt6wNvnEEG1lNVEd34tkPRuY0x70VPZ8fL24OIukt00NvL1pCag+4MOs17Yh3BbaxpWxBsMvDJrHO593Ck9v4wqtD2DXYBY3RVC0Z9HluteTAh0exrKAMlLjLXXrhGXfxxUH1CUrrvsxFaamBMZ8nPWevd2ZOvkKFhxaIkEtU4rSot9Hw82ex999jaoyqWRHZ6d27utFoTWA6S6yf1aYtIOH10+ipAYJk3Be+KJPZwynuWl6yvLNN+44tqQRVwHUgnBCVx9Yj4jjYyH0DZxcBeUTaJou/o7YuBnNLdIOXn5X1zQNYK0zDWeE/AQYANzdmxC01H5wAAAAASUVORK5CYII=",
 	init: function() {
-		
+		Favicon.el = $j("link[rel='shortcut icon']").attr("href", Favicon.read);
+	},
+	update: function() {
+	
 	}
 };
 
 Filter = {
 	init: function() {
+	
+	},
+	node: function(post) {
 	
 	}
 };
@@ -46,7 +53,8 @@ Keybinds = {
 		$j(document).on("keydown", Keybinds.key);
 	},
 	key: function(e) {
-		if (e.target.nodeName != "TEXTAREA") return;
+		if (e.target.nodeName != "TEXTAREA")
+			return;
 		if (e.ctrlKey) {
 			var tag = null;
 			switch (e.which) {
@@ -77,8 +85,8 @@ Keybinds = {
 				var val = ta.value;
 				var ss = ta.selectionStart;
 				var se = ta.selectionEnd;
-				ta.value = val.slice(0, ss) + ("[" + tag + "]") + val.slice(ss, se) + ("[/" + tag + "]") + val.slice(se);
 				var r = se + 3;
+				ta.value = val.slice(0, ss) + ("[" + tag + "]") + val.slice(ss, se) + ("[/" + tag + "]") + val.slice(se);
 				ta.setSelectionRange(r, r);
 			}
 		}
@@ -97,8 +105,6 @@ Main = {
 		Settings.init();
 		if (Set["Show thread information in title"])
 			Title.init();
-		if (Set["Show unread post count in title"])
-			Unread.init();
 		if (Set["Enable thread autoupdate"])
 			ThreadUpdater.init();
 		if (Set["Enable watched threads autoupdate"])
@@ -121,8 +127,24 @@ Ponychan = {
 };
 
 QR = {
+	timer: 15,
 	init: function() {
 		
+	},
+	show: function() {
+	
+	},
+	hide: function() {
+	
+	},
+	post: function() {
+	
+	},
+	quote: function() {
+	
+	},
+	cooldown: function() {
+	
 	}
 };
 
@@ -154,12 +176,12 @@ Settings = {
 		},
 		Monitoring: {
 			"Enable read and unread favicons": true,
-			"Show unread post count in title": true,
 			"Show thread information in title": true
 		},
 		Posting: {
 			"Enable quick reply": true,
-			"Hide quick reply after posting": false
+			"Hide quick reply after posting": false,
+			"Quote selected text on quick reply": true,
 		},
 		Posts: {
 			"Enable backlinks": true,
@@ -189,6 +211,7 @@ Settings = {
 Title = {
 	title: document.title,
 	task: null,
+	unread: [],
 	init: function() {
 		if (Main.thread == "0")
 			return;
@@ -196,23 +219,20 @@ Title = {
 		if (subject != "")
 			Title.title = subject;
 		Title.title = "/" + Main.board + "/" + " - " + Title.title;
-		Title.set();
+		Title.update();
+		$j(window).on("scroll", Title.scroll);
 	},
-	set: function() {
+	update: function() {
 		clearTimeout(Title.task);
 		Title.task = setTimeout(function() {
-			document.title = Title.title;
+			document.title = "(" + (Main.status == 200 ? Title.unread.length : Main.status) + ") " + Title.title;
 		}, 500);
-	}
-};
-
-Unread = {
-	unread: [],
-	init: function() {
-		$j(window).on("scroll", Unread.scroll);
 	},
 	scroll: function() {
-		
+		Title.update();
+	},
+	node: function(post) {
+		Title.unread.push(post);
 	}
 };
 
@@ -223,6 +243,15 @@ ThreadUpdater = {
 };
 
 WatchedUpdater = {
+	init: function() {
+		
+	},
+	update: function() {
+		
+	}
+};
+
+Catalog = {
 	init: function() {
 	
 	}
