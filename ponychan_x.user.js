@@ -17,13 +17,41 @@
 
 var $j = jQuery.noConflict();
 
-var AutoUpdate, Favicon, Filter, Keybinds, Main, Ponychan, QR, Settings, ThreadUpdater, Unread, WatchedUpdater;
+var AutoUpdate, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ThreadUpdater, WatchedUpdater;
 
 var Set = {};
 
 AutoUpdate = {
 	init: function() {
-	
+		
+	}
+};
+
+Backlinks = {
+	node: function(post) {
+		
+	}
+};
+
+Css = {
+	init: function() {
+		var css = "\
+		.postarea h5 { margin: 0 0 0.5em 0; }\
+		.hidden { height: 0; visibility: hidden; }\
+		";
+		$j("<style />").text(css).appendTo("body");
+	}
+};
+
+InlineReplies = {
+	node: function(post) {
+		
+	}
+};
+
+Links = {
+	node: function(post) {
+		
 	}
 };
 
@@ -34,17 +62,23 @@ Favicon = {
 		Favicon.set();
 	},
 	set: function(icon) {
-		$j("link[rel='shortcut icon']").remove();
+		var ci = $j("link[rel='shortcut icon']");
+		if (ci.attr("href") == icon)
+			return;
+		ci.remove();
 		$j("<link />").attr("rel", "shortcut icon").attr("type", "image/x-icon").attr("href", icon || Favicon.read).appendTo("head");
 	}
 };
 
 Filter = {
+	names: [],
+	tripcodes: [],
+	posts: [],
 	init: function() {
 	
 	},
 	node: function(post) {
-	
+		
 	}
 };
 
@@ -102,6 +136,7 @@ Main = {
 	init: function() {
 		Main.board = $j("input[name='board']").val();
 		Main.thread = $j("input[name='replythread']").val();
+		Css.init();
 		Settings.init();
 		if (Set["Show thread information in title"])
 			Title.init();
@@ -123,13 +158,20 @@ Main = {
 };
 
 Ponychan = {
+	node: function(post) {
 	
+	}
 };
 
 QR = {
 	timer: 15,
 	init: function() {
-		
+		var pf = $j("#postform");
+		var pa = $j(".postarea");
+		$j("<a />").attr("href", "javascript:;").html("<h5>Show/Hide Post Form</h5>").on("click", function() {
+			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
+		}).click().prependTo(pa);
+		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.show).prependTo(pa);
 	},
 	show: function() {
 	
@@ -181,11 +223,11 @@ Settings = {
 		Posting: {
 			"Enable quick reply": true,
 			"Hide quick reply after posting": false,
-			"Quote selected text on quick reply": true,
+			"Quote selected text on quick reply": true
 		},
 		Posts: {
 			"Enable backlinks": true,
-			"Enable inline posts": true,
+			"Enable inline replies": true,
 			"Show reply link": true,
 			"Show report link": true,
 			"Show google image link": true,
@@ -226,6 +268,8 @@ Title = {
 		clearTimeout(Title.task);
 		Title.task = setTimeout(function() {
 			document.title = "(" + (Main.status == 200 ? Title.unread.length : Main.status) + ") " + Title.title;
+			if (Set["Enable read and unread favicons"])
+				Favicon.set(Title.unread.length ? Favicon.unread : Favicon.read);
 		}, 500);
 	},
 	scroll: function() {
@@ -237,8 +281,12 @@ Title = {
 };
 
 ThreadUpdater = {
+	timer: 10,
 	init: function() {
 		
+	},
+	update: function() {
+	
 	}
 };
 
@@ -248,12 +296,6 @@ WatchedUpdater = {
 	},
 	update: function() {
 		
-	}
-};
-
-Catalog = {
-	init: function() {
-	
 	}
 };
 
