@@ -38,6 +38,8 @@ Css = {
 		var css = "\
 		.postarea h5 { margin: 0 0 0.5em 0; }\
 		.hidden { height: 0; visibility: hidden; }\
+		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
+		#settingsWrapper { }\
 		";
 		$j("<style />").text(css).appendTo("body");
 	}
@@ -193,12 +195,13 @@ QR = {
 Settings = {
 	init: function() {
 		var ss = Settings.settings;
-		for (cat in ss) {
-			for (set in ss[cat]) {
+		for (var cat in ss) {
+			for (var set in ss[cat]) {
 				var sset = Settings.get(set);
-				Set[set] = typeof sset != null && sset == "true" ? true : ss[cat][set];
+				Set[set] = sset == null ? ss[cat][set] : sset == "true" ? true : false;
 			}
 		}
+		$j("<a />").addClass("adminbaritem").text("pX").attr("href", "javascript:;").on("click", Settings.show).prependTo(".adminbar");
 	},
 	get: function(n) {
 		return localStorage.getItem(Main.namespace + n);
@@ -247,6 +250,29 @@ Settings = {
 		Other: {
 			"Automatically check for updates": true
 		}
+	},
+	show: function() {
+		if ($j("#settingsOverlay").length)
+			return Settings.hide();
+		$j("<div />").attr("id", "settingsOverlay").on("click", Settings.hide).appendTo("body");
+		var sw = $j("<div />").attr("id", "settingsWrapper").appendTo("body");
+		var ss = Settings.settings;
+		for (var cat in ss) {
+			$j("<h2 />").text(cat).appendTo(sw);
+			for (var set in ss[cat]) {
+				$j("<label><input type='checkbox' name='" + set + "'" + (Set[set] ? "checked" : "") + " /> " + set + "</label>").appendTo(sw);
+			}
+		}
+		$j("<input />").attr("type", "button").val("Apply").on("click", Settings.save).appendTo(sw);
+	},
+	hide: function() {
+		$j("#settingsOverlay").remove();
+		$j("#settingsWrapper").remove();
+	},
+	save: function() {
+		$j("#settingsWrapper input[type='checkbox']").each(function() {
+			Settings.set(this.name, this.checked);
+		});
 	}
 };
 
