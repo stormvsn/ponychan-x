@@ -39,7 +39,11 @@ Css = {
 		.postarea h5 { margin: 0 0 0.5em 0; }\
 		.hidden { height: 0; visibility: hidden; }\
 		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
-		#settingsWrapper { }\
+		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
+		#settingsWrapper label { font-family: Arial; font-size: 14px; color: black; cursor: pointer; display: block; }\
+		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
+		#settingsWrapper h2 { font-size: 1em; }\
+		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
 		";
 		$j("<style />").text(css).appendTo("body");
 	}
@@ -263,6 +267,7 @@ Settings = {
 				$j("<label><input type='checkbox' name='" + set + "'" + (Set[set] ? "checked" : "") + " /> " + set + "</label>").appendTo(sw);
 			}
 		}
+		$j("<img />").attr("src", "http://www.milkyis.me/ponychanx/icon.png").appendTo(sw);
 		$j("<input />").attr("type", "button").val("Apply").on("click", Settings.save).appendTo(sw);
 	},
 	hide: function() {
@@ -273,6 +278,7 @@ Settings = {
 		$j("#settingsWrapper input[type='checkbox']").each(function() {
 			Settings.set(this.name, this.checked);
 		});
+		location.reload(true);
 	}
 };
 
