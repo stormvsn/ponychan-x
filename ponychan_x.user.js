@@ -160,6 +160,8 @@ Main = {
 		Main.thread = $j("input[name='replythread']").val();
 		Css.init();
 		Settings.init();
+		if (/catalog\.html/.test(document.URL))
+			return;
 		if (Set["Show thread information in title"])
 			Title.init();
 		if (Set["Enable thread autoupdate"])
