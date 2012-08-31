@@ -173,6 +173,11 @@ Main = {
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
 			AutoUpdate.init();
+	},
+	nodes: function(nodes) {
+		for (var i = 0, l = nodes.length; i < l; i++) {
+			
+		}
 	}
 };
 
@@ -319,18 +324,27 @@ Title = {
 			document.title = "(" + (Main.status == 200 ? Title.unread.length : Main.status) + ") " + Title.title;
 			if (Set["Enable read and unread favicons"])
 				Favicon.set(Title.unread.length ? Favicon.unread : Favicon.read);
-		}, 500);
+		}, 50);
 	},
 	scroll: function() {
-		Title.update();
+		var ll = Title.unread.length;
+		var rm = 0;
+		for (var i = 0; i < ll; i++) {
+			if (Title.unread[i].getBoundingClientRect().bottom < document.documentElement.clientHeight) {
+				rm++;
+			}
+		}
+		Title.unread = Title.unread.slice(rm);
+		if (ll != Title.unread.length)
+			Title.update();
 	},
 	node: function(post) {
-		Title.unread.push(post);
+		if (post.getBoundingClientRect().bottom > document.documentElement.clientHeight)
+			Title.unread.push(post);
 	}
 };
 
 ThreadUpdater = {
-	timer: 10,
 	init: function() {
 		
 	},
