@@ -170,16 +170,21 @@ Main = {
 			QR.init();
 		if (Set["Enable filter"])
 			Filter.init();
-		if (Set["Enable read and unread favicons"])
+		if (Set["Enable favicons"])
 			Favicon.init();
 		if (Set["Enable keybinds"])
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
 			AutoUpdate.init();
+		// To do: Get OP
+		Main.nodes($j(".thread table"));
 	},
 	nodes: function(nodes) {
 		for (var i = 0, l = nodes.length; i < l; i++) {
-			
+			if (Set["Show thread information in title"])
+				Title.node(nodes[i]);
+			if (Set["Enable filter"])
+				Filter.node(nodes[i]);
 		}
 	}
 };
@@ -248,7 +253,7 @@ Settings = {
 			"Animate gif thumbnails": true
 		},
 		Monitoring: {
-			"Enable read and unread favicons": true,
+			"Enable favicons": true,
 			"Show thread information in title": true
 		},
 		Posting: {
@@ -284,6 +289,7 @@ Settings = {
 		if ($j("#settingsOverlay").length)
 			return Settings.hide();
 		$j("<div />").attr("id", "settingsOverlay").on("click", Settings.hide).appendTo("body");
+		$j("body").css("overflow", "hidden");
 		var sw = $j("<div />").attr("id", "settingsWrapper").appendTo("body");
 		var ss = Settings.settings;
 		for (var cat in ss) {
@@ -300,6 +306,7 @@ Settings = {
 		$j("<input />").attr("type", "button").val("Apply").on("click", Settings.save).appendTo(sw);
 	},
 	hide: function() {
+		$j("body").css("overflow", "auto");
 		$j("#settingsOverlay").remove();
 		$j("#settingsWrapper").remove();
 	},
@@ -332,7 +339,7 @@ Title = {
 		clearTimeout(Title.task);
 		Title.task = setTimeout(function() {
 			document.title = "(" + (Main.status == 200 ? Title.unread.length : Main.status) + ") " + Title.title;
-			if (Set["Enable read and unread favicons"])
+			if (Set["Enable favicons"])
 				Favicon.set(Title.unread.length ? Favicon.unread : Favicon.read);
 		}, 50);
 	},
