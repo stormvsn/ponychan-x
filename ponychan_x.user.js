@@ -23,7 +23,18 @@ var Set = {};
 
 AutoUpdate = {
 	init: function() {
-		
+		var last = Settings.get("autoupdate.last");
+		var now = Date.now();
+		if (last != null || now < last+86400000)
+			return;
+		$j.ajax({
+			url: "http://www.milkyis.me/ponychanx/latest.php"
+		}).done(function(latest) {
+			Settings.set("autoupdate.latest", latest);
+			Settings.set("autoupdate.last", now);
+			if (parseInt(latest) > Main.version && confirm("A new update for Ponychan X is available. Install now?"))
+				window.location = "https://github.com/milkytiptoe/ponychan-x/raw/master/ponychan_x.user.js";
+		});
 	}
 };
 
@@ -93,8 +104,6 @@ Keybinds = {
 		$j(document).on("keydown", Keybinds.key);
 	},
 	key: function(e) {
-		if (e.target.nodeName != "TEXTAREA")
-			return;
 		if (e.ctrlKey) {
 			var tag = null;
 			switch (e.which) {
@@ -118,8 +127,12 @@ Keybinds = {
 					if (Set["Strikethrough tags"])
 						tag = "s";
 				break;
+				case 81:
+					if (Set["Enable quick reply"] && Set["Toggle quick reply"])
+						return QR.toggle();
+				break;
 			}
-			if (tag != null) {
+			if (tag != null && e.target.nodeName == "TEXTAREA") {
 				e.originalEvent.preventDefault();
 				var ta = e.target;
 				var val = ta.value;
@@ -135,7 +148,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 1.0,
+	version: 100,
 	board: null,
 	thread: null,
 	status: 200,
@@ -170,7 +183,7 @@ Ponychan = {
 };
 
 QR = {
-	timer: 15,
+	qr: null,
 	init: function() {
 		var pf = $j("#postform");
 		var pa = $j(".postarea");
@@ -178,12 +191,15 @@ QR = {
 			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
 		}).click().prependTo(pa);
 		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.show).prependTo(pa);
+		QR.qr = $j("<div />").attr("id", "qr").appendTo("body");
+		var display = Settings.get("qr.display");
+		if (display == null)
+			display = "block";
+		QR.qr.css("display", display);
 	},
-	show: function() {
-	
-	},
-	hide: function() {
-	
+	toggle: function() {
+		QR.qr.toggle();
+		Settings.set("qr.display", QR.qr.css("display"));
 	},
 	post: function() {
 	
@@ -205,7 +221,7 @@ Settings = {
 				Set[set] = sset == null ? ss[cat][set] : sset == "true" ? true : false;
 			}
 		}
-		$j("<a />").addClass("adminbaritem").text("pX").attr("href", "javascript:;").on("click", Settings.show).prependTo(".adminbar");
+		$j("<a />").addClass("adminbaritem").text("pX").attr("href", "javascript:;").on("click", Settings.toggle).prependTo(".adminbar");
 	},
 	get: function(n) {
 		return localStorage.getItem(Main.namespace + n);
@@ -249,13 +265,14 @@ Settings = {
 			"Bold tags": true,
 			"Italic tags": true,
 			"Underline tags": true,
-			"Strikethrough tags": true
+			"Strikethrough tags": true,
+			"Toggle quick reply": true
 		},
 		Other: {
 			"Automatically check for updates": true
 		}
 	},
-	show: function() {
+	toggle: function() {
 		if ($j("#settingsOverlay").length)
 			return Settings.hide();
 		$j("<div />").attr("id", "settingsOverlay").on("click", Settings.hide).appendTo("body");
