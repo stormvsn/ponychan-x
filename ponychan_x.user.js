@@ -54,6 +54,7 @@ Css = {
 		#settingsWrapper label { font-family: Arial; font-size: 14px; color: black; cursor: pointer; display: block; }\
 		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
 		#settingsWrapper h2 { font-size: 1em; }\
+		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
 		";
 		$j("<style />").text(css).appendTo("body");
@@ -89,10 +90,12 @@ Favicon = {
 
 Filter = {
 	names: [],
-	tripcodes: [],
+	trips: [],
 	posts: [],
 	init: function() {
-	
+		Filter.names = Settings.get("filter.names").split("\n");
+		Filter.trips = Settings.get("filter.trips").split("\n");
+		Filter.posts = Settings.get("filter.posts").split("\n");
 	},
 	node: function(post) {
 		
@@ -261,9 +264,6 @@ Settings = {
 			"Show google image link": true,
 			"Show save image link": true
 		},
-		Filter: {
-			"Enable filter": false
-		},
 		Keybinds: {
 			"Enable keybinds": true,
 			"Spoiler tags": true,
@@ -275,7 +275,10 @@ Settings = {
 		},
 		Other: {
 			"Automatically check for updates": true
-		}
+		},
+		Filter: {
+			"Enable filter": false
+		},
 	},
 	toggle: function() {
 		if ($j("#settingsOverlay").length)
@@ -289,6 +292,10 @@ Settings = {
 				$j("<label><input type='checkbox' name='" + set + "'" + (Set[set] ? "checked" : "") + " /> " + set + "</label>").appendTo(sw);
 			}
 		}
+		$j("<label />").text("Seperate each item with a new line").appendTo(sw);
+		$j("<textarea />").attr("name", "filter.names").attr("placeholder", "Names").val(Settings.get("filter.names")).appendTo(sw);
+		$j("<textarea />").attr("name", "filter.trips").attr("placeholder", "Tripcodes").val(Settings.get("filter.trips")).appendTo(sw);
+		$j("<textarea />").attr("name", "filter.posts").attr("placeholder", "Posts").val(Settings.get("filter.posts")).appendTo(sw);
 		$j("<img />").attr("src", "http://www.milkyis.me/ponychanx/icon.png").appendTo(sw);
 		$j("<input />").attr("type", "button").val("Apply").on("click", Settings.save).appendTo(sw);
 	},
@@ -299,6 +306,9 @@ Settings = {
 	save: function() {
 		$j("#settingsWrapper input[type='checkbox']").each(function() {
 			Settings.set(this.name, this.checked);
+		});
+		$j("#settingsWrapper textarea").each(function() {
+			Settings.set(this.name, this.value);
 		});
 		location.reload(true);
 	}
@@ -330,9 +340,8 @@ Title = {
 		var ll = Title.unread.length;
 		var rm = 0;
 		for (var i = 0; i < ll; i++) {
-			if (Title.unread[i].getBoundingClientRect().bottom < document.documentElement.clientHeight) {
+			if (Title.unread[i].getBoundingClientRect().bottom < document.documentElement.clientHeight)
 				rm++;
-			}
 		}
 		Title.unread = Title.unread.slice(rm);
 		if (ll != Title.unread.length)
