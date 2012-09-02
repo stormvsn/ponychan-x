@@ -17,7 +17,7 @@
 
 var $j = jQuery.noConflict();
 
-var AutoUpdate, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ThreadUpdater, WatchedUpdater;
+var AutoUpdate, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ThreadUpdater;
 
 var Set = {};
 
@@ -181,8 +181,12 @@ Main = {
 		// To do: Get OP
 		Main.nodes($j(".thread table"));
 	},
+	prenode: function(node) {
+		
+	},
 	nodes: function(nodes) {
 		for (var i = 0, l = nodes.length; i < l; i++) {
+			Main.prenode(nodes[i]);
 			if (Set["Show thread information in title"])
 				Title.node(nodes[i]);
 			if (Set["Enable filter"])
@@ -247,7 +251,6 @@ Settings = {
 	settings: {
 		Updating: {
 			"Enable thread autoupdate": true,
-			"Enable watched threads autoupdate": true
 		},
 		Images: {
 			"Show image on hover": true,
@@ -266,8 +269,6 @@ Settings = {
 		Posts: {
 			"Enable backlinks": true,
 			"Enable inline replies": true,
-			"Show reply link": true,
-			"Show report link": true,
 			"Show google image link": true,
 			"Show save image link": true
 		},
@@ -368,15 +369,6 @@ ThreadUpdater = {
 	},
 	update: function() {
 	
-	}
-};
-
-WatchedUpdater = {
-	init: function() {
-		
-	},
-	update: function() {
-		
 	}
 };
 
