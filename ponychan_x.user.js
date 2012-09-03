@@ -4,6 +4,7 @@
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
+// @run-at        document-idle
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
 // @icon          http://www.milkyis.me/ponychanx/icon.png
@@ -202,7 +203,7 @@ Ponychan = {
 };
 
 QR = {
-	qr: null,
+	el: null,
 	init: function() {
 		var pf = $j("#postform");
 		var pa = $j(".postarea");
@@ -210,15 +211,15 @@ QR = {
 			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
 		}).click().prependTo(pa);
 		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.show).prependTo(pa);
-		QR.qr = $j("<div />").attr("id", "qr").appendTo("body");
+		QR.el = $j("<div />").attr("id", "qr").appendTo("body");
 		var display = Settings.get("qr.display");
 		if (display == null)
 			display = "block";
-		QR.qr.css("display", display);
+		QR.el.css("display", display);
 	},
 	toggle: function() {
-		QR.qr.toggle();
-		Settings.set("qr.display", QR.qr.css("display"));
+		QR.el.toggle();
+		Settings.set("qr.display", QR.el.css("display"));
 	},
 	post: function() {
 	
@@ -250,7 +251,7 @@ Settings = {
 	},
 	settings: {
 		Updating: {
-			"Enable thread autoupdate": true,
+			"Enable thread autoupdate": true
 		},
 		Images: {
 			"Show image on hover": true,
