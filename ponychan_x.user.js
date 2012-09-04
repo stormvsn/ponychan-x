@@ -135,6 +135,12 @@ Keybinds = {
 					if (Set["Enable quick reply"] && Set["Toggle quick reply"])
 						return QR.toggle();
 				break;
+				case 90:
+					if (Set["Mark thread as read"]) {
+						Title.unread = [];
+						return Title.update();
+					}
+				break;
 			}
 			if (tag != null && e.target.nodeName == "TEXTAREA") {
 				e.originalEvent.preventDefault();
@@ -179,7 +185,6 @@ Main = {
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
 			AutoUpdate.init();
-		// To do: Get OP
 		Main.nodes($j(".thread table"));
 	},
 	prenode: function(node) {
@@ -212,10 +217,7 @@ QR = {
 		}).click().prependTo(pa);
 		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.show).prependTo(pa);
 		QR.el = $j("<div />").attr("id", "qr").appendTo("body");
-		var display = Settings.get("qr.display");
-		if (display == null)
-			display = "block";
-		QR.el.css("display", display);
+		QR.el.css("display", Settings.get("qr.block") || "block").css("left", Settings.get("qr.left") || "20px").css("top", Settings.get("qr.top") || "20px");
 	},
 	toggle: function() {
 		QR.el.toggle();
@@ -280,7 +282,8 @@ Settings = {
 			"Italic tags": true,
 			"Underline tags": true,
 			"Strikethrough tags": true,
-			"Toggle quick reply": true
+			"Toggle quick reply": true,
+			"Mark thread as read": true
 		},
 		Other: {
 			"Automatically check for updates": true
