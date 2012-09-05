@@ -73,7 +73,18 @@ Css = {
 
 InlineReplies = {
 	node: function(post) {
-		
+		$j("blockquote a", post).each(function() {
+			var pid = this.className.split("|").pop();
+			var a = $j(".reflink a:contains(" + pid + ")");
+			var p = a.parents(".reply").parent().parent().parent().first();
+			if (!a.length || !p.length)
+				return;
+			$j(this).attr("href", "javascript:;").removeAttr("onclick").on("click", function() {
+				var next = $j(this).next();
+				next.hasClass("inline") ? next.remove() : $j(this).after(p.clone(true).addClass("inline"));
+			});
+			
+		});
 	}
 };
 
