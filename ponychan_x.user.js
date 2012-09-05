@@ -54,7 +54,7 @@ Backlinks = {
 
 Css = {
 	init: function() {
-		var css = "\
+		$j("<style />").text("\
 		.postarea h5 { margin: 0 0 0.5em 0; }\
 		.hidden { height: 0; visibility: hidden; }\
 		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
@@ -66,8 +66,9 @@ Css = {
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
 		#qr { min-width: 400px; }\
 		.extrabtns { vertical-align: top; }\
-		";
-		$j("<style />").text(css).appendTo("body");
+		#dialog { position: fixed; bottom: 5px; right: 10px; }\
+		#countdown { margin-right: 5px; }\
+		").appendTo("body");
 	}
 };
 
@@ -83,7 +84,6 @@ InlineReplies = {
 				var next = $j(this).next();
 				next.hasClass("inline") ? next.remove() : $j(this).after(p.clone(true).addClass("inline"));
 			});
-			
 		});
 	}
 };
@@ -120,14 +120,28 @@ Favicon = {
 Filter = {
 	names: [],
 	trips: [],
+	emails: [],
+	subjects: [],
 	posts: [],
 	init: function() {
-		Filter.names = Settings.get("filter.names").split("\n");
-		Filter.trips = Settings.get("filter.trips").split("\n");
-		Filter.posts = Settings.get("filter.posts").split("\n");
+		var names = Settings.get("filter.names");
+		if (names != null)
+			Filter.names = names.split("\n");
+		var trips = Settings.get("filter.trips");
+		if (trips != null)
+			Filter.trips = trips.split("\n");
+		var emails = Settings.get("filter.emails");
+		if (emails != null)
+			Filter.emails = emails.split("\n");
+		var subjects = Settings.get("filter.subjects");
+		if (subjects != null)
+			Filter.subjects = trips.split("\n");
+		var posts = Settings.get("filter.posts");
+		if (posts != null)
+			Filter.posts = posts.split("\n");
 	},
 	node: function(post) {
-		
+		// return $j(post).addClass("hidden");
 	}
 };
 
@@ -233,7 +247,7 @@ Main = {
 
 Ponychan = {
 	node: function(post) {
-	
+		
 	}
 };
 
@@ -343,6 +357,8 @@ Settings = {
 		$j("<label />").text("Seperate each item with a new line").appendTo(sw);
 		$j("<textarea />").attr("name", "filter.names").attr("placeholder", "Names").val(Settings.get("filter.names")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.trips").attr("placeholder", "Tripcodes").val(Settings.get("filter.trips")).appendTo(sw);
+		$j("<textarea />").attr("name", "filter.emails").attr("placeholder", "Emails").val(Settings.get("filter.emails")).appendTo(sw);
+		$j("<textarea />").attr("name", "filter.subjects").attr("placeholder", "Subjects").val(Settings.get("filter.subjects")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.posts").attr("placeholder", "Posts").val(Settings.get("filter.posts")).appendTo(sw);
 		$j("<h2 />").text("More").appendTo(sw);
 		$j("<label />").html("<a href='https://raw.github.com/milkytiptoe/ponychan-x/master/changelog' target='_blank'>Changelog</a>").appendTo(sw);
@@ -384,7 +400,7 @@ Title = {
 	update: function() {
 		clearTimeout(Title.task);
 		Title.task = setTimeout(function() {
-			document.title = "(" + (Main.status == 200 ? Title.unread.length : Main.status) + ") " + Title.title;
+			document.title = "(" + (Main.status != 404 ? Title.unread.length : Main.status) + ") " + Title.title;
 			if (Set["Enable favicons"])
 				Favicon.set(Title.unread.length ? Favicon.unread : Favicon.read);
 		}, 50);
@@ -407,11 +423,34 @@ Title = {
 };
 
 ThreadUpdater = {
+	timer: 10,
+	left: 10,
 	init: function() {
-		
+		if (Main.thread == "0")
+			return;
+		ThreadUpdater.left = ThreadUpdater.timer = parseInt(Settings.get("threadupdater.timer")) || ThreadUpdater.timer;
+		var dialog = $j("<div />").attr("id", "dialog").appendTo("body");
+		$j("<span />").attr("id", "countdown").text(ThreadUpdater.left).appendTo(dialog);
+		$j("<a />").attr("href", "javascript:;").on("click", function() { ThreadUpdater.left = 0; }).html("<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAYAAACkTj4ZAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAx5JREFUeNo0U11oFFcYPd+98+PM7rg7u01s6xr8ibiJgfhgTf8oLTaltJUi9MUnS7FF8EEFEepDEfpSKBYfAyqUQtrmxf7lSWhpTWkRasAqaURLq2JMkN24JrszmZ25X79J6MCdC9/Md+75zjmXoADyAGSA2kBQPQBHvNUboYPuML1qPYUad02a/I1b8RV8r4oYb0+gBekhactfyiPZ/gcysgKCu4veLL2jPnUHMECaVusmM2DDMAmj8xNfap3DUW5ilnysPjmQzhHJEhYrgL2RRnpO2l96g3oLkUK2BCSzuGfaHOmiKpIGrH7e5mzRzyXX8LNpoUFO3p8DCSNVEGoOgsoH9pniS/bufMx4hu+0xrPT6UNzdvk7/ia5iTlrE223fDsoP+8/7W7XI+1f0ymzhIby8yHlFJKRvBfVC5t/9Bs7/gp48yW/ZW3Cvpy23S+n1eTHAlD9yLlYv1HinbMhDz0IuXbev6KqVKeikLF6CMGooBnqd3t1RXsK7an0l9J+54fSARvd2yz6QFXet09V97t79TqC6Ypei4zyPmfPxrPeV7qqhrU/qk8Eo/bp4rP2a27N2pDrj4wsVcZeqxfvxjPmrpQqwSvWsXSBH6UtxM6TFDID7avp/bRpYsNcgNWnhmuf+9NDC2UenJF1PeSdt0Kuz5SiymHngiohFFdFSax6VDnijA38U+L6zfUcvGV9nAdA9PVU1jTX5o5HBxa/TX6nUm4hI1sxaExEfzTHkkOFt/Wi/4bKw9HRvdghMrxuVjJ0m1nanTd/Sl24IdJ6vczc5Eb7t/Sy3YdnRNxa524sxnVd/QR5VEDHqlCgQnq5csj+zBtSg5C4LF9Op1sT6SeSkuXVCOmqAHVE0EgMrFJ/+QSNO7vNHsWiVqrQncO/itSyqLfN7pHo2Yx0AdH8h8l7yQ18nTvGMUPnGeBEEG0x7jGa8VWe0lXUrT5sVS7BCqmsQ+rVBdgsSq3c5ubiWHoqucNfIBUdaO16rQF116KeZwoRGsk0JtN5PGTNRThsy/c4uc/3liazyUfnspNybS6CyfDj/H6sAf0nwADKKTlgROF51gAAAABJRU5ErkJggg==' width='18' height='13' alt='Autoupdate' title='Update now' />").appendTo(dialog);
+		ThreadUpdater.count();
 	},
 	update: function() {
-	
+		$j.ajax({
+			ifModified: true,
+			url: document.URL
+		}).done(function(response, status, xhr) {
+			
+		}).fail(function(xhr) {
+			if (xhr.status == 404)
+				Main.status = 404;
+		});
+		ThreadUpdater.count(true);
+	},
+	count: function(reset) {
+		if (reset)
+			ThreadUpdater.left = ThreadUpdater.timer;
+		$j("#countdown").text(ThreadUpdater.left--);
+		ThreadUpdater.left == -2 ? ThreadUpdater.update() : setTimeout(ThreadUpdater.count, 1000);
 	}
 };
 
