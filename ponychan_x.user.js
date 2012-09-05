@@ -43,7 +43,12 @@ AutoUpdater = {
 
 Backlinks = {
 	node: function(post) {
-		
+		$j("blockquote a", post).each(function() {
+			var pid = this.className.split("|").pop();
+			var a = $j(".reflink a:contains(" + pid + ")");
+			if (a.length)
+				$j("<a />").attr("href", "javascript:;").text(">>" + pid).appendTo(a.parent().next());
+		});
 	}
 };
 
@@ -60,6 +65,7 @@ Css = {
 		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
 		#qr { min-width: 400px; }\
+		.extrabtns { vertical-align: top; }\
 		";
 		$j("<style />").text(css).appendTo("body");
 	}
@@ -235,6 +241,9 @@ QR = {
 	toggle: function() {
 		QR.el.toggle();
 		Settings.set("qr.display", QR.el.css("display"));
+	},
+	move: function() {
+		
 	},
 	post: function() {
 	
