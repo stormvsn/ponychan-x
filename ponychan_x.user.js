@@ -18,11 +18,11 @@
 
 var $j = jQuery.noConflict();
 
-var AutoUpdate, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ThreadUpdater;
+var AutoUpdater, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ThreadUpdater;
 
 var Set = {};
 
-AutoUpdate = {
+AutoUpdater = {
 	init: function() {
 		var last = Settings.get("autoupdate.last");
 		var now = Date.now();
@@ -31,6 +31,8 @@ AutoUpdate = {
 		$j.ajax({
 			url: "http://www.milkyis.me/ponychanx/latest.php"
 		}).done(function(latest) {
+			if (latest.length != 3)
+				return;
 			Settings.set("autoupdate.latest", latest);
 			Settings.set("autoupdate.last", now);
 			if (parseInt(latest) > Main.version && confirm("A new update for Ponychan X is available. Install now?"))
@@ -57,6 +59,7 @@ Css = {
 		#settingsWrapper h2 { font-size: 1em; }\
 		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
+		#qr { min-width: 400px; }\
 		";
 		$j("<style />").text(css).appendTo("body");
 	}
@@ -70,7 +73,15 @@ InlineReplies = {
 
 Links = {
 	node: function(post) {
-		
+		var pf = $j(".postfooter", post);
+		var fa = $j(".filesize a", post);
+		if (!pf.length || !fa.length)
+			return;
+		var src = fa.attr("href");
+		if (Set["Show google image link"])
+			pf.append("&nbsp; • &nbsp;<a href='http://www.google.com/searchbyimage?image_url=" + src + "' target='_blank'>Google</a>");
+		if (Set["Show save image link"])
+			pf.append("&nbsp; • &nbsp;<a href='" + src + "' download='" + src.split("/").pop() + "' target='_blank'>Save</a>");
 	}
 };
 
@@ -112,31 +123,31 @@ Keybinds = {
 			var tag = null;
 			switch (e.which) {
 				case 83:
-					if (Set["Spoiler tags"])
+					if (Set["Spoiler tags (Ctrl+S)"])
 						tag = "?";
 				break;
 				case 66:
-					if (Set["Bold tags"])
+					if (Set["Bold tags (Ctrl+B)"])
 						tag = "b";
 				break;
 				case 73:
-					if (Set["Italic tags"])
+					if (Set["Italic tags (Ctrl+I)"])
 						tag = "?";
 				break;
 				case 85:
-					if (Set["Underline tags"])
+					if (Set["Underline tags (Ctrl+U)"])
 						tag = "u";
 				break;
 				case 82:
-					if (Set["Strikethrough tags"])
+					if (Set["Strikethrough tags (Ctrl+R)"])
 						tag = "s";
 				break;
 				case 81:
-					if (Set["Enable quick reply"] && Set["Toggle quick reply"])
+					if (Set["Enable quick reply"] && Set["Toggle quick reply (Ctrl+Q)"])
 						return QR.toggle();
 				break;
 				case 90:
-					if (Set["Mark thread as read"]) {
+					if (Set["Mark thread as read (Ctrl+Z)"]) {
 						Title.unread = [];
 						return Title.update();
 					}
@@ -184,19 +195,21 @@ Main = {
 		if (Set["Enable keybinds"])
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
-			AutoUpdate.init();
+			AutoUpdater.init();
 		Main.nodes($j(".thread table"));
-	},
-	prenode: function(node) {
-		
 	},
 	nodes: function(nodes) {
 		for (var i = 0, l = nodes.length; i < l; i++) {
-			Main.prenode(nodes[i]);
 			if (Set["Show thread information in title"])
 				Title.node(nodes[i]);
 			if (Set["Enable filter"])
 				Filter.node(nodes[i]);
+			if (Set["Enable backlinks"])
+				Backlinks.node(nodes[i]);
+			if (Set["Enable inline replies"])
+				InlineReplies.node(nodes[i]);
+			if (Set["Enable links"])
+				Links.node(nodes[i]);
 		}
 	}
 };
@@ -212,7 +225,7 @@ QR = {
 	init: function() {
 		var pf = $j("#postform");
 		var pa = $j(".postarea");
-		$j("<a />").attr("href", "javascript:;").html("<h5>Show/Hide Post Form</h5>").on("click", function() {
+		$j("<a />").attr("href", "javascript:;").html("<h5>Toggle Post Form</h5>").on("click", function() {
 			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
 		}).click().prependTo(pa);
 		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.show).prependTo(pa);
@@ -256,7 +269,6 @@ Settings = {
 			"Enable thread autoupdate": true
 		},
 		Images: {
-			"Show image on hover": true,
 			"Show spoilered images": true,
 			"Animate gif thumbnails": true
 		},
@@ -264,28 +276,31 @@ Settings = {
 			"Enable favicons": true,
 			"Show thread information in title": true
 		},
-		Posting: {
+		QR: {
 			"Enable quick reply": true,
 			"Hide quick reply after posting": false,
 			"Quote selected text on quick reply": true
 		},
 		Posts: {
 			"Enable backlinks": true,
-			"Enable inline replies": true,
+			"Enable inline replies": true
+		},
+		Links: {
+			"Enable links": true,
 			"Show google image link": true,
 			"Show save image link": true
 		},
 		Keybinds: {
 			"Enable keybinds": true,
-			"Spoiler tags": true,
-			"Bold tags": true,
-			"Italic tags": true,
-			"Underline tags": true,
-			"Strikethrough tags": true,
-			"Toggle quick reply": true,
-			"Mark thread as read": true
+			"Spoiler tags (Ctrl+S)": true,
+			"Bold tags (Ctrl+B)": true,
+			"Italic tags (Ctrl+I)": true,
+			"Underline tags (Ctrl+U)": true,
+			"Strikethrough tags (Ctrl+R)": true,
+			"Toggle quick reply (Ctrl+Q)": true,
+			"Mark thread as read (Ctrl+Z)": true
 		},
-		Other: {
+		Advanced: {
 			"Automatically check for updates": true
 		},
 		Filter: {
@@ -309,6 +324,10 @@ Settings = {
 		$j("<textarea />").attr("name", "filter.names").attr("placeholder", "Names").val(Settings.get("filter.names")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.trips").attr("placeholder", "Tripcodes").val(Settings.get("filter.trips")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.posts").attr("placeholder", "Posts").val(Settings.get("filter.posts")).appendTo(sw);
+		$j("<h2 />").text("More").appendTo(sw);
+		$j("<label />").html("<a href='https://raw.github.com/milkytiptoe/ponychan-x/master/changelog' target='_blank'>Changelog</a>").appendTo(sw);
+		$j("<label />").html("<a href='http://www.ponychan.net/chan/meta/res/115168+50.html' target='_blank'>Feedback</a>").appendTo(sw);
+		$j("<label />").text("Version 1." + Main.version.toString().substring(1)).appendTo(sw);
 		$j("<img />").attr("src", "http://www.milkyis.me/ponychanx/icon.png").appendTo(sw);
 		$j("<input />").attr("type", "button").val("Apply").on("click", Settings.save).appendTo(sw);
 	},
