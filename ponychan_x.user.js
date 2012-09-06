@@ -256,9 +256,13 @@ Ponychan = {
 
 QR = {
 	el: null,
+	ajax: null,
+	action: "",
+	timer: 15,
 	init: function() {
 		var pf = $j("#postform");
 		var pa = $j(".postarea");
+		QR.action = pf.attr("action");
 		$j("<a />").attr("href", "javascript:;").html("<h5>Toggle Post Form</h5>").on("click", function() {
 			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
 		}).click().prependTo(pa);
@@ -270,17 +274,44 @@ QR = {
 		QR.el.toggle();
 		Settings.set("qr.display", QR.el.css("display"));
 	},
+	clear: function() {
+		QR.title("");
+	},
 	move: function() {
 		
 	},
 	post: function() {
-	
+		if (QR.ajax != null)
+			return QR.ajax.abort();
+		QR.ajax = $j.ajax({
+			processData: false,
+			contentType: false,
+			type: "POST",
+			url: QR.action,
+			data: d,
+		}).done(function(response, status, xhr) {
+			if (xhr.status != 200)
+				return QR.title("(" + xhr.status + ") An error occured while posting");
+			if (/<title>Ponychan<\/title>/.test(response))
+				return QR.title(response.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
+			if (/<title>YOU ARE BANNED!<\/title>/.test(response))
+				return QR.title("You are banned! <a href='http://www.ponychan.net/chan/banned.php'>View reason</a>");
+			QR.clear();
+			QR.cooldown();
+		}).fail(function(xhr, status) {
+			QR.title(xhr.status == 0 ? status == "abort" ? "Posting aborted" : "An error occured while posting" : "(" + xhr.status + ") An error occured while posting");
+		}).always(function() {
+			QR.ajax = null;
+		});
 	},
-	quote: function() {
+	quote: function(pid) {
 	
 	},
 	cooldown: function() {
-	
+		
+	},
+	title: function(title) {
+		$j("#qr-title").html(title);
 	}
 };
 
@@ -443,7 +474,15 @@ ThreadUpdater = {
 			ifModified: true,
 			url: document.URL
 		}).done(function(response, status, xhr) {
-			
+			if (xhr.status != 200)
+				return;
+			var last = $j("a[name]", ".thread table:not(.inline):last");
+			var lastid = last.length ? parseInt(last.attr("name")) : -1;
+			var posts = $j(".thread table", response);
+			for (var i = 0, l = posts.length; i < l; i++) {
+				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid)
+					$j(".thread").append(posts[i]);
+			}
 		}).fail(function(xhr) {
 			if (xhr.status == 404)
 				Main.status = 404;
