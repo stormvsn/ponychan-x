@@ -308,7 +308,17 @@ QR = {
 		});
 	},
 	quote: function(pid) {
-		
+		var qtext = "";
+		if (Set["Quote selected text on quick reply"])
+			qtext = $j.trim(window.getSelection().toString());
+		var quote = ">>" + pid + (qtext.length > 0 ? "\n>" + qtext + "\n" : "\n");
+		var ta = $j("textarea", "#qr").get(0);
+		var val = ta.value;
+		var ss = ta.selectionStart;
+		var se = ta.selectionEnd;
+		var r = se + quote.length;
+		ta.value = val.slice(0, ss) + quote + val.slice(se);
+		ta.setSelectionRange(r, r);
 	},
 	cooldown: function() {
 		
@@ -317,6 +327,8 @@ QR = {
 		$j("#qr-title").html(title);
 	},
 	node: function(post) {
+		if (Main.thread == "0")
+			return;
 		var el = $j(".reflink a:nth-child(2)", post);
 		el.removeAttr("onclick").on("click", function() { QR.quote(el.text()); });
 	}
