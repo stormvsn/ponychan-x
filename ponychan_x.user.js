@@ -230,21 +230,24 @@ Main = {
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
 			AutoUpdater.init();
-		Main.nodes($j(".thread table"));
+		$j(".thread table").each(function() {
+			Main.node(this);
+		});
 	},
-	nodes: function(nodes) {
-		for (var i = 0, l = nodes.length; i < l; i++) {
-			if (Set["Show thread information in title"])
-				Title.node(nodes[i]);
-			if (Set["Enable filter"])
-				Filter.node(nodes[i]);
-			if (Set["Enable backlinks"])
-				Backlinks.node(nodes[i]);
-			if (Set["Enable inline replies"])
-				InlineReplies.node(nodes[i]);
-			if (Set["Enable links"])
-				Links.node(nodes[i]);
-		}
+	node: function(post) {
+		if (Set["Show thread information in title"])
+			Title.node(post);
+		if (Set["Enable filter"])
+			Filter.node(post);
+		if (Set["Enable backlinks"])
+			Backlinks.node(post);
+		if (Set["Enable inline replies"])
+			InlineReplies.node(post);
+		if (Set["Enable links"])
+			Links.node(post);
+		if (Set["Enable quick reply"])
+			QR.node(post);
+		return post;
 	}
 };
 
@@ -305,13 +308,17 @@ QR = {
 		});
 	},
 	quote: function(pid) {
-	
+		
 	},
 	cooldown: function() {
 		
 	},
 	title: function(title) {
 		$j("#qr-title").html(title);
+	},
+	node: function(post) {
+		var el = $j(".reflink a:nth-child(2)", post);
+		el.removeAttr("onclick").on("click", function() { QR.quote(el.text()); });
 	}
 };
 
@@ -481,7 +488,7 @@ ThreadUpdater = {
 			var posts = $j(".thread table", response);
 			for (var i = 0, l = posts.length; i < l; i++) {
 				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid)
-					$j(".thread").append(posts[i]);
+					$j(".thread").append(Main.node(posts[i]));
 			}
 		}).fail(function(xhr) {
 			if (xhr.status == 404)
