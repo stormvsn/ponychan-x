@@ -74,10 +74,14 @@ Css = {
 		#qr input[type='file'] { width: 70%; }\
 		#qr input[type='submit'] { width: 30%; }\
 		#qr input[type='checkbox'] { position: relative; top: 2px; }\
+		#qr-images-wrapper { overflow-x: scroll; background-color: darkGray; position: relative; min-height: 97px; display: none; }\
+		#qr-images { position: absolute; top: 0; left: 0; overflow: hidden; white-space: pre; }\
 		#qr-title, #qr-opts { box-sizing: border-box; -moz-box-sizing: border-box; display: inline-block; padding: 3px; color: white; }\
 		#qr-title { min-width: 86%; }\
 		#qr-opts { text-align: right; min-width: 14%; }\
 		#qr-opts a { color: white; cursor: pointer; padding-left: 1px; font-weight: bold; }\
+		.qr-thumb { border: 1px solid darkGray; -webkit-transition: opacity .15s ease-in-out; -moz-transition: opacity .15s ease-in-out; transition: opacity .15s ease-in-out; -o-transition: opacity .15s ease-in-out; opacity: .6; width: 78px; height: 78px; background-size: cover; cursor: pointer; display: inline-block; }\
+		.qr-thumb:hover { opacity: 1; }\
 		.extrabtns { vertical-align: top; }\
 		#dialog { position: fixed; bottom: 5px; right: 10px; }\
 		#countdown { margin-right: 5px; }\
@@ -275,10 +279,13 @@ QR = {
 	ajax: null,
 	action: "",
 	timer: 15,
+	files: [],
+	maxsize: 0,
 	init: function() {
 		var pf = $j("#postform");
 		var pa = $j(".postarea");
 		QR.action = pf.attr("action");
+		QR.maxsize = $j("#postform input[name='MAX_FILE_SIZE']").val();
 		$j("<a />").attr("href", "javascript:;").html("<h5>Toggle Post Form</h5>").on("click", function() {
 			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
 		}).click().prependTo(pa);
@@ -286,21 +293,45 @@ QR = {
 		QR.el = $j("<div />").attr("id", "qr").appendTo("body");
 		QR.el.css("display", Settings.get("qr.block") || "block").css("left", Settings.get("qr.left") || "40px").css("top", Settings.get("qr.top") || "40px");
 		var move = $j("<div />").attr("id", "qr-move").on("mousedown", QR.move).appendTo(QR.el);
-		$j("<span />").attr("id", "qr-title").html("Error").appendTo(move);
+		$j("<span />").attr("id", "qr-title").appendTo(move);
 		var opts = $j("<span />").attr("id", "qr-opts").appendTo(move);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Expand").text("+").appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Expand").text("+").on("click", function() { $j("#qr-images-wrapper").toggle(); }).appendTo(opts);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Up").text("▲").appendTo(opts);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Down").text("▼").appendTo(opts);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Close").text("X").on("click", QR.toggle).appendTo(opts);
-		$j("<div />").attr("id", "qr-images").appendTo(QR.el);
+		var imageswrapper = $j("<div />").attr("id", "qr-images-wrapper").appendTo(QR.el);
+		$j("<div />").attr("id", "qr-images").appendTo(imageswrapper);
 		$j("<input />").attr("type", "text").attr("name", "name").attr("placeholder", "Name").appendTo(QR.el);
 		$j("<input />").attr("type", "text").attr("name", "em").attr("placeholder", "Email").appendTo(QR.el);
 		$j("<input />").attr("type", "text").attr("name", "subject").attr("placeholder", "Subject").appendTo(QR.el);
 		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").appendTo(QR.el);
-		$j("<input />").attr("type", "file").attr("multiple", "").appendTo(QR.el);
-		$j("<input />").attr("type", "submit").val("Post").appendTo(QR.el);
+		$j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
+		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
 		$j("<label />").html("<input type='checkbox' id='qr-auto' /> (0) Auto").appendTo(QR.el);
 		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(QR.el);
+	},
+	add: function(e) {
+		QR.title("");
+		var files = e.target.files;
+		if (files.length == 0)
+			return;
+		var wrapper = $j("#qr-images");
+		var url = window.URL || window.webkitURL;
+		for (var i = 0, l = files.length; i < l; i++) {
+			var file = files[i];
+			if (file.size > QR.maxsize) {
+				QR.title(file.name + " is too large");
+				continue;
+			}
+			QR.files.push(file);
+			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + (file.size/1024).toFixed(0) + " KB)").appendTo(wrapper);
+			if (/^image/.test(file.type)) {
+				thumb.css("background-image", "url(" + url.createObjectURL(file) + ")");
+			}
+		}
+		if (wrapper.children().length)
+			$j("#qr-images-wrapper").css("display", "block");
+		e.target.value = "";
 	},
 	toggle: function() {
 		QR.el.toggle();
@@ -308,6 +339,9 @@ QR = {
 	},
 	clear: function() {
 		QR.title("");
+		$j("#qr textarea").val("");
+		$j("#qr input[name='subject']").val("");
+		$j("#qr input[type='checkbox']:not(#qr-auto)").get(0).checked = false;
 	},
 	move: function(e) {
 		if(e.which != 1)
@@ -328,6 +362,18 @@ QR = {
 	post: function() {
 		if (QR.ajax != null)
 			return QR.ajax.abort();
+		var d = new FormData();
+		d.append("board", Main.board);
+		d.append("replythread", Main.thread);
+		d.append("ponychanx", Main.version);
+		d.append("stats_referrer", "");
+		d.append("postpassword", $j("#postform :input[name='postpassword']").val());
+		d.append("how_much_pony_can_you_handle", $j("#postform :input[name='how_much_pony_can_you_handle']").val());
+		$j(":input:not([type='file'],[type='submit'],[name='auto'])", "#qr").each(function() {
+			var value = this.getAttribute("type") == "checkbox" ? this.checked == true ? "true" : null : this.value;
+			if (value != null)
+				d.append(this.name, value);
+		});
 		QR.ajax = $j.ajax({
 			processData: false,
 			contentType: false,
@@ -537,6 +583,7 @@ ThreadUpdater = {
 		}).done(function(response, status, xhr) {
 			if (xhr.status != 200)
 				return;
+			$j("#postform :input[name='how_much_pony_can_you_handle']").val($j("#postform :input[name='how_much_pony_can_you_handle']", response).val());
 			var last = $j("a[name]", ".thread table:not(.inline):last");
 			var lastid = last.length ? parseInt(last.attr("name")) : -1;
 			var posts = $j(".thread table", response);
