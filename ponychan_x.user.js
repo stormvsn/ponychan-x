@@ -71,8 +71,8 @@ Css = {
 		#qr input[type='text'], #qr textarea { min-width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; display: block; }\
 		#qr textarea { padding: 3px; font-family: Arial; font-size: 13px; min-height: 120px; }\
 		#qr input[type='text'] { padding: 2px; min-height: 26px; }\
-		#qr input[type='file'] { width: 70%; }\
-		#qr input[type='submit'] { width: 30%; }\
+		#qr input[type='file'] { width: 80%; }\
+		#qr input[type='submit'] { width: 20%; }\
 		#qr input[type='checkbox'] { position: relative; top: 2px; }\
 		#qr-images-wrapper { overflow-x: scroll; background-color: darkGray; position: relative; min-height: 97px; display: none; }\
 		#qr-images { position: absolute; top: 0; left: 0; overflow: hidden; white-space: pre; }\
@@ -82,6 +82,7 @@ Css = {
 		#qr-opts a { color: white; cursor: pointer; padding-left: 1px; font-weight: bold; }\
 		.qr-thumb { border: 1px solid darkGray; -webkit-transition: opacity .15s ease-in-out; -moz-transition: opacity .15s ease-in-out; transition: opacity .15s ease-in-out; -o-transition: opacity .15s ease-in-out; opacity: .6; width: 78px; height: 78px; background-size: cover; cursor: pointer; display: inline-block; }\
 		.qr-thumb:hover { opacity: 1; }\
+		#qr-thumb-selected { opacity: 1; border: 1px solid black; }\
 		.extrabtns { vertical-align: top; }\
 		#dialog { position: fixed; bottom: 5px; right: 10px; }\
 		#countdown { margin-right: 5px; }\
@@ -280,6 +281,7 @@ QR = {
 	action: "",
 	timer: 15,
 	files: [],
+	file: null,
 	maxsize: 0,
 	init: function() {
 		var pf = $j("#postform");
@@ -295,9 +297,9 @@ QR = {
 		var move = $j("<div />").attr("id", "qr-move").on("mousedown", QR.move).appendTo(QR.el);
 		$j("<span />").attr("id", "qr-title").appendTo(move);
 		var opts = $j("<span />").attr("id", "qr-opts").appendTo(move);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Expand").text("+").on("click", function() { $j("#qr-images-wrapper").toggle(); }).appendTo(opts);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Up").text("▲").appendTo(opts);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Down").text("▼").appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Toggle image queue").text("+").on("click", function() { $j("#qr-images-wrapper").toggle(); }).appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Jump to top of page").text("▲").appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Jump to bottom of page").text("▼").appendTo(opts);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Close").text("X").on("click", QR.toggle).appendTo(opts);
 		var imageswrapper = $j("<div />").attr("id", "qr-images-wrapper").appendTo(QR.el);
 		$j("<div />").attr("id", "qr-images").appendTo(imageswrapper);
@@ -307,7 +309,7 @@ QR = {
 		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").appendTo(QR.el);
 		$j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
-		$j("<label />").html("<input type='checkbox' id='qr-auto' /> (0) Auto").appendTo(QR.el);
+		$j("<label />").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(QR.el);
 		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(QR.el);
 	},
 	add: function(e) {
@@ -324,14 +326,40 @@ QR = {
 				continue;
 			}
 			QR.files.push(file);
-			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + (file.size/1024).toFixed(0) + " KB)").appendTo(wrapper);
+			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + (file.size/1024).toFixed(0) + " KB) (Shift+Click to remove)").appendTo(wrapper);
+			var furl = url.createObjectURL(file);
 			if (/^image/.test(file.type)) {
-				thumb.css("background-image", "url(" + url.createObjectURL(file) + ")");
+				thumb.css("background-image", "url(" + furl + ")");
 			}
+			(function(thumb, file, furl) {
+				thumb.on("click", function(e) {
+					if (e.shiftKey) {
+						url.revokeObjectURL(furl);
+						$j(this).remove();
+						QR.updatequeue();
+					} else {
+						var selected = $j("#qr-thumb-selected");
+						if (selected.length)
+							selected.removeAttr("id");
+						$j(this).attr("id", "qr-thumb-selected");
+						QR.file = file;
+					}
+				});
+			})(thumb, file, furl);
 		}
-		if (wrapper.children().length)
-			$j("#qr-images-wrapper").css("display", "block");
+		QR.updatequeue();
 		e.target.value = "";
+	},
+	updatequeue: function() {
+		var children = $j("#qr-images").children();
+		$j("#qr-auto-number").text("(" + children.length + ")");
+		if (children.length) {
+			children.first().click();
+			$j("#qr-images-wrapper").show();
+		} else {
+			$j("#qr-images-wrapper").hide();
+			QR.files = [];
+		}
 	},
 	toggle: function() {
 		QR.el.toggle();
@@ -339,6 +367,10 @@ QR = {
 	},
 	clear: function() {
 		QR.title("");
+		var selected = $j("#qr-thumb-selected");
+		QR.file = null;
+		selected.remove();
+		QR.updatequeue();
 		$j("#qr textarea").val("");
 		$j("#qr input[name='subject']").val("");
 		$j("#qr input[type='checkbox']:not(#qr-auto)").get(0).checked = false;
@@ -362,6 +394,8 @@ QR = {
 	post: function() {
 		if (QR.ajax != null)
 			return QR.ajax.abort();
+		var button = $j("#qr input[type='submit']");
+		button.val("...");
 		var d = new FormData();
 		d.append("board", Main.board);
 		d.append("replythread", Main.thread);
@@ -369,6 +403,8 @@ QR = {
 		d.append("stats_referrer", "");
 		d.append("postpassword", $j("#postform :input[name='postpassword']").val());
 		d.append("how_much_pony_can_you_handle", $j("#postform :input[name='how_much_pony_can_you_handle']").val());
+		if (QR.file != null)
+			d.append("imagefile", QR.file);
 		$j(":input:not([type='file'],[type='submit'],[name='auto'])", "#qr").each(function() {
 			var value = this.getAttribute("type") == "checkbox" ? this.checked == true ? "true" : null : this.value;
 			if (value != null)
@@ -380,6 +416,14 @@ QR = {
 			type: "POST",
 			url: QR.action,
 			data: d,
+			xhr: function() {
+				var xhr = new window.XMLHttpRequest();
+				xhr.upload.addEventListener("progress", function(e) {
+					if (e.lengthComputable)
+						button.val(Math.round(e.loaded * 100 / e.total).toString() + '%');
+				}, false);
+				return xhr;
+			},
 		}).done(function(response, status, xhr) {
 			if (xhr.status != 200)
 				return QR.title("(" + xhr.status + ") An error occured while posting");
@@ -409,7 +453,20 @@ QR = {
 		ta.setSelectionRange(r, r);
 	},
 	cooldown: function() {
-		
+		var button = $j("#qr input[type='submit']");
+		if (QR.timer > 0) {
+			setTimeout(QR.cooldown, 1000);
+			button.attr("disabled", "disabled").val(QR.timer--);
+		} else {
+			var autobutton = $j("#qr-auto");
+			button.removeAttr("disabled").val("Post");
+			QR.timer = 15;
+			if (autobutton.is(":checked") && $j("#qr-images").children().length) {
+				QR.post();
+			} else {
+				autobutton.get(0).checked = false;
+			}
+		}
 	},
 	title: function(title) {
 		$j("#qr-title").html(title);
