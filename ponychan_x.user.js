@@ -59,12 +59,25 @@ Css = {
 		.hidden { height: 0; visibility: hidden; }\
 		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
 		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
-		#settingsWrapper label { font-family: Arial; font-size: 14px; color: black; cursor: pointer; display: block; }\
+		#settingsWrapper label { font-family: Arial; font-size: 12px; color: black; cursor: pointer; display: block; }\
 		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
 		#settingsWrapper h2 { font-size: 1em; }\
 		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
-		#qr { min-width: 400px; }\
+		#qr * { margin: 0; padding: 0; }\
+		#qr label { cursor: pointer; margin: 0 2px 0 1px; }\
+		#qr-move { min-width: 100%; height: 22px; background-color: black; cursor: move; }\
+		#qr { border-radius: 3px; padding: 1px; background-color: #e2e2e2; border: 1px solid black; z-index: 1; font-family: Arial, Verdana, sans-serif; font-size: 12px; min-width: 400px; position: fixed; }\
+		#qr input[type='text'], #qr textarea { min-width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; display: block; }\
+		#qr textarea { padding: 3px; font-family: Arial; font-size: 13px; min-height: 120px; }\
+		#qr input[type='text'] { padding: 2px; min-height: 26px; }\
+		#qr input[type='file'] { width: 70%; }\
+		#qr input[type='submit'] { width: 30%; }\
+		#qr input[type='checkbox'] { position: relative; top: 2px; }\
+		#qr-title, #qr-opts { box-sizing: border-box; -moz-box-sizing: border-box; display: inline-block; padding: 3px; color: white; }\
+		#qr-title { min-width: 86%; }\
+		#qr-opts { text-align: right; min-width: 14%; }\
+		#qr-opts a { color: white; cursor: pointer; padding-left: 1px; font-weight: bold; }\
 		.extrabtns { vertical-align: top; }\
 		#dialog { position: fixed; bottom: 5px; right: 10px; }\
 		#countdown { margin-right: 5px; }\
@@ -269,9 +282,25 @@ QR = {
 		$j("<a />").attr("href", "javascript:;").html("<h5>Toggle Post Form</h5>").on("click", function() {
 			pf.hasClass("hidden") ? pf.removeClass("hidden") : pf.addClass("hidden");
 		}).click().prependTo(pa);
-		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.show).prependTo(pa);
+		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.toggle).prependTo(pa);
 		QR.el = $j("<div />").attr("id", "qr").appendTo("body");
-		QR.el.css("display", Settings.get("qr.block") || "block").css("left", Settings.get("qr.left") || "20px").css("top", Settings.get("qr.top") || "20px");
+		QR.el.css("display", Settings.get("qr.block") || "block").css("left", Settings.get("qr.left") || "40px").css("top", Settings.get("qr.top") || "40px");
+		var move = $j("<div />").attr("id", "qr-move").on("mousedown", QR.move).appendTo(QR.el);
+		$j("<span />").attr("id", "qr-title").html("Error").appendTo(move);
+		var opts = $j("<span />").attr("id", "qr-opts").appendTo(move);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Expand").text("+").appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Up").text("▲").appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Down").text("▼").appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Close").text("X").on("click", QR.toggle).appendTo(opts);
+		$j("<div />").attr("id", "qr-images").appendTo(QR.el);
+		$j("<input />").attr("type", "text").attr("name", "name").attr("placeholder", "Name").appendTo(QR.el);
+		$j("<input />").attr("type", "text").attr("name", "em").attr("placeholder", "Email").appendTo(QR.el);
+		$j("<input />").attr("type", "text").attr("name", "subject").attr("placeholder", "Subject").appendTo(QR.el);
+		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").appendTo(QR.el);
+		$j("<input />").attr("type", "file").attr("multiple", "").appendTo(QR.el);
+		$j("<input />").attr("type", "submit").val("Post").appendTo(QR.el);
+		$j("<label />").html("<input type='checkbox' id='qr-auto' /> (0) Auto").appendTo(QR.el);
+		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(QR.el);
 	},
 	toggle: function() {
 		QR.el.toggle();
@@ -280,8 +309,21 @@ QR = {
 	clear: function() {
 		QR.title("");
 	},
-	move: function() {
-		
+	move: function(e) {
+		if(e.which != 1)
+			return;
+		e.originalEvent.preventDefault();
+		var start = QR.el.position();
+		var xoff = e.pageX - start.left;
+		var yoff = e.pageY - start.top;
+		$j(window).on("mousemove.QR", function(e) {
+			QR.el.css("left", e.clientX - xoff);
+			QR.el.css("top", e.clientY - yoff);
+		}).on("mouseup.QR", function(e) {
+			$j(window).off("mousemove.QR").off("mouseup.QR");
+			Settings.set("qr.left", e.clientX - xoff + "px");
+			Settings.set("qr.top", e.clientY - yoff + "px");
+		});
 	},
 	post: function() {
 		if (QR.ajax != null)
