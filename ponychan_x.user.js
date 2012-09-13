@@ -18,9 +18,15 @@
 
 var $j = jQuery.noConflict();
 
-var AutoUpdater, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ThreadUpdater;
+var AutoGif, AutoUpdater, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater;
 
 var Set = {};
+
+AutoGif = {
+	node: function(post) {
+		
+	}
+};
 
 AutoUpdater = {
 	init: function() {
@@ -56,7 +62,7 @@ Css = {
 	init: function() {
 		$j("<style />").text("\
 		.postarea h5 { margin: 0 0 0.5em 0; }\
-		.hidden { height: 0; visibility: hidden; }\
+		.hidden { display: none; height: 0; visibility: hidden; }\
 		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
 		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
 		#settingsWrapper label { font-family: Arial; font-size: 12px; color: black; cursor: pointer; display: block; }\
@@ -141,7 +147,6 @@ Filter = {
 	trips: [],
 	emails: [],
 	subjects: [],
-	posts: [],
 	init: function() {
 		var names = Settings.get("filter.names");
 		if (names != null)
@@ -155,12 +160,19 @@ Filter = {
 		var subjects = Settings.get("filter.subjects");
 		if (subjects != null)
 			Filter.subjects = trips.split("\n");
-		var posts = Settings.get("filter.posts");
-		if (posts != null)
-			Filter.posts = posts.split("\n");
 	},
 	node: function(post) {
-		// return $j(post).addClass("hidden");
+		if (Filter.names.indexOf($j(".postername", post).text()) > -1)
+			return $j(post).addClass("hidden");
+		var tripfield = $j(".postertrip", post);
+		if (tripfield.length && Filter.trips.indexOf(tripfield.text()) > -1)
+			return $j(post).addClass("hidden");
+		var subjectfield = $j(".filetitle", post);
+		if (subjectfield.length && Filter.subjects.indexOf(subjectfield.text()) > -1)
+			return $j(post).addClass("hidden");
+		var emailfield = $j(".postername a", post);
+		if (emailfield.length && Filter.emails.indexOf(emailfield.attr("href").toString().substring(7)) > -1)
+			return $j(post).addClass("hidden");
 	}
 };
 
@@ -265,6 +277,10 @@ Main = {
 			Links.node(post);
 		if (Set["Enable quick reply"])
 			QR.node(post);
+		if (Set["Animate gif thumbnails"])
+			AutoGif.node(post);
+		if (Set["Show spoilered images"])
+			ShowSpoiler.node(post);
 		return post;
 	}
 };
@@ -366,10 +382,11 @@ QR = {
 		Settings.set("qr.display", QR.el.css("display"));
 	},
 	clear: function() {
+		if (Set["Hide quick reply after posting"])
+			QR.el.hide();
 		QR.title("");
-		var selected = $j("#qr-thumb-selected");
+		$j("#qr-thumb-selected").remove();
 		QR.file = null;
-		selected.remove();
 		QR.updatequeue();
 		$j("#qr textarea").val("");
 		$j("#qr input[name='subject']").val("");
@@ -557,7 +574,6 @@ Settings = {
 		$j("<textarea />").attr("name", "filter.trips").attr("placeholder", "Tripcodes").val(Settings.get("filter.trips")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.emails").attr("placeholder", "Emails").val(Settings.get("filter.emails")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.subjects").attr("placeholder", "Subjects").val(Settings.get("filter.subjects")).appendTo(sw);
-		$j("<textarea />").attr("name", "filter.posts").attr("placeholder", "Posts").val(Settings.get("filter.posts")).appendTo(sw);
 		$j("<h2 />").text("More").appendTo(sw);
 		$j("<label />").html("<a href='https://raw.github.com/milkytiptoe/ponychan-x/master/changelog' target='_blank'>Changelog</a>").appendTo(sw);
 		$j("<label />").html("<a href='http://www.ponychan.net/chan/meta/res/115168+50.html' target='_blank'>Feedback</a>").appendTo(sw);
@@ -578,6 +594,12 @@ Settings = {
 			Settings.set(this.name, this.value);
 		});
 		location.reload(true);
+	}
+};
+
+ShowSpoiler = {
+	node: function(post) {
+	
 	}
 };
 
