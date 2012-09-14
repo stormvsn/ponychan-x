@@ -67,12 +67,14 @@ Css = {
 	init: function() {
 		$j("<style />").text("\
 		.postarea h5 { margin: 0 0 1.5em 0; }\
+		.inline { border: 1px solid rgba(0, 0, 0, 0.3); }\
 		.hidden { display: none; height: 0; visibility: hidden; }\
 		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
 		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
 		#settingsWrapper label { font-family: Arial; font-size: 12px; color: black; cursor: pointer; display: block; }\
 		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
-		#settingsWrapper h2 { font-size: 1em; }\
+		#settingsWrapper h2 { margin-top: 9px; font-size: 1em; }\
+		#settingsWrapper h2:first-child { margin-top: 0; }\
 		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
 		#qr * { margin: 0; padding: 0; }\
@@ -278,7 +280,6 @@ Main = {
 			var p = a.parents(".reply").parent().parent().parent().first();
 			if (!a.length || !p.length)
 				return;
-			this.removeEventListener("mouseover", false);
 			$j(this).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover);
 		});
 	},
@@ -530,6 +531,7 @@ QR = {
 		var r = se + quote.length;
 		ta.value = val.slice(0, ss) + quote + val.slice(se);
 		ta.setSelectionRange(r, r);
+		return ta.focus();
 	},
 	cooldown: function() {
 		var button = $j("#qr input[type='submit']");
@@ -724,7 +726,8 @@ ThreadUpdater = {
 	update: function() {
 		$j.ajax({
 			ifModified: true,
-			url: document.URL
+			url: document.URL,
+			cache: false,
 		}).done(function(response, status, xhr) {
 			if (xhr.status != 200)
 				return;
