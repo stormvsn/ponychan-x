@@ -1,3 +1,29 @@
+v1.00 alpha (Please note several features from 0.41 are missing in this release and will be reintroduced over time)
+- Updated settings interface
+- Fixed settings applying before applying changes
+- Fixed tag keybinds working when quick reply is not focused
+- Fixed tag keybinds in post form
+- Added "Enable favicons" setting
+- Added "Mark thread as read" keybind
+- Fixed inline replies and backlinks when a quote has text besides numbers
+- Fixed inline replies not being full width
+- Added subject and email options to filter
+- Added 404 favicon
+- Fixed 404 status disappearing from title
+- Fixed resizing quick reply textarea not resizing quick reply
+- Fixed dragging quick reply causing quick reply to jump
+- Added button to collapse quick reply image queue
+- Added subject option to filter
+- Updated jQuery library
+- Fixed deleting posts that are inline
+- Removed "Hide original post form" setting
+- Removed "Expand images on hover" setting
+- Renamed "Show new post count in title" setting to "Show thread information in title". This setting will now also include the board name in the title.
+- Fixed quick reply blocking non-image files
+- Fixed unread counter being 0 when thread first loads
+- Keybind tags will now wrap around selected text in quick reply
+- Fixed some features not applying to OP posts
+
 0.41
 - Fixed quick reply message clearing after selecting an image
 - Added ban notification

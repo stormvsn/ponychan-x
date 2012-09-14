@@ -29,10 +29,10 @@ var Set = {};
 
 AutoGif = {
 	node: function(post) {
-		var filesizespan = $j(".filesize", post);
+		var filesizespan = $j(".filesize:first", post);
 		if (!filesizespan.length || !/.gif/.test(filesizespan.text()))
 			return;
-		$j("a span[id] img", post).attr("src", $j("a", filesizespan).attr("href"));
+		$j("a span[id] img:first", post).attr("src", $j("a", filesizespan).attr("href"));
 	}
 };
 
@@ -57,7 +57,7 @@ AutoUpdater = {
 
 Backlinks = {
 	node: function(post) {
-		$j("blockquote a", post).each(function() {
+		$j("blockquote:first a", post).each(function() {
 			var pid = this.className.split("|").pop();
 			var a = $j(".reflink a:contains(" + pid + ")");
 			if (a.length) {
@@ -112,10 +112,10 @@ Css = {
 
 Links = {
 	node: function(post) {
-		var fa = $j(".filesize a", post);
+		var fa = $j(".filesize:first a", post);
 		if (!fa.length)
 			return;
-		var pf = $j(".postfooter", post);
+		var pf = $j(".postfooter:first", post);
 		var src = fa.attr("href");
 		if (Set["Show google image link"])
 			pf.append("&nbsp; • &nbsp;<a href='http://www.google.com/searchbyimage?image_url=" + src + "' target='_blank'>Google</a>");
@@ -160,17 +160,17 @@ Filter = {
 			Filter.subjects = trips.split("\n");
 	},
 	node: function(post) {
-		if ($j(".mod", post).length || $j(".admin", post).length)
+		if ($j(".mod:first", post).length || $j(".admin:first", post).length)
 			return;
-		if (Filter.names.indexOf($j(".postername", post).text()) > -1)
+		if (Filter.names.indexOf($j(".postername:first", post).text()) > -1)
 			return $j(post).addClass("hidden");
-		var tripfield = $j(".postertrip", post);
+		var tripfield = $j(".postertrip:first", post);
 		if (tripfield.length && Filter.trips.indexOf(tripfield.text()) > -1)
 			return $j(post).addClass("hidden");
-		var subjectfield = $j(".filetitle", post);
+		var subjectfield = $j(".filetitle:first", post);
 		if (subjectfield.length && Filter.subjects.indexOf(subjectfield.text()) > -1)
 			return $j(post).addClass("hidden");
-		var emailfield = $j(".postername a", post);
+		var emailfield = $j(".postername:first a", post);
 		if (emailfield.length && Filter.emails.indexOf(emailfield.attr("href").toString().substring(7)) > -1)
 			return $j(post).addClass("hidden");
 	}
@@ -178,7 +178,7 @@ Filter = {
 
 InlineReplies = {
 	node: function(post) {
-		$j("blockquote a", post).each(function() {
+		$j("blockquote:first a", post).each(function() {
 			var pid = this.className.split("|").pop();
 			var a = $j(".reflink a:contains(" + pid + ")");
 			var p = a.parents(".reply").parent().parent().parent().first();
@@ -276,12 +276,15 @@ Main = {
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
 			AutoUpdater.init();
+		$j(".thread").each(function() {
+			Main.node(this);
+		});
 		$j(".thread table:not([width])").each(function() {
 			Main.node(this);
 		});
 	},
 	prenode: function(post) {
-		$j("blockquote a", post).each(function() {
+		$j("blockquote:first a", post).each(function() {
 			var pid = this.className.split("|").pop();
 			var a = $j(".reflink a:contains(" + pid + ")");
 			var p = a.parents(".reply").parent().parent().parent().first();
@@ -573,9 +576,9 @@ QR = {
 	node: function(post) {
 		if (Main.thread == "0")
 			return;
-		var el = $j(".reflink a:nth-child(2)", post);
+		var el = $j(".reflink:first a:nth-child(2)", post);
 		el.removeAttr("onclick").attr("href", "javascript:;").on("click", function() { QR.quote(el.text()); });
-		$j(".postfooter", post).children().first().removeAttr("onclick").attr("href", "javascript:;").on("click", function() { QR.quote(el.text()); });
+		$j(".postfooter:first", post).children().first().removeAttr("onclick").attr("href", "javascript:;").on("click", function() { QR.quote(el.text()); });
 	},
 	save: function() {
 		Settings.set("qr.name", $j("#qr :input[name='name']").val());
@@ -688,10 +691,10 @@ Settings = {
 
 ShowSpoiler = {
 	node: function(post) {
-		var filesizespan = $j(".filesize", post);
+		var filesizespan = $j(".filesize:first", post);
 		if (!filesizespan.length || !/, spoiler\.(gif|png|bmp|jpg)/.test(filesizespan.text()))
 			return;
-		$j("a span[id] img", post).attr("src", $j("a", filesizespan).attr("href"));
+		$j("a span[id] img:first", post).attr("src", $j("a", filesizespan).attr("href"));
 	}
 };
 
@@ -766,9 +769,9 @@ ThreadUpdater = {
 		}).fail(function(xhr) {
 			if (xhr.status == 404)
 				Main.status = 404;
+			if (Set["Show thread information in title"])
+				Title.update();
 		});
-		if (Set["Show thread information in title"])
-			Title.update();
 		ThreadUpdater.count(true);
 	},
 	count: function(reset) {
