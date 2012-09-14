@@ -399,7 +399,7 @@ QR = {
 		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").appendTo(QR.el);
 		$j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
-		$j("<label />").attr("title", "Automatically post when cooldown ends (requires an image)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(QR.el);
+		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(QR.el);
 		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(QR.el);
 		if ($j("#nsfw").length)
 			$j("<label />").html("<input type='checkbox' name='nsfw' /> NSFW").appendTo(QR.el);
@@ -421,10 +421,17 @@ QR = {
 			}
 			QR.files.push(file);
 			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + (file.size/1024).toFixed(0) + " KB) (Shift+Click to remove)").appendTo(wrapper);
-			var furl = url.createObjectURL(file);
+			var furl = null; 
 			if (/^image/.test(file.type)) {
-				thumb.css("background-image", "url(" + furl + ")");
+				furl = url.createObjectURL(file);
+			} else if (/text\/plain|doc|msword$/.test(file.type)) {
+				furl = "http://www.ponychan.net/chan/inc/filetypes/text.png";
+			} else if (/css$/.test(file.type)) {
+				furl = "http://www.ponychan.net/chan/inc/filetypes/css.png";
+			} else {
+				furl = "http://www.milkyis.me/ponychanx/unknown.png";
 			}
+			thumb.css("background-image", "url(" + furl + ")");
 			(function(thumb, file, furl) {
 				thumb.on("click", function(e) {
 					if (e.shiftKey) {
@@ -525,10 +532,14 @@ QR = {
 		}).done(function(response, status, xhr) {
 			if (xhr.status != 200)
 				return QR.title("(" + xhr.status + ") An error occured while posting");
-			if (/<title>Ponychan<\/title>/.test(response))
+			if (/<title>Ponychan<\/title>/.test(response)) {
+				button.val("Retry");
 				return QR.title(response.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
-			if (/<title>YOU ARE BANNED!<\/title>/.test(response))
+			}
+			if (/<title>YOU ARE BANNED!<\/title>/.test(response)) {
+				button.val("Banned");
 				return QR.title("You are banned! <a href='http://www.ponychan.net/chan/banned.php'>View reason</a>");
+			}
 			if (Main.thread == "0")
 				location.reload(true);
 			QR.save();
@@ -536,6 +547,7 @@ QR = {
 			QR.cooldown();
 		}).fail(function(xhr, status) {
 			QR.title(xhr.status == 0 ? status == "abort" ? "Posting aborted" : "An error occured while posting" : "(" + xhr.status + ") An error occured while posting");
+			button.val("Retry");
 		}).always(function() {
 			QR.ajax = null;
 		});

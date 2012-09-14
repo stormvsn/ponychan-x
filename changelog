@@ -23,6 +23,7 @@ v1.00 alpha (Please note several features from 0.41 are missing in this release 
 - Fixed unread counter being 0 when thread first loads
 - Keybind tags will now wrap around selected text in quick reply
 - Fixed some features not applying to OP posts
+- Fixed quick reply thumbnail previews for non-image files
 
 0.41
 - Fixed quick reply message clearing after selecting an image
