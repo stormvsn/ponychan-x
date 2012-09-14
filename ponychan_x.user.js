@@ -43,7 +43,7 @@ AutoUpdater = {
 		if (last != null || now < last+86400000)
 			return;
 		$j.ajax({
-			url: "http://www.milkyis.me/ponychanx/latest.php"
+			url: "http://www.milkyis.me/ponychanx/update.php"
 		}).done(function(latest) {
 			if (latest.length != 3)
 				return;
@@ -380,8 +380,8 @@ QR = {
 		$j("<span />").attr("id", "qr-title").appendTo(move);
 		var opts = $j("<span />").attr("id", "qr-opts").appendTo(move);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Toggle image queue").text("+").on("click", function() { $j("#qr-images-wrapper").toggle(); }).appendTo(opts);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Jump to top of page").text("▲").appendTo(opts);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Jump to bottom of page").text("▼").appendTo(opts);
+		$j("<a />").attr("href", "#").attr("title", "Jump to top of page").text("▲").appendTo(opts);
+		$j("<a />").attr("href", "javascript:window.scrollTo(0, document.body.scrollHeight);").attr("title", "Jump to bottom of page").text("▼").appendTo(opts);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Close").text("X").on("click", QR.toggle).appendTo(opts);
 		var imageswrapper = $j("<div />").attr("id", "qr-images-wrapper").appendTo(QR.el);
 		$j("<div />").attr("id", "qr-images").appendTo(imageswrapper);
@@ -465,6 +465,7 @@ QR = {
 		QR.updatequeue();
 		$j("#qr textarea").val("");
 		$j("#qr input[name='subject']").val("");
+		$j("#qr input[name='embed']").val("");
 		$j("#qr input[type='checkbox']:not(#qr-auto)").get(0).checked = false;
 	},
 	move: function(e) {
