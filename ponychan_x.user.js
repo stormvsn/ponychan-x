@@ -64,7 +64,7 @@ Backlinks = {
 Css = {
 	init: function() {
 		$j("<style />").text("\
-		.postarea h5 { margin: 0 0 0.5em 0; }\
+		.postarea h5 { margin: 0 0 1.5em 0; }\
 		.hidden { display: none; height: 0; visibility: hidden; }\
 		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
 		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
@@ -265,7 +265,7 @@ Main = {
 			Keybinds.init();
 		if (Set["Automatically check for updates"])
 			AutoUpdater.init();
-		$j(".thread table").each(function() {
+		$j(".thread table:not([width])").each(function() {
 			Main.node(this);
 		});
 	},
@@ -295,7 +295,7 @@ Main = {
 Ponychan = {
 	checkmod: function() {
 		return true;
-	}
+	},
 };
 
 QR = {
@@ -416,9 +416,11 @@ QR = {
 		});
 	},
 	post: function() {
-		if (QR.ajax != null)
-			return QR.ajax.abort();
 		var button = $j("#qr input[type='submit']");
+		if (QR.ajax != null) {
+			button.val("Post");
+			return QR.ajax.abort();
+		}
 		button.val("...");
 		var d = new FormData();
 		d.append("board", Main.board);
@@ -455,6 +457,8 @@ QR = {
 				return QR.title(response.match(/.*<h2.*>([\s\S]*)<\/h2>.*/)[1]);
 			if (/<title>YOU ARE BANNED!<\/title>/.test(response))
 				return QR.title("You are banned! <a href='http://www.ponychan.net/chan/banned.php'>View reason</a>");
+			if (Main.thread == "0")
+				location.reload(true);
 			QR.clear();
 			QR.cooldown();
 		}).fail(function(xhr, status) {
@@ -499,7 +503,8 @@ QR = {
 		if (Main.thread == "0")
 			return;
 		var el = $j(".reflink a:nth-child(2)", post);
-		el.removeAttr("onclick").on("click", function() { QR.quote(el.text()); });
+		el.removeAttr("onclick").attr("href", "javascript:;").on("click", function() { QR.quote(el.text()); });
+		$j(".postfooter", post).children().first().removeAttr("onclick").attr("href", "javascript:;").on("click", function() { QR.quote(el.text()); });
 	}
 };
 
@@ -673,9 +678,9 @@ ThreadUpdater = {
 			if (xhr.status != 200)
 				return;
 			$j("#postform :input[name='how_much_pony_can_you_handle']").val($j("#postform :input[name='how_much_pony_can_you_handle']", response).val());
-			var last = $j("a[name]", ".thread table:not(.inline):last");
+			var last = $j("a[name]", ".thread table:not(.inline):not([width]):last");
 			var lastid = last.length ? parseInt(last.attr("name")) : -1;
-			var posts = $j(".thread table", response);
+			var posts = $j(".thread table:not([width])", response);
 			for (var i = 0, l = posts.length; i < l; i++) {
 				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid)
 					$j(".thread").append(Main.node(posts[i], true));
