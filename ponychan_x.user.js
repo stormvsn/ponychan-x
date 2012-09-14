@@ -55,8 +55,10 @@ Backlinks = {
 		$j("blockquote a", post).each(function() {
 			var pid = this.className.split("|").pop();
 			var a = $j(".reflink a:contains(" + pid + ")");
-			if (a.length)
-				$j("<a />").attr("href", "javascript:;").text(">>" + pid).appendTo(a.parent().next());
+			if (a.length) {
+				var from = $j(".reflink a:nth-child(2)", $j(this).parent().parent().parent()).text();
+				$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(a.parent().next());
+			}
 		});
 	}
 };
@@ -101,10 +103,10 @@ Css = {
 
 Links = {
 	node: function(post) {
-		var pf = $j(".postfooter", post);
 		var fa = $j(".filesize a", post);
-		if (!pf.length || !fa.length)
+		if (!fa.length)
 			return;
+		var pf = $j(".postfooter", post);
 		var src = fa.attr("href");
 		if (Set["Show google image link"])
 			pf.append("&nbsp; • &nbsp;<a href='http://www.google.com/searchbyimage?image_url=" + src + "' target='_blank'>Google</a>");
@@ -269,7 +271,19 @@ Main = {
 			Main.node(this);
 		});
 	},
+	prenode: function(post) {
+		$j("blockquote a", post).each(function() {
+			var pid = this.className.split("|").pop();
+			var a = $j(".reflink a:contains(" + pid + ")");
+			var p = a.parents(".reply").parent().parent().parent().first();
+			if (!a.length || !p.length)
+				return;
+			this.removeEventListener("mouseover", false);
+			$j(this).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover);
+		});
+	},
 	node: function(post, auto) {
+		Main.prenode(post);
 		if (Set["Show thread information in title"])
 			Title.node(post);
 		if (Set["Enable filter"])
@@ -292,10 +306,47 @@ Main = {
 	}
 };
 
+// kusaba.js functions
+// https://github.com/ponychan/ponychan-kusaba/blob/public/lib/javascript/kusaba.js
 Ponychan = {
-	checkmod: function() {
-		return true;
+	starthover: function(e) {
+		var e_out;
+		var ie_var = "srcElement";
+		var moz_var = "href";
+		this[moz_var] ? e_out = this : e_out = e[ie_var];
+		ainfo = e_out.className.split('|');
+		var previewdiv = document.createElement('div');
+		previewdiv.setAttribute("id", "preview" + e_out.className);
+		previewdiv.setAttribute('class', 'reflinkpreview');
+		previewdiv.setAttribute('className', 'reflinkpreview');
+		if (e.pageX) {
+			previewdiv.style.left = (e.pageX + 50) + 'px';
+			previewdiv.style.top = (e.pageY + 20) + 'px';
+		} else {
+			previewdiv.style.left = (e.clientX + 50);
+			previewdiv.style.top = (e.clientY + 20);
+		}
+		var src = $j('a[name="' + ainfo[3] + '"]');
+		var content = src.length ? src[0].parentNode.innerHTML : '';
+		if (!content)
+			return;
+		previewdiv.innerHTML = content;
+		$j('.reflink, .postfooter', previewdiv).remove();
+		document.body.appendChild(previewdiv);
 	},
+	stophover: function(e) {
+		var e_out;
+		var ie_var = "srcElement";
+		var moz_var = "href";
+		this[moz_var] ? e_out = this : e_out = e[ie_var];
+		while(true) {
+			var previewelement = document.getElementById("preview" + e_out.className);
+			if (previewelement) {
+				previewelement.parentNode.removeChild(previewelement);
+			} else
+				break;
+		}
+	}
 };
 
 QR = {
