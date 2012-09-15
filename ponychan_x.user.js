@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0
+// @version       1.01
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -57,13 +57,13 @@ AutoUpdater = {
 
 Backlinks = {
 	node: function(post) {
-		$j("blockquote:first a", post).each(function() {
+		$j("blockquote:first a[onclick]", post).each(function() {
 			var pid = this.className.split("|").pop();
-			var a = $j(".reflink a:contains(" + pid + "):first");
-			if (a.length && a.text() == pid) {
-				var from = $j(".reflink a:nth-child(2)", $j(this).parent().parent().parent()).text();
+			var checkbox = $j("input[type='checkbox'][value='" + pid + "']");
+			if (checkbox.length) {
+				var from = $j(".reflink a:nth-child(2)", $j(this).parent().parent().parent()).first().text();
 				if (from != "")
-					$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(a.parent().next());
+					$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(checkbox.parent().next().next());
 			}
 		});
 	}
@@ -103,6 +103,7 @@ Css = {
 		.qr-thumb:hover { opacity: 1; }\
 		#qr-thumb-selected { opacity: 1; border: 1px solid black; }\
 		.extrabtns { vertical-align: top; }\
+		.extrabtns a { margin-right: 4px; }\
 		#dialog { position: fixed; bottom: 5px; right: 10px; }\
 		#countdown { margin-right: 5px; }\
 		#qr input[name='embed'] { min-width: 80%; display: inline-block; }\
@@ -179,11 +180,11 @@ Filter = {
 
 InlineReplies = {
 	node: function(post) {
-		$j("blockquote:first a", post).each(function() {
+		$j("blockquote:first a[onclick]", post).each(function() {
 			var pid = this.className.split("|").pop();
-			var a = $j(".reflink a:contains(" + pid + ")");
-			var p = a.parents(".reply").parent().parent().parent().first();
-			if (!a.length || !p.length)
+			var checkbox = $j("input[type='checkbox'][value='" + pid + "']");
+			var p = checkbox.parents(".reply").parent().parent().parent().first();
+			if (!checkbox.length || !p.length)
 				return;
 			$j(this).attr("href", "javascript:;").removeAttr("onclick").on("click", function() {
 				var next = $j(this).next();
@@ -285,11 +286,11 @@ Main = {
 		});
 	},
 	prenode: function(post) {
-		$j("blockquote:first a", post).each(function() {
+		$j("blockquote:first a[onclick]", post).each(function() {
 			var pid = this.className.split("|").pop();
-			var a = $j(".reflink a:contains(" + pid + ")");
-			var p = a.parents(".reply").parent().parent().parent().first();
-			if (!a.length || !p.length)
+			var checkbox = $j("input[type='checkbox'][value='" + pid + "']");
+			var p = checkbox.parents(".reply").parent().parent().parent().first();
+			if (!checkbox.length || !p.length)
 				return;
 			$j(this).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover);
 		});
