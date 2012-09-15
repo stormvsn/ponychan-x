@@ -229,7 +229,7 @@ Keybinds = {
 						return QR.toggle();
 				break;
 				case 90:
-					if (Set["Mark thread as read (Ctrl+Z)"]) {
+					if (Set["Mark thread as read (Ctrl+Z)"] && Set["Show thread information in title"]) {
 						Title.unread = [];
 						return Title.update();
 					}
