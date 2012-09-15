@@ -23,7 +23,7 @@
 
 var $j = jQuery.noConflict();
 
-var AutoGif, AutoUpdater, Backlinks, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater;
+var AutoGif, AutoUpdater, Backlinks, Catalog, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater;
 
 var Set = {};
 
@@ -64,6 +64,21 @@ Backlinks = {
 				var from = $j("input[type='checkbox'][value]", post).first().val();
 				$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(checkbox.parent().next().next());
 			}
+		});
+	}
+};
+
+Catalog = {
+	init: function() {
+		$j("#SearchText").on("keyup", function(e) {
+			if (e.keyCode == 13)
+				Catalog.update();
+		});
+		$j("#SearchBtn").on("click", Catalog.update);
+	},
+	update: function() {
+		$j("div a[href]", $j(".catalogtable").next()).each(function() {
+			this.href = "http://www.ponychan.net/chan/gotopost.php?board=" + this.href.split("/")[4] + "&post=" + this.href.split("/").pop().replace(".html", "");
 		});
 	}
 };
@@ -269,7 +284,7 @@ Main = {
 		Settings.init();
 		Css.init();
 		if (/catalog\.html/.test(document.URL))
-			return;
+			return (Set["Automatically +50 catalog result links"] ? Catalog.init() : false);
 		if (Set["Show thread information in title"])
 			Title.init();
 		if (Set["Enable thread autoupdate"])
@@ -670,8 +685,9 @@ Settings = {
 		},
 		Other: {
 			"Hide name fields": false,
-			"Automatically check for updates": true,
-			"Scroll on new post": false
+			"Scroll on new post": false,
+			"Automatically +50 catalog result links": true,
+			"Automatically check for pX updates": true
 		},
 		Filter: {
 			"Enable filter": false
