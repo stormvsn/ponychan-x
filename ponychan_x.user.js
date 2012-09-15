@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.00
+// @version       1.01
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -272,7 +272,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 100,
+	version: 101,
 	board: null,
 	thread: null,
 	status: 200,

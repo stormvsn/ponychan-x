@@ -1,4 +1,10 @@
-v1.00 alpha (Please note several features from 0.41 are missing in this release and will be reintroduced over time)
+v1.01 Alpha
+- Readded "Hide name fields" setting
+- Readded "Scroll on new post" setting
+- Readded "Clear quick reply (Ctrl+L)" setting
+- Added "Automatically +50 catalog result links" setting
+
+v1.00 Alpha
 - Updated settings interface
 - Fixed settings applying before applying changes
 - Fixed tag keybinds working when quick reply is not focused
