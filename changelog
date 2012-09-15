@@ -1,10 +1,11 @@
-v1.01 Alpha
+v1.0.1 Alpha
 - Readded "Hide name fields" setting
 - Readded "Scroll on new post" setting
 - Readded "Clear quick reply (Ctrl+L)" setting
 - Added "Automatically +50 catalog result links" setting
+- Fixed unreadable quick reply labels on nightmare moon theme
 
-v1.00 Alpha
+v1.0.0 Alpha
 - Updated settings interface
 - Fixed settings applying before applying changes
 - Fixed tag keybinds working when quick reply is not focused

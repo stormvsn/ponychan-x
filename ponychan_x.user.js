@@ -98,7 +98,7 @@ Css = {
 		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
 		#qr * { margin: 0; padding: 0; }\
-		#qr label { cursor: pointer; margin: 0 2px 0 1px; }\
+		#qr label { cursor: pointer; margin: 0 2px 0 1px; color: black; }\
 		#qr-move { min-width: 100%; height: 22px; background-color: black; cursor: move; }\
 		#qr { border-radius: 3px; padding: 1px; background-color: #e2e2e2; border: 1px solid black; z-index: 1; font-family: Arial, Verdana, sans-serif; font-size: 12px; min-width: 400px; position: fixed; }\
 		#qr input[type='text'], #qr textarea { min-width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; display: block; }\
