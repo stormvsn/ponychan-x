@@ -93,7 +93,7 @@ Css = {
 		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
 		#settingsWrapper label { font-family: Arial; font-size: 12px; color: black; cursor: pointer; display: block; }\
 		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
-		#settingsWrapper h2 { margin-top: 9px; font-size: 1em; }\
+		#settingsWrapper h2 { margin-top: 9px; font-size: 1em; color: black; text-align: left; font-family: sans-serif; background: none; }\
 		#settingsWrapper h2:first-child { margin-top: 0; }\
 		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
 		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
