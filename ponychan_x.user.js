@@ -210,7 +210,7 @@ Keybinds = {
 				break;
 				case 73:
 					if (Set["Italic tags (Ctrl+I)"])
-						tag = "?";
+						tag = "i";
 				break;
 				case 85:
 					if (Set["Underline tags (Ctrl+U)"])
@@ -370,6 +370,8 @@ QR = {
 	maxsize: 0,
 	init: function() {
 		var pf = $j("#postform");
+		if (!pf.length)
+			return;
 		var pa = $j(".postarea");
 		QR.action = pf.attr("action");
 		QR.maxsize = $j("#postform input[name='MAX_FILE_SIZE']").val();
@@ -378,7 +380,7 @@ QR = {
 		}).click().prependTo(pa);
 		$j("<a />").attr("href", "javascript:;").html("<h2>" + (Main.thread == "0" ? "New Thread" : "Quick Reply") + "</h2>").on("click", QR.toggle).prependTo(pa);
 		QR.el = $j("<div />").attr("id", "qr").appendTo("body");
-		QR.el.css("display", Settings.get("qr.block") || "block").css("left", Settings.get("qr.left") || "40px").css("top", Settings.get("qr.top") || "40px");
+		QR.el.css("display", Settings.get("qr.display") || "block").css("left", Settings.get("qr.left") || "40px").css("top", Settings.get("qr.top") || "40px");
 		var move = $j("<div />").attr("id", "qr-move").on("mousedown", QR.move).appendTo(QR.el);
 		$j("<span />").attr("id", "qr-title").appendTo(move);
 		var opts = $j("<span />").attr("id", "qr-opts").appendTo(move);
@@ -754,7 +756,7 @@ ThreadUpdater = {
 	timer: 10,
 	left: 10,
 	init: function() {
-		if (Main.thread == "0")
+		if (Main.thread == "0" || !$j("#postform").length)
 			return;
 		ThreadUpdater.left = ThreadUpdater.timer = parseInt(Settings.get("threadupdater.timer")) || ThreadUpdater.timer;
 		var dialog = $j("<div />").attr("id", "dialog").appendTo("body");
