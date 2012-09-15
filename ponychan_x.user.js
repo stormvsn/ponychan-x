@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.01
+// @version       1.00
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -57,13 +57,12 @@ AutoUpdater = {
 
 Backlinks = {
 	node: function(post) {
-		$j("blockquote:first a[onclick]", post).each(function() {
+		$j("blockquote:first a[class]", post).each(function() {
 			var pid = this.className.split("|").pop();
-			var checkbox = $j("input[type='checkbox'][value='" + pid + "']");
+			var checkbox = $j("input[type='checkbox'][value='" + pid + "']").first();
 			if (checkbox.length) {
-				var from = $j(".reflink a:nth-child(2)", $j(this).parent().parent().parent()).first().text();
-				if (from != "")
-					$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(checkbox.parent().next().next());
+				var from = $j("input[type='checkbox'][value]", post).first().val();
+				$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(checkbox.parent().next().next());
 			}
 		});
 	}
@@ -180,7 +179,7 @@ Filter = {
 
 InlineReplies = {
 	node: function(post) {
-		$j("blockquote:first a[onclick]", post).each(function() {
+		$j("blockquote:first a[class]", post).each(function() {
 			var pid = this.className.split("|").pop();
 			var checkbox = $j("input[type='checkbox'][value='" + pid + "']");
 			var p = checkbox.parents(".reply").parent().parent().parent().first();
@@ -286,7 +285,7 @@ Main = {
 		});
 	},
 	prenode: function(post) {
-		$j("blockquote:first a[onclick]", post).each(function() {
+		$j("blockquote:first a[class]", post).each(function() {
 			var pid = this.className.split("|").pop();
 			var checkbox = $j("input[type='checkbox'][value='" + pid + "']");
 			var p = checkbox.parents(".reply").parent().parent().parent().first();
