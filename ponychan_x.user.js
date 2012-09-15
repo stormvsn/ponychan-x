@@ -234,6 +234,12 @@ Keybinds = {
 						return Title.update();
 					}
 				break;
+				case 76:
+					if (Set["Clear quick reply (Ctrl+L)"]) {
+						QR.clear();
+						return e.originalEvent.preventDefault();
+					}
+				break;
 			}
 			if (tag != null && e.target.nodeName == "TEXTAREA") {
 				e.originalEvent.preventDefault();
@@ -659,6 +665,7 @@ Settings = {
 			"Underline tags (Ctrl+U)": true,
 			"Strikethrough tags (Ctrl+R)": true,
 			"Toggle quick reply (Ctrl+Q)": true,
+			"Clear quick reply (Ctrl+L)": true,
 			"Mark thread as read (Ctrl+Z)": true
 		},
 		Other: {
