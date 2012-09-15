@@ -24,6 +24,7 @@ v1.00 alpha (Please note several features from 0.41 are missing in this release 
 - Keybind tags will now wrap around selected text in quick reply
 - Fixed some features not applying to OP posts
 - Fixed quick reply thumbnail previews for non-image files
+- Fixed embed options having options on unsupported boards
 
 0.41
 - Fixed quick reply message clearing after selecting an image

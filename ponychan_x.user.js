@@ -685,7 +685,7 @@ Settings = {
 		$j("<textarea />").attr("name", "filter.subjects").attr("placeholder", "Subjects").val(Settings.get("filter.subjects")).appendTo(sw);
 		$j("<h2 />").text("More").appendTo(sw);
 		$j("<label />").html("<a href='https://raw.github.com/milkytiptoe/ponychan-x/master/changelog' target='_blank'>Changelog</a>").appendTo(sw);
-		$j("<label />").html("<a href='http://www.ponychan.net/chan/meta/res/115168+50.html' target='_blank'>Feedback</a>").appendTo(sw);
+		$j("<label />").html("<a href='http://www.ponychan.net/chan/meta/res/129068.html' target='_blank'>Feedback</a>").appendTo(sw);
 		$j("<label />").text("Version 1." + Main.version.toString().substring(1)).appendTo(sw);
 		$j("<img />").attr("src", "http://www.milkyis.me/ponychanx/icon.png").appendTo(sw);
 		$j("<input />").attr("type", "button").val("Apply").on("click", Settings.save).appendTo(sw);
