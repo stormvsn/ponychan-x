@@ -70,7 +70,7 @@ Backlinks = {
 
 Css = {
 	init: function() {
-		$j("<style />").text("\
+		var css = "\
 		.postarea h5 { margin: 0 0 1.5em 0; }\
 		.inline { border: 1px solid rgba(0, 0, 0, 0.3); }\
 		.hidden { display: none; height: 0; visibility: hidden; }\
@@ -107,7 +107,10 @@ Css = {
 		#countdown { margin-right: 5px; }\
 		#qr input[name='embed'] { min-width: 80%; display: inline-block; }\
 		#qr select[name='embedtype'] { vertical-align: top; min-width: 20%; display: inline-block; height: 26px; }\
-		").appendTo("body");
+		";
+		if (Set["Hide name fields"])
+			css += " input[name='name']:not(:hover) { background-color: black; }";
+		$j("<style />").text(css).appendTo("body");
 	}
 };
 
@@ -257,8 +260,8 @@ Main = {
 			return;
 		Main.board = $j("input[name='board']").val();
 		Main.thread = $j("input[name='replythread']").val();
-		Css.init();
 		Settings.init();
+		Css.init();
 		if (/catalog\.html/.test(document.URL))
 			return;
 		if (Set["Show thread information in title"])
@@ -658,7 +661,8 @@ Settings = {
 			"Toggle quick reply (Ctrl+Q)": true,
 			"Mark thread as read (Ctrl+Z)": true
 		},
-		Advanced: {
+		Other: {
+			"Hide name fields": false,
 			"Automatically check for updates": true
 		},
 		Filter: {
