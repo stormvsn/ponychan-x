@@ -59,10 +59,11 @@ Backlinks = {
 	node: function(post) {
 		$j("blockquote:first a", post).each(function() {
 			var pid = this.className.split("|").pop();
-			var a = $j(".reflink a:contains(" + pid + ")");
-			if (a.length) {
+			var a = $j(".reflink a:contains(" + pid + "):first");
+			if (a.length && a.text() == pid) {
 				var from = $j(".reflink a:nth-child(2)", $j(this).parent().parent().parent()).text();
-				$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(a.parent().next());
+				if (from != "")
+					$j("<a onclick='return highlight(" + from + ", true);' />").attr("class", "ref|" + Main.board + "|" + Main.thread + "|" + from).attr("href", "javascript:;").text(">>" + from).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover).appendTo(a.parent().next());
 			}
 		});
 	}
