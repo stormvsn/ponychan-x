@@ -30,7 +30,7 @@ var Set = {};
 AutoGif = {
 	node: function(post) {
 		var filesizespan = $j(".filesize:first", post);
-		if (!filesizespan.length || !/.gif/.test(filesizespan.text()))
+		if (!filesizespan.length || !/.gif/.test(filesizespan.text()) || (!Set["Show spoilered images"] && /, spoiler\.gif/.test(filesizespan.text())))
 			return;
 		$j("a span[id] img:first", post).attr("src", $j("a", filesizespan).attr("href"));
 	}
@@ -470,7 +470,7 @@ QR = {
 		Settings.set("qr.display", QR.el.css("display"));
 	},
 	clear: function() {
-		if (Set["Hide quick reply after posting"] && QR.el.css("display") != "none")
+		if (Set["Hide quick reply after posting"] && QR.el.css("display") != "none" && !$j("#qr-auto").is(":checked"))
 			QR.toggle();
 		QR.title("");
 		$j("#qr-thumb-selected").remove();
