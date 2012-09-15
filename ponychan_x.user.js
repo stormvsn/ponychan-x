@@ -299,7 +299,7 @@ Main = {
 			Favicon.init();
 		if (Set["Enable keybinds"])
 			Keybinds.init();
-		if (Set["Automatically check for updates"])
+		if (Set["Automatically check for pX updates"])
 			AutoUpdater.init();
 		$j(".thread").each(function() {
 			Main.node(this);
