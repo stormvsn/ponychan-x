@@ -402,7 +402,7 @@ QR = {
 			$j("<input />").attr("type", "text").attr("name", "embed").attr("placeholder", "Embed URL").appendTo(embedwrap);
 			$j("select[name='embedtype']").clone().appendTo(embedwrap);
 		}
-		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").appendTo(QR.el);
+		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").val($j("#postform textarea").val()).appendTo(QR.el);
 		$j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
 		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(QR.el);
@@ -663,7 +663,8 @@ Settings = {
 		},
 		Other: {
 			"Hide name fields": false,
-			"Automatically check for updates": true
+			"Automatically check for updates": true,
+			"Scroll on new post": false
 		},
 		Filter: {
 			"Enable filter": false
@@ -791,6 +792,8 @@ ThreadUpdater = {
 				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid) {
 					$j(".thread").append(posts[i]);
 					Main.node(posts[i]);
+					if (Set["Scroll on new post"])
+						window.scrollTo(0, document.body.scrollHeight);
 				}
 			}
 		}).fail(function(xhr) {
