@@ -555,6 +555,8 @@ QR = {
 		});
 	},
 	quote: function(pid) {
+		if (QR.el.css("display") != "block")
+			QR.toggle();
 		var qtext = "";
 		if (Set["Quote selected text on quick reply"])
 			qtext = $j.trim(window.getSelection().toString());
