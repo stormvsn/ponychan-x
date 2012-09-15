@@ -748,6 +748,8 @@ Title = {
 			Title.update();
 	},
 	node: function(post) {
+		if (Main.thread == "0" || !$j("#postform").length)
+			return;
 		var ll = Title.unread.length;
 		if (post.getBoundingClientRect().bottom > document.documentElement.clientHeight)
 			Title.unread.push(post);
