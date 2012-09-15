@@ -295,8 +295,6 @@ Main = {
 	},
 	node: function(post, auto) {
 		Main.prenode(post);
-		if (Set["Show thread information in title"])
-			Title.node(post);
 		if (Set["Enable filter"])
 			Filter.node(post);
 		if (Set["Enable backlinks"])
@@ -313,6 +311,8 @@ Main = {
 			ShowSpoiler.node(post);
 		if (auto)
 			ThreadUpdater.node(post);
+		if (Set["Show thread information in title"])
+			Title.node(post);
 		return post;
 	}
 };
@@ -469,8 +469,8 @@ QR = {
 		Settings.set("qr.display", QR.el.css("display"));
 	},
 	clear: function() {
-		if (Set["Hide quick reply after posting"])
-			QR.el.hide();
+		if (Set["Hide quick reply after posting"] && QR.el.css("display") != "none")
+			QR.el.toggle();
 		QR.title("");
 		$j("#qr-thumb-selected").remove();
 		QR.file = null;
@@ -719,15 +719,14 @@ Title = {
 	task: null,
 	unread: [],
 	init: function() {
-		if (Main.thread == "0")
+		if (Main.thread == "0" || !$j("#postform").length)
 			return;
 		var subject = $j(".filetitle").text();
 		if (subject != "")
 			Title.title = subject;
 		Title.title = "/" + Main.board + "/" + " - " + Title.title;
 		Title.update();
-		if (Main.thread != "0")
-			$j(window).on("scroll", Title.scroll);
+		$j(window).on("scroll", Title.scroll);
 	},
 	update: function() {
 		clearTimeout(Title.task);
@@ -749,8 +748,11 @@ Title = {
 			Title.update();
 	},
 	node: function(post) {
+		var ll = Title.unread.length;
 		if (post.getBoundingClientRect().bottom > document.documentElement.clientHeight)
 			Title.unread.push(post);
+		if (ll != Title.unread.length)
+			Title.update();
 	}
 };
 
@@ -779,8 +781,10 @@ ThreadUpdater = {
 			var lastid = last.length ? parseInt(last.attr("name")) : -1;
 			var posts = $j(".thread table:not([width])", response);
 			for (var i = 0, l = posts.length; i < l; i++) {
-				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid)
-					$j(".thread").append(Main.node(posts[i], true));
+				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid) {
+					$j(".thread").append(posts[i]);
+					Main.node(posts[i]);
+				}
 			}
 		}).fail(function(xhr) {
 			if (xhr.status == 404)
