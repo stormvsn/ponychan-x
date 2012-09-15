@@ -8,6 +8,8 @@
 // @include       http://www.ponychan.net/chan/*
 // @exclude       http://www.ponychan.net/chan/board.php
 // @icon          http://www.milkyis.me/ponychanx/icon.png
+// @updateURL     https://github.com/milkytiptoe/ponychan-x/raw/master/ponychan_x.user.js
+// @homepage      http://www.ponychan.net/chan/meta/res/129068.html
 // ==/UserScript==
 
 // Inspired by 4chan X
