@@ -470,7 +470,7 @@ QR = {
 	},
 	clear: function() {
 		if (Set["Hide quick reply after posting"] && QR.el.css("display") != "none")
-			QR.el.toggle();
+			QR.toggle();
 		QR.title("");
 		$j("#qr-thumb-selected").remove();
 		QR.file = null;
