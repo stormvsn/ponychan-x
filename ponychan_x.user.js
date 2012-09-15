@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.01
+// @version       1.0.1
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
