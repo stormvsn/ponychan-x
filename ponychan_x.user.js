@@ -104,7 +104,7 @@ Css = {
 		#qr-move { min-width: 100%; height: 22px; background-color: black; cursor: move; }\
 		#qr { border-radius: 3px; padding: 1px; background-color: #e2e2e2; border: 1px solid black; z-index: 1; font-family: Arial, Verdana, sans-serif; font-size: 12px; min-width: 400px; position: fixed; }\
 		#qr input[type='text'], #qr textarea { min-width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; display: block; }\
-		#qr textarea { padding: 3px; font-family: Arial; font-size: 13px; min-height: 120px; }\
+		#qr textarea { padding: 3px; font-family: Arial; font-size: 13px; min-height: 120px; background-image: none; }\
 		#qr input[type='text'] { padding: 2px; min-height: 26px; }\
 		#qr input[type='file'] { width: 80%; }\
 		#qr input[type='submit'] { width: 20%; }\

@@ -4,6 +4,7 @@
 - Readded "Clear quick reply (Ctrl+L)" setting
 - Added "Automatically +50 catalog result links" setting
 - Fixed unreadable quick reply labels on nightmare moon theme
+- Fixed image showing up in quick reply textarea on chrysalis theme
 
 1.0.0 Alpha
 - Updated settings interface
