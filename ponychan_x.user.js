@@ -25,7 +25,7 @@
 
 var $j = jQuery.noConflict();
 
-var AutoGif, AutoUpdater, Backlinks, Catalog, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater;
+var AutoGif, AutoUpdater, Backlinks, Catalog, Cookie, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater;
 
 var Set = {};
 
@@ -82,6 +82,16 @@ Catalog = {
 		$j("div a[href]", $j(".catalogtable").next()).each(function() {
 			this.href = "http://www.ponychan.net/chan/gotopost.php?board=" + this.href.split("/")[4] + "&post=" + this.href.split("/").pop().replace(".html", "");
 		});
+	}
+};
+
+Cookie = {
+	get: function(name) {
+		var re = new RegExp('[; ]' + name + '=([^\\s;]*)');
+		var sMatch = (" " + document.cookie).match(re);
+		if (name && sMatch)
+			return unescape(sMatch[1]);
+		return "";
 	}
 };
 
@@ -320,7 +330,7 @@ Main = {
 			$j(this).on("mouseover", Ponychan.starthover).on("mouseout", Ponychan.stophover);
 		});
 	},
-	node: function(post, auto) {
+	node: function(post) {
 		Main.prenode(post);
 		if (Set["Enable filter"])
 			Filter.node(post);
@@ -336,8 +346,6 @@ Main = {
 			AutoGif.node(post);
 		if (Set["Show spoilered images"])
 			ShowSpoiler.node(post);
-		if (auto)
-			ThreadUpdater.node(post);
 		if (Set["Show thread information in title"])
 			Title.node(post);
 		return post;
@@ -347,6 +355,18 @@ Main = {
 // kusaba.js functions
 // https://github.com/ponychan/ponychan-kusaba/blob/public/lib/javascript/kusaba.js
 Ponychan = {
+	checkmod: function() {
+		var mod = Cookie.get("kumod");
+		if (!mod)
+			return false;
+		if (mod == "allboards")
+			return true;
+		var boards = kumod.split('|');
+		for (var cookieboard in boards) {
+			if (boards[cookieboard] == Main.board)
+				return true;
+		}
+	},
 	starthover: function(e) {
 		var e_out;
 		var ie_var = "srcElement";
@@ -434,6 +454,14 @@ QR = {
 			$j("<label />").html("<input type='checkbox' name='nsfw' /> NSFW").appendTo(QR.el);
 		if ($j("#nofile").length)
 			$j("<label />").html("<input type='checkbox' name='nofile' /> No File").appendTo(QR.el);
+		if (Ponychan.checkmod()) {
+			$j("<input />").attr("type", "text").attr("name", "modpassword").attr("placeholder", "Mod Password").appendTo(QR.el);
+			$j("<label />").attr("title", "Display staff status (Mod/Admin)").html("<input type='checkbox' name='displaystaffstatus' checked /> Display Status").appendTo(QR.el);
+			$j("<label />").attr("title", "Lock this thread").html("<input type='checkbox' name='lockonpost' /> Lock").appendTo(QR.el);
+			$j("<label />").attr("title", "Sticky this thread").html("<input type='checkbox' name='stickyonpost' /> Sticky").appendTo(QR.el);
+			$j("<label />").attr("title", "Post with raw HTML").html("<input type='checkbox' name='rawhtml' /> HTML").appendTo(QR.el);
+			$j("<label />").attr("title", "Name").html("<input type='checkbox' name='usestaffname' /> Name").appendTo(QR.el);
+		}
 	},
 	add: function(e) {
 		QR.title("");
@@ -817,6 +845,7 @@ ThreadUpdater = {
 				if (parseInt($j("a[name]", posts[i]).attr("name")) > lastid) {
 					$j(".thread").append(posts[i]);
 					Main.node(posts[i]);
+					ThreadUpdater.node(posts[i]);
 					if (Set["Scroll on new post"])
 						window.scrollTo(0, document.body.scrollHeight);
 				}
