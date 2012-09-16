@@ -2,6 +2,7 @@
 - Readded quick reply mod options
 - Fixed quick reply checkboxs not unchecking themselves after posting
 - Display Status and Name quick reply mod options stay checked if checked
+- Fixed bottom right thread options span not following updating thread
 
 1.0.1 Alpha
 - Readded "Hide name fields" setting
