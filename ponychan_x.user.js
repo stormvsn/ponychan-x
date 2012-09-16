@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.1
+// @version       1.0.2
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -25,7 +25,7 @@
 
 var $j = jQuery.noConflict();
 
-var AutoGif, AutoUpdater, Backlinks, Catalog, Cookie, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater;
+var AutoGif, AutoUpdater, Backlinks, Catalog, Cookie, Css, Favicon, Filter, InlineReplies, Keybinds, Links, Main, Ponychan, QR, Settings, ShowSpoiler, ThreadUpdater, Time;
 
 var Set = {};
 
@@ -284,7 +284,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 101,
+	version: 102,
 	board: null,
 	thread: null,
 	status: 200,
@@ -459,7 +459,7 @@ QR = {
 			$j("<label />").attr("title", "Display staff status (Mod/Admin)").html("<input type='checkbox' name='displaystaffstatus' checked /> Display Status").appendTo(QR.el);
 			$j("<label />").attr("title", "Lock this thread").html("<input type='checkbox' name='lockonpost' /> Lock").appendTo(QR.el);
 			$j("<label />").attr("title", "Sticky this thread").html("<input type='checkbox' name='stickyonpost' /> Sticky").appendTo(QR.el);
-			$j("<label />").attr("title", "Post with raw HTML").html("<input type='checkbox' name='rawhtml' /> HTML").appendTo(QR.el);
+			$j("<label />").attr("title", "Post with raw HTML").html("<input type='checkbox' name='rawhtml' /> Raw HTML").appendTo(QR.el);
 			$j("<label />").attr("title", "Name").html("<input type='checkbox' name='usestaffname' /> Name").appendTo(QR.el);
 		}
 	},
@@ -533,7 +533,7 @@ QR = {
 		$j("#qr textarea").val("");
 		$j("#qr input[name='subject']").val("");
 		$j("#qr input[name='embed']").val("");
-		$j("#qr input[type='checkbox']:not(#qr-auto)").get(0).checked = false;
+		$j("#qr input[type='checkbox']:not(#qr-auto):not([name='displaystaffstatus']):not([name='usestaffname'])").attr("checked", false);
 	},
 	move: function(e) {
 		if(e.which != 1)
@@ -869,6 +869,10 @@ ThreadUpdater = {
 	node: function(post) {
 		
 	}
+};
+
+Time = {
+	
 };
 
 Main.init();
