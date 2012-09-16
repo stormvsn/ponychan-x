@@ -678,7 +678,8 @@ Settings = {
 	},
 	settings: {
 		Updating: {
-			"Enable thread autoupdate": true
+			"Enable thread autoupdate": true,
+			"Scroll on new post": false
 		},
 		Images: {
 			"Show spoilered images": true,
@@ -715,7 +716,6 @@ Settings = {
 		},
 		Other: {
 			"Hide name fields": false,
-			"Scroll on new post": false,
 			"Automatically +50 catalog result links": true,
 			"Automatically check for pX updates": true
 		},
