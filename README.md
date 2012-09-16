@@ -1,1 +1,1 @@
-Help, feedback and information at [this ponychan thread](http://www.ponychan.net/chan/meta/res/115168+50.html)
+Help, feedback and information at [this ponychan thread](http://www.ponychan.net/chan/meta/res/129068.html)
