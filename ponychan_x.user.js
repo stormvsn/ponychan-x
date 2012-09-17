@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.2
+// @version       1.0.3
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -288,7 +288,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 102,
+	version: 103,
 	board: null,
 	thread: null,
 	status: 200,
@@ -815,7 +815,7 @@ Title = {
 		if (Main.thread == "0" || !$j("#postform").length)
 			return;
 		var ll = Title.unread.length;
-		if (post.getBoundingClientRect().bottom > document.documentElement.clientHeight)
+		if (post.getBoundingClientRect().bottom > document.documentElement.clientHeight || (document.hidden || document.oHidden || document.mozHidden || document.webkitHidden))
 			Title.unread.push(post);
 		if (ll != Title.unread.length)
 			Title.update();

@@ -1,3 +1,6 @@
+1.0.3 Alpha
+- Fixed unread post counter for hidden tabs
+
 1.0.2 Alpha
 - Readded quick reply mod options
 - Fixed quick reply checkboxs not unchecking themselves after posting
