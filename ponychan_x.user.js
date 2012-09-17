@@ -704,7 +704,7 @@ Settings = {
 		},
 		Links: {
 			"Enable links": true,
-			"Show hide post link": true,
+			"Show hide post link": false,
 			"Show google image link": true,
 			"Show save image link": true
 		},
@@ -832,7 +832,7 @@ ThreadUpdater = {
 		var dialog = $j("<div />").attr("id", "dialog").appendTo("body");
 		$j("<span />").attr("id", "countdown").text(ThreadUpdater.left).appendTo(dialog);
 		$j("<a />").attr("href", "javascript:;").on("click", function() { ThreadUpdater.left = 0; }).html("<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAYAAACkTj4ZAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAx5JREFUeNo0U11oFFcYPd+98+PM7rg7u01s6xr8ibiJgfhgTf8oLTaltJUi9MUnS7FF8EEFEepDEfpSKBYfAyqUQtrmxf7lSWhpTWkRasAqaURLq2JMkN24JrszmZ25X79J6MCdC9/Md+75zjmXoADyAGSA2kBQPQBHvNUboYPuML1qPYUad02a/I1b8RV8r4oYb0+gBekhactfyiPZ/gcysgKCu4veLL2jPnUHMECaVusmM2DDMAmj8xNfap3DUW5ilnysPjmQzhHJEhYrgL2RRnpO2l96g3oLkUK2BCSzuGfaHOmiKpIGrH7e5mzRzyXX8LNpoUFO3p8DCSNVEGoOgsoH9pniS/bufMx4hu+0xrPT6UNzdvk7/ia5iTlrE223fDsoP+8/7W7XI+1f0ymzhIby8yHlFJKRvBfVC5t/9Bs7/gp48yW/ZW3Cvpy23S+n1eTHAlD9yLlYv1HinbMhDz0IuXbev6KqVKeikLF6CMGooBnqd3t1RXsK7an0l9J+54fSARvd2yz6QFXet09V97t79TqC6Ypei4zyPmfPxrPeV7qqhrU/qk8Eo/bp4rP2a27N2pDrj4wsVcZeqxfvxjPmrpQqwSvWsXSBH6UtxM6TFDID7avp/bRpYsNcgNWnhmuf+9NDC2UenJF1PeSdt0Kuz5SiymHngiohFFdFSax6VDnijA38U+L6zfUcvGV9nAdA9PVU1jTX5o5HBxa/TX6nUm4hI1sxaExEfzTHkkOFt/Wi/4bKw9HRvdghMrxuVjJ0m1nanTd/Sl24IdJ6vczc5Eb7t/Sy3YdnRNxa524sxnVd/QR5VEDHqlCgQnq5csj+zBtSg5C4LF9Op1sT6SeSkuXVCOmqAHVE0EgMrFJ/+QSNO7vNHsWiVqrQncO/itSyqLfN7pHo2Yx0AdH8h8l7yQ18nTvGMUPnGeBEEG0x7jGa8VWe0lXUrT5sVS7BCqmsQ+rVBdgsSq3c5ubiWHoqucNfIBUdaO16rQF116KeZwoRGsk0JtN5PGTNRThsy/c4uc/3liazyUfnspNybS6CyfDj/H6sAf0nwADKKTlgROF51gAAAABJRU5ErkJggg==' width='18' height='13' alt='Autoupdate' title='Update now' />").appendTo(dialog);
-		if (/\+50/.test(document.URL))
+		if (/\+50.html$/.test(document.URL))
 			$j(".thread span[style]:last").insertAfter(".thread");
 		ThreadUpdater.count();
 	},
