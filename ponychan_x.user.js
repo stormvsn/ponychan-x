@@ -143,10 +143,14 @@ Css = {
 
 Links = {
 	node: function(post) {
+		var pf = $j(".postfooter:first", post);
+		if (Set["Show hide post link"] && post.nodeName == "TABLE") {
+			var a = $j("<a />").attr("href", "javascript:;").text("Hide").on("click", function() { $j(post).addClass("hidden"); });
+			pf.append("&nbsp; • &nbsp;").append(a);	
+		}
 		var fa = $j(".filesize:first a", post);
 		if (!fa.length)
 			return;
-		var pf = $j(".postfooter:first", post);
 		var src = fa.attr("href");
 		if (Set["Show google image link"])
 			pf.append("&nbsp; • &nbsp;<a href='http://www.google.com/searchbyimage?image_url=" + src + "' target='_blank'>Google</a>");
@@ -700,6 +704,7 @@ Settings = {
 		},
 		Links: {
 			"Enable links": true,
+			"Show hide post link": true,
 			"Show google image link": true,
 			"Show save image link": true
 		},
