@@ -101,8 +101,8 @@ Css = {
 		.postarea h5 { margin: 0 0 1.5em 0; }\
 		.inline { border: 1px solid rgba(0, 0, 0, 0.3); }\
 		.hidden { display: none; height: 0; visibility: hidden; }\
-		#settingsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
-		#settingsWrapper { border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
+		#settingsOverlay { z-index: 2; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
+		#settingsWrapper { z-index: 3; border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
 		#settingsWrapper label { font-family: Arial; font-size: 12px; color: black; cursor: pointer; display: block; }\
 		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
 		#settingsWrapper h2 { margin-top: 9px; font-size: 1em; color: black; text-align: left; font-family: sans-serif; background: none; }\
