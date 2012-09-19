@@ -660,6 +660,11 @@ QR = {
 		var email = $j("#qr :input[name='em']").val();
 		if (email != "sage" && email != "\u4E0B\u3052")
 				Settings.set("qr.email", email);
+	},
+	resetpos: function() {
+		QR.el.css("left", "40px").css("top", "40px");
+		Settings.set("qr.left", "40px");
+		Settings.set("qr.top", "40px");
 	}
 };
 
@@ -747,6 +752,7 @@ Settings = {
 		$j("<textarea />").attr("name", "filter.emails").attr("placeholder", "Emails").val(Settings.get("filter.emails")).appendTo(sw);
 		$j("<textarea />").attr("name", "filter.subjects").attr("placeholder", "Subjects").val(Settings.get("filter.subjects")).appendTo(sw);
 		$j("<h2 />").text("More").appendTo(sw);
+		$j("<label />").html("<a href='javascript:;'>Reset quick reply position</a>").on("click", QR.resetpos).appendTo(sw);
 		$j("<label />").html("<a href='https://raw.github.com/milkytiptoe/ponychan-x/master/changelog' target='_blank'>Changelog</a>").appendTo(sw);
 		$j("<label />").html("<a href='http://www.ponychan.net/chan/meta/res/129068.html' target='_blank'>Feedback</a>").appendTo(sw);
 		$j("<label />").text("Version 1." + Main.version.toString().substring(1)).appendTo(sw);
