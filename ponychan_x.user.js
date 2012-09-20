@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.3
+// @version       1.0.4
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -102,13 +102,13 @@ Css = {
 		.inline { border: 1px solid rgba(0, 0, 0, 0.3); }\
 		.hidden { display: none; height: 0; visibility: hidden; }\
 		#settingsOverlay { z-index: 2; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); }\
-		#settingsWrapper { z-index: 3; border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; margin: -300px 0 0 -300px; }\
+		#settingsWrapper { z-index: 3; border: 1px solid black; background-color: #e2e2e2; padding: 5px; overflow-y: scroll; position: fixed; top: 50%; left: 50%; width: 450px; height: 450px; margin: -225px 0 0 -225px; }\
 		#settingsWrapper label { font-family: Arial; font-size: 12px; color: black; cursor: pointer; display: block; }\
-		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -337px 0 0 213px; }\
+		#settingsWrapper input[type='button'] { position: fixed; top: 50%; left: 50%; width: 100px; height: 32px; margin: -259px 0 0 138px; }\
 		#settingsWrapper h2 { margin-top: 9px; font-size: 1em; color: black; text-align: left; font-family: sans-serif; background: none; }\
 		#settingsWrapper h2:first-child { margin-top: 0; }\
-		#settingsWrapper textarea { width: 578px; height: 80px; margin-bottom: 3px; }\
-		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -337px 0 0 -300px; }\
+		#settingsWrapper textarea { width: 427px; height: 80px; margin-bottom: 3px; }\
+		#settingsWrapper img { position: fixed; top: 50%; left: 50%; margin: -259px 0 0 -227px; }\
 		#qr * { margin: 0; padding: 0; }\
 		#qr label { cursor: pointer; margin: 0 2px 0 1px; color: black; }\
 		#qr-move { min-width: 100%; height: 22px; background-color: black; cursor: move; }\
@@ -288,7 +288,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 103,
+	version: 104,
 	board: null,
 	thread: null,
 	status: 200,
@@ -481,7 +481,7 @@ QR = {
 				continue;
 			}
 			QR.files.push(file);
-			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + (file.size/1024).toFixed(0) + " KB) (Shift+Click to remove)").appendTo(wrapper);
+			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + QR.sizestring(file.size) + ") (Shift+Click to remove)").appendTo(wrapper);
 			var furl = null; 
 			if (/^image/.test(file.type)) {
 				furl = url.createObjectURL(file);
@@ -665,6 +665,13 @@ QR = {
 		QR.el.css("left", "40px").css("top", "40px");
 		Settings.set("qr.left", "40px");
 		Settings.set("qr.top", "40px");
+	},
+	sizestring: function(size) {
+		if (size < 1024)
+			return size + " B";
+		if (size < 1048576)
+			return (size/1024).toFixed(0) + " KB";
+		return (size/1048576).toFixed(2) + " MB";
 	}
 };
 

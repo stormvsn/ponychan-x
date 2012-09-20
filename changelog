@@ -1,3 +1,7 @@
+1.0.4 Alpha
+- Fixed file size units in image thumbnail titles
+- Fixed settings being too large on small resolutions
+
 1.0.3 Alpha
 - Fixed unread post counter for hidden tabs
 
