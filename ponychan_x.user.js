@@ -116,8 +116,9 @@ Css = {
 		#qr input[type='text'], #qr textarea { min-width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; display: block; }\
 		#qr textarea { padding: 3px; font-family: Arial; font-size: 13px; min-height: 120px; background-image: none; }\
 		#qr input[type='text'] { padding: 2px; min-height: 26px; }\
-		#qr input[type='file'] { width: 80%; }\
-		#qr input[type='submit'] { width: 20%; }\
+		#qr input[type='file'] { display: none; }\
+		#qr input[type='button'] { width: 28%; }\
+		#qr input[type='submit'] { width: 28%; float: right; }\
 		#qr input[type='checkbox'] { position: relative; top: 2px; }\
 		#qr-images-wrapper { overflow-x: scroll; background-color: darkGray; position: relative; min-height: 97px; display: none; }\
 		#qr-images { position: absolute; top: 0; left: 0; overflow: hidden; white-space: pre; }\
@@ -451,7 +452,8 @@ QR = {
 			$j("select[name='embedtype']").clone().appendTo(embedwrap);
 		}
 		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").val($j("#postform textarea").val()).appendTo(QR.el);
-		$j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
+		var fileinput = $j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
+		$j("<input />").attr("type", "button").val("Choose Files").on("click", function() { fileinput.click(); }).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
 		var row = $j("<div />").attr("class", "qr-row").appendTo(QR.el);
 		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(row);
