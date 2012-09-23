@@ -112,7 +112,7 @@ Css = {
 		#qr * { margin: 0; padding: 0; }\
 		#qr label { cursor: pointer; margin: 0 2px 0 1px; color: black; }\
 		#qr-move { min-width: 100%; height: 22px; background-color: black; cursor: move; }\
-		#qr { border-radius: 3px; padding: 1px; background-color: #e2e2e2; border: 1px solid black; z-index: 1; font-family: Arial, Verdana, sans-serif; font-size: 12px; min-width: 400px; position: fixed; }\
+		#qr { border-radius: 3px; padding: 1px; background-color: #e2e2e2; border: 1px solid black; z-index: 1; font-family: Arial, Verdana, sans-serif; font-size: 12px; min-width: 350px; position: fixed; }\
 		#qr input[type='text'], #qr textarea { min-width: 100%; box-sizing: border-box; -moz-box-sizing: border-box; display: block; }\
 		#qr textarea { padding: 3px; font-family: Arial; font-size: 13px; min-height: 120px; background-image: none; }\
 		#qr input[type='text'] { padding: 2px; min-height: 26px; }\
@@ -124,16 +124,17 @@ Css = {
 		#qr-title, #qr-opts { box-sizing: border-box; -moz-box-sizing: border-box; display: inline-block; padding: 3px; color: white; }\
 		#qr-title { min-width: 86%; }\
 		#qr-opts { text-align: right; min-width: 14%; }\
-		#qr-opts a { color: white; cursor: pointer; padding-left: 1px; font-weight: bold; }\
+		#qr-opts a { color: white; cursor: pointer; font-weight: bold; }\
 		.qr-thumb { border: 1px solid darkGray; -webkit-transition: opacity .15s ease-in-out; -moz-transition: opacity .15s ease-in-out; transition: opacity .15s ease-in-out; -o-transition: opacity .15s ease-in-out; opacity: .6; width: 78px; height: 78px; background-size: cover; cursor: pointer; display: inline-block; }\
 		.qr-thumb:hover { opacity: 1; }\
+		.qr-row { min-width: 100%; }\
 		#qr-thumb-selected { opacity: 1; border: 1px solid black; }\
 		.extrabtns { vertical-align: top; }\
 		.extrabtns a { margin-right: 4px; }\
 		#dialog { position: fixed; bottom: 5px; right: 10px; }\
 		#countdown { margin-right: 5px; }\
-		#qr input[name='embed'] { min-width: 80%; display: inline-block; }\
-		#qr select[name='embedtype'] { vertical-align: top; min-width: 20%; display: inline-block; height: 26px; }\
+		#qr input[name='embed'] { min-width: 78%; display: inline-block; }\
+		#qr select[name='embedtype'] { vertical-align: top; min-width: 22%; display: inline-block; height: 26px; }\
 		";
 		if (Set["Hide name fields"])
 			css += " input[name='name']:not(:hover) { background-color: black; }";
@@ -445,26 +446,28 @@ QR = {
 		$j("<input />").attr("type", "text").attr("name", "em").attr("placeholder", "Email").val(Settings.get("qr.email") || "").appendTo(QR.el);
 		$j("<input />").attr("type", "text").attr("name", "subject").attr("placeholder", "Subject").appendTo(QR.el);
 		if ($j("input[name='embed']").length) {
-			var embedwrap = $j("<div />").appendTo(QR.el);
+			var embedwrap = $j("<div />").attr("class", "qr-row").appendTo(QR.el);
 			$j("<input />").attr("type", "text").attr("name", "embed").attr("placeholder", "Embed URL").appendTo(embedwrap);
 			$j("select[name='embedtype']").clone().appendTo(embedwrap);
 		}
 		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").val($j("#postform textarea").val()).appendTo(QR.el);
 		$j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
-		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(QR.el);
-		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(QR.el);
+		var row = $j("<div />").attr("class", "qr-row").appendTo(QR.el);
+		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(row);
+		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(row);
 		if ($j("#nsfw").length)
-			$j("<label />").html("<input type='checkbox' name='nsfw' /> NSFW").appendTo(QR.el);
+			$j("<label />").html("<input type='checkbox' name='nsfw' /> NSFW").appendTo(row);
 		if ($j("#nofile").length)
-			$j("<label />").html("<input type='checkbox' name='nofile' /> No File").appendTo(QR.el);
+			$j("<label />").html("<input type='checkbox' name='nofile' /> No File").appendTo(row);
 		if (Ponychan.checkmod()) {
 			$j("<input />").attr("type", "text").attr("name", "modpassword").attr("placeholder", "Mod Password").appendTo(QR.el);
-			$j("<label />").attr("title", "Display staff status (Mod/Admin)").html("<input type='checkbox' name='displaystaffstatus' checked /> Display Status").appendTo(QR.el);
-			$j("<label />").attr("title", "Lock this thread").html("<input type='checkbox' name='lockonpost' /> Lock").appendTo(QR.el);
-			$j("<label />").attr("title", "Sticky this thread").html("<input type='checkbox' name='stickyonpost' /> Sticky").appendTo(QR.el);
-			$j("<label />").attr("title", "Post with raw HTML").html("<input type='checkbox' name='rawhtml' /> Raw HTML").appendTo(QR.el);
-			$j("<label />").attr("title", "Name").html("<input type='checkbox' name='usestaffname' /> Name").appendTo(QR.el);
+			var modrow = $j("<div />").attr("class", "qr-row").appendTo(QR.el);
+			$j("<label />").attr("title", "Display staff status (Mod/Admin)").html("<input type='checkbox' name='displaystaffstatus' checked /> Display Status").appendTo(modrow);
+			$j("<label />").attr("title", "Lock this thread").html("<input type='checkbox' name='lockonpost' /> Lock").appendTo(modrow);
+			$j("<label />").attr("title", "Sticky this thread").html("<input type='checkbox' name='stickyonpost' /> Sticky").appendTo(modrow);
+			$j("<label />").attr("title", "Post with raw HTML").html("<input type='checkbox' name='rawhtml' /> Raw HTML").appendTo(modrow);
+			$j("<label />").attr("title", "Name").html("<input type='checkbox' name='usestaffname' /> Name").appendTo(modrow);
 		}
 	},
 	add: function(e) {
