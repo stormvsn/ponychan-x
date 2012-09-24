@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.5
+// @version       1.0.6
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -136,6 +136,8 @@ Css = {
 		#countdown { margin-right: 5px; }\
 		#qr input[name='embed'] { min-width: 78%; display: inline-block; }\
 		#qr select[name='embedtype'] { vertical-align: top; min-width: 22%; display: inline-block; height: 26px; }\
+		.qr-remove-thumb { font-size: 12px; float: right; font-weight: bold; text-decoration: none; background-color: black; color: white; border: 1px solid black; padding: 0 3px 1px 3px !important; border-radius: 2px; }\
+		.qr-remove-thumb:hover { color: white; }\
 		";
 		if (Set["Hide name fields"])
 			css += " input[name='name']:not(:hover) { background-color: black; }";
@@ -290,7 +292,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 105,
+	version: 106,
 	board: null,
 	thread: null,
 	status: 200,
@@ -419,7 +421,7 @@ QR = {
 	action: "",
 	timer: 10,
 	files: [],
-	file: null,
+	selectedfile: null,
 	maxsize: 0,
 	init: function() {
 		var pf = $j("#postform");
@@ -456,7 +458,7 @@ QR = {
 		$j("<input />").attr("type", "button").val("Choose Files").on("click", function() { fileinput.click(); }).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
 		var row = $j("<div />").attr("class", "qr-row").appendTo(QR.el);
-		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> <span id='qr-auto-number'>(0)</span> Auto").appendTo(row);
+		$j("<label />").attr("title", "Automatically post when cooldown ends (requires a file)").html("<input type='checkbox' id='qr-auto' /> Auto <span id='qr-auto-number'>(0)</span>").appendTo(row);
 		$j("<label />").html("<input type='checkbox' name='spoiler' /> Spoiler").appendTo(row);
 		if ($j("#nsfw").length)
 			$j("<label />").html("<input type='checkbox' name='nsfw' /> NSFW").appendTo(row);
@@ -489,54 +491,23 @@ QR = {
 	},
 	pushfiles: function(files) {
 		QR.title("");
-		var wrapper = $j("#qr-images");
-		var url = window.URL || window.webkitURL;
 		for (var i = 0, l = files.length; i < l; i++) {
 			var file = files[i];
 			if (file.size > QR.maxsize) {
 				QR.title(file.name + " is too large");
 				continue;
 			}
-			QR.files.push(file);
-			var thumb = $j("<div />").attr("class", "qr-thumb").attr("title", file.name + " (" + QR.sizestring(file.size) + ") (Shift+Click to remove)").appendTo(wrapper);
-			var furl = null; 
-			if (/^image/.test(file.type)) {
-				furl = url.createObjectURL(file);
-			} else if (/text\/plain|doc|msword$/.test(file.type)) {
-				furl = "http://www.ponychan.net/chan/inc/filetypes/text.png";
-			} else if (/css$/.test(file.type)) {
-				furl = "http://www.ponychan.net/chan/inc/filetypes/css.png";
-			} else {
-				furl = "http://www.milkyis.me/ponychanx/unknown.png";
-			}
-			thumb.css("background-image", "url(" + furl + ")");
-			(function(thumb, file, furl) {
-				thumb.on("click", function(e) {
-					if (e.shiftKey) {
-						url.revokeObjectURL(furl);
-						$j(this).remove();
-						QR.updatequeue();
-					} else {
-						var selected = $j("#qr-thumb-selected");
-						if (selected.length)
-							selected.removeAttr("id");
-						$j(this).attr("id", "qr-thumb-selected");
-						QR.file = file;
-					}
-				});
-			})(thumb, file, furl);
+			QR.files.push(new QR.file(file));
 		}
 		QR.updatequeue();
 	},
 	updatequeue: function() {
-		var children = $j("#qr-images").children();
-		$j("#qr-auto-number").text("(" + children.length + ")");
-		if (children.length) {
-			children.first().click();
+		$j("#qr-auto-number").text("(" + QR.files.length + ")");
+		if (QR.files.length) {
+			QR.files[0].select();
 			$j("#qr-images-wrapper").show();
 		} else {
 			$j("#qr-images-wrapper").hide();
-			QR.files = [];
 		}
 	},
 	toggle: function() {
@@ -547,9 +518,8 @@ QR = {
 		if (Set["Hide quick reply after posting"] && QR.el.css("display") != "none" && !$j("#qr-auto").is(":checked"))
 			QR.toggle();
 		QR.title("");
-		$j("#qr-thumb-selected").remove();
-		QR.file = null;
-		QR.updatequeue();
+		if (QR.selectedfile)
+			QR.selectedfile.rm();
 		$j("#qr textarea").val("");
 		$j("#qr input[name='subject']").val("");
 		$j("#qr input[name='embed']").val("");
@@ -585,9 +555,9 @@ QR = {
 		d.append("stats_referrer", "");
 		d.append("postpassword", $j("#postform :input[name='postpassword']").val());
 		d.append("how_much_pony_can_you_handle", $j("#postform :input[name='how_much_pony_can_you_handle']").val());
-		if (QR.file != null && !$j("input[name='nofile']", "#qr").is(":checked"))
-			d.append("imagefile", QR.file);
-		$j(":input:not([type='file'],[type='submit'],[name='auto'])", "#qr").each(function() {
+		if (QR.selectedfile && !$j("input[name='nofile']", "#qr").is(":checked"))
+			d.append("imagefile", QR.selectedfile.file);
+		$j(":input:not([type='file'],[type='submit'],[type='button'],[name='auto'])", "#qr").each(function() {
 			var value = this.getAttribute("type") == "checkbox" ? this.checked == true ? "true" : null : this.value;
 			if (value != null)
 				d.append(this.name, value);
@@ -654,7 +624,7 @@ QR = {
 			var autobutton = $j("#qr-auto");
 			button.removeAttr("disabled").val("Post");
 			QR.timer = 10;
-			if (autobutton.is(":checked") && $j("#qr-images").children().length) {
+			if (autobutton.is(":checked") && QR.files.length) {
 				QR.post();
 			} else {
 				autobutton.get(0).checked = false;
@@ -688,6 +658,35 @@ QR = {
 		if (size < 1048576)
 			return (size/1024).toFixed(0) + " KB";
 		return (size/1048576).toFixed(2) + " MB";
+	},
+	file: function(file) {
+		var url = window.URL || window.webkitURL;
+		this.file = file;
+		this.furl = null;
+		if (/^image/.test(file.type)) {
+			this.furl = url.createObjectURL(file);
+		} else if (/text\/plain|doc|msword$/.test(file.type)) {
+			this.furl = "http://www.ponychan.net/chan/inc/filetypes/text.png";
+		} else if (/css$/.test(file.type)) {
+			this.furl = "http://www.ponychan.net/chan/inc/filetypes/css.png";
+		}
+		var _this = this;
+		this.el = $j("<div/>").attr("class", "qr-thumb").attr("title", this.file.name + " (" + QR.sizestring(this.file.size) + ") (Shift+Click to remove)").css("background-image", "url(" + (this.furl || "http://www.milkyis.me/ponychanx/unknown.png") + ")").on("click", function(e) { e.shiftKey ? _this.rm() :_this.select(); }).appendTo("#qr-images");
+		$j("<a/>").attr("class", "qr-remove-thumb").attr("title", "Remove").text("x").on("click", function(e) { _this.rm(); }).appendTo(this.el);
+		this.select = function() {
+			$j("#qr-thumb-selected").removeAttr("id");
+			this.el.attr("id", "qr-thumb-selected");
+			QR.selectedfile = this;
+		}
+		this.rm = function() {
+			if (this.furl != null)
+				url.revokeObjectURL(this.furl);
+			this.el.remove();
+			delete this.file;
+			var index = QR.files.indexOf(this);
+			QR.files.splice(index, 1);
+			QR.updatequeue();
+		}
 	}
 };
 
