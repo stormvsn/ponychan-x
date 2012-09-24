@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.4
+// @version       1.0.5
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -290,7 +290,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 104,
+	version: 105,
 	board: null,
 	thread: null,
 	status: 200,
@@ -417,7 +417,7 @@ QR = {
 	el: null,
 	ajax: null,
 	action: "",
-	timer: 15,
+	timer: 10,
 	files: [],
 	file: null,
 	maxsize: 0,
@@ -437,7 +437,7 @@ QR = {
 		var move = $j("<div />").attr("id", "qr-move").on("mousedown", QR.move).appendTo(QR.el);
 		$j("<span />").attr("id", "qr-title").appendTo(move);
 		var opts = $j("<span />").attr("id", "qr-opts").appendTo(move);
-		$j("<a />").attr("href", "javascript:;").attr("title", "Toggle image queue").text("+").on("click", function() { $j("#qr-images-wrapper").toggle(); }).appendTo(opts);
+		$j("<a />").attr("href", "javascript:;").attr("title", "Toggle file queue").text("+").on("click", function() { $j("#qr-images-wrapper").toggle(); }).appendTo(opts);
 		$j("<a />").attr("href", "#").attr("title", "Jump to top of page").text("▲").appendTo(opts);
 		$j("<a />").attr("href", "javascript:window.scrollTo(0, document.body.scrollHeight);").attr("title", "Jump to bottom of page").text("▼").appendTo(opts);
 		$j("<a />").attr("href", "javascript:;").attr("title", "Close").text("X").on("click", QR.toggle).appendTo(opts);
@@ -452,7 +452,7 @@ QR = {
 			$j("select[name='embedtype']").clone().appendTo(embedwrap);
 		}
 		$j("<textarea />").attr("name", "message").attr("placeholder", "Message").val($j("#postform textarea").val()).appendTo(QR.el);
-		var fileinput = $j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.add).appendTo(QR.el);
+		var fileinput = $j("<input />").attr("type", "file").attr("multiple", "").on("change", QR.addfiles).appendTo(QR.el);
 		$j("<input />").attr("type", "button").val("Choose Files").on("click", function() { fileinput.click(); }).appendTo(QR.el);
 		$j("<input />").attr("type", "submit").val("Post").on("click", QR.post).appendTo(QR.el);
 		var row = $j("<div />").attr("class", "qr-row").appendTo(QR.el);
@@ -471,12 +471,24 @@ QR = {
 			$j("<label />").attr("title", "Post with raw HTML").html("<input type='checkbox' name='rawhtml' /> Raw HTML").appendTo(modrow);
 			$j("<label />").attr("title", "Name").html("<input type='checkbox' name='usestaffname' /> Name").appendTo(modrow);
 		}
+		$j(document).on("drop", QR.addfiles);
+		$j(document).on("dragover", function(e) {
+			var dt = e.originalEvent.dataTransfer;
+			if (dt && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('application/x-moz-file'))) {
+				dt.dropEffect = "copy";
+				e.preventDefault();
+			}
+		});
 	},
-	add: function(e) {
+	addfiles: function(e) {
+		var files = e.originalEvent.target.files || e.originalEvent.dataTransfer.files;
+		if (files.length) {
+			e.preventDefault();
+			QR.pushfiles(files);
+		}
+	},
+	pushfiles: function(files) {
 		QR.title("");
-		var files = e.target.files;
-		if (files.length == 0)
-			return;
 		var wrapper = $j("#qr-images");
 		var url = window.URL || window.webkitURL;
 		for (var i = 0, l = files.length; i < l; i++) {
@@ -515,7 +527,6 @@ QR = {
 			})(thumb, file, furl);
 		}
 		QR.updatequeue();
-		e.target.value = "";
 	},
 	updatequeue: function() {
 		var children = $j("#qr-images").children();
@@ -642,7 +653,7 @@ QR = {
 		} else {
 			var autobutton = $j("#qr-auto");
 			button.removeAttr("disabled").val("Post");
-			QR.timer = 15;
+			QR.timer = 10;
 			if (autobutton.is(":checked") && $j("#qr-images").children().length) {
 				QR.post();
 			} else {
