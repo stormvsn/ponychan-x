@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.9
+// @version       1.1.0
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -47,9 +47,8 @@ AutoUpdater = {
 		$j.ajax({
 			url: "http://www.milkyis.me/ponychanx/update.php"
 		}).done(function(latest) {
-			if (latest.length != 3)
+			if (latest.length > 6)
 				return;
-			Settings.set("autoupdate.latest", latest);
 			Settings.set("autoupdate.last", now);
 			if (parseInt(latest) > Main.version && confirm("A new update for Ponychan X is available. Install now?"))
 				window.location = "https://github.com/milkytiptoe/ponychan-x/raw/master/ponychan_x.user.js";
@@ -138,28 +137,11 @@ Css = {
 		#qr select[name='embedtype'] { vertical-align: top; min-width: 22%; display: inline-block; height: 26px; }\
 		.qr-remove-thumb { font-size: 12px; float: right; font-weight: bold; text-decoration: none; background-color: black; color: white; border: 1px solid black; padding: 0 3px 1px 3px !important; border-radius: 2px; }\
 		.qr-remove-thumb:hover { color: white; }\
+		#pXdownload { display:none; visibility: hidden; }\
 		";
 		if (Set["Hide name fields"])
 			css += " input[name='name']:not(:hover) { background-color: black; }";
 		$j("<style />").text(css).appendTo("body");
-	}
-};
-
-Links = {
-	node: function(post) {
-		var pf = $j(".postfooter:first", post);
-		if (Set["Show hide post link"] && post.nodeName == "TABLE") {
-			var a = $j("<a />").attr("href", "javascript:;").text("Hide").on("click", function() { $j(post).addClass("hidden"); });
-			pf.append("&nbsp; • &nbsp;").append(a);	
-		}
-		var fa = $j(".filesize:first a", post);
-		if (!fa.length)
-			return;
-		var src = fa.attr("href");
-		if (Set["Show google image link"])
-			pf.append("&nbsp; • &nbsp;<a href='http://www.google.com/searchbyimage?image_url=" + src + "' target='_blank'>Google</a>");
-		if (Set["Show save image link"])
-			pf.append("&nbsp; • &nbsp;<a href='" + src + "' download='" + src.split("/").pop() + "' target='_blank'>Save</a>");
 	}
 };
 
@@ -290,9 +272,36 @@ Keybinds = {
 	}
 };
 
+Links = {
+	iframe: null,
+	init: function() {
+		Links.iframe = $j("<iframe id='pXdownload' />").appendTo("body");
+	},
+	node: function(post) {
+		var pf = $j(".postfooter:first", post);
+		if (Set["Show hide post link"] && post.nodeName == "TABLE") {
+			var a = $j("<a />").attr("href", "javascript:;").text("Hide").on("click", function() { $j(post).addClass("hidden"); });
+			pf.append("&nbsp; • &nbsp;").append(a);	
+		}
+		var fa = $j(".filesize:first a", post);
+		if (!fa.length)
+			return;
+		var src = fa.attr("href");
+		if (Set["Show google image link"])
+			pf.append("&nbsp; • &nbsp;<a href='http://www.google.com/searchbyimage?image_url=" + src + "' target='_blank'>Google</a>");
+		if (Set["Show save image link"]) {
+			pf.append("&nbsp; • &nbsp;");
+			pf.append("<a href='javascript:;' target='_blank'>Save</a>").on("click", function() {
+				Links.iframe.attr("src", "http://www.milkyis.me/ponychanx/download.php?file=" + src);
+				return false;
+			});
+		}
+	}
+};
+
 Main = {
 	namespace: "pX.",
-	version: 109,
+	version: 110,
 	board: null,
 	thread: null,
 	status: 200,
@@ -319,6 +328,8 @@ Main = {
 			Favicon.init();
 		if (Set["Enable keybinds"])
 			Keybinds.init();
+		if (Set["Enable links"])
+			Links.init();
 		if (Set["Automatically check for pX updates"])
 			AutoUpdater.init();
 		$j(".thread").each(function() {

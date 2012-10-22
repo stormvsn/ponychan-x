@@ -1,3 +1,6 @@
+1.1.0
+- Fixed Save link in Firefox
+
 1.0.9 Alpha
 - Fixed NaN times
 - Fixed midnight being 0 on twelve hour format times
