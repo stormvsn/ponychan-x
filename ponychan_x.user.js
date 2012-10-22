@@ -700,9 +700,11 @@ Settings = {
 				Set[set] = sset == null ? ss[cat][set] : sset == "true" ? true : false;
 			}
 		}
-		var script = document.createElement("script");
-		script.textContent = "localStorage.setItem('pX.ponychan.time-zone', Ponychan.settings.get('time-zone')); localStorage.setItem('pX.ponychan.twelve-hour', Ponychan.settings.get('twelve-hour'));";
-		document.body.appendChild(script);
+		if (Main.thread != "0") {
+			var script = document.createElement("script");
+			script.textContent = "localStorage.setItem('pX.ponychan.time-zone', Ponychan.settings.get('time-zone')); localStorage.setItem('pX.ponychan.twelve-hour', Ponychan.settings.get('twelve-hour'));";
+			document.body.appendChild(script);
+		}
 		$j("<a />").addClass("adminbaritem").text("pX").attr("href", "javascript:;").on("click", Settings.toggle).prependTo(".adminbar");
 	},
 	get: function(n) {
