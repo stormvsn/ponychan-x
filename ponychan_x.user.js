@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.7
+// @version       1.0.8
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -292,7 +292,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 107,
+	version: 108,
 	board: null,
 	thread: null,
 	status: 200,
@@ -700,7 +700,9 @@ Settings = {
 				Set[set] = sset == null ? ss[cat][set] : sset == "true" ? true : false;
 			}
 		}
-		window.location = "javascript:localStorage.setItem('pX.ponychan.time-zone', Ponychan.settings.get('time-zone'));localStorage.setItem('pX.ponychan.twelve-hour', Ponychan.settings.get('twelve-hour'))";
+		var script = document.createElement("script");
+		script.textContent = "localStorage.setItem('pX.ponychan.time-zone', Ponychan.settings.get('time-zone')); localStorage.setItem('pX.ponychan.twelve-hour', Ponychan.settings.get('twelve-hour'));";
+		document.body.appendChild(script);
 		$j("<a />").addClass("adminbaritem").text("pX").attr("href", "javascript:;").on("click", Settings.toggle).prependTo(".adminbar");
 	},
 	get: function(n) {
@@ -910,8 +912,6 @@ Time = {
 	months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
 	node: function(post) {
 		var timezone = Settings.get("ponychan.time-zone");
-		if (timezone == null)
-			return;
 		if (timezone == "")
 			timezone = -8;
 		var twelvehour = Settings.get("ponychan.twelve-hour") == "true";
