@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name          Ponychan X
-// @version       1.0.8
+// @version       1.0.9
 // @description   Adds new features to ponychan
 // @namespace     milky
 // @author        milky
@@ -292,7 +292,7 @@ Keybinds = {
 
 Main = {
 	namespace: "pX.",
-	version: 108,
+	version: 109,
 	board: null,
 	thread: null,
 	status: 200,
@@ -918,7 +918,7 @@ Time = {
 			timezone = -8;
 		var twelvehour = Settings.get("ponychan.twelve-hour") == "true";
 		var timeel = $j(".posttime", post);
-		var d = new Date(timeel.text().replace(/th, /, ", ").replace(/st, /, ", ").replace(/rd, /, ", "));
+		var d = new Date(timeel.text().replace(/th, /, ", ").replace(/nd, /, ", ").replace(/st, /, ", ").replace(/rd, /, ", "));
 		d.setHours(d.getHours() + 8 + parseFloat(timezone));
 		var hours = d.getHours();
 		var minutes = d.getMinutes();
